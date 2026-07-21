@@ -176,6 +176,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <h3>Sistema</h3>
 <div class="nav-item" onclick="showSection('consensus')" data-section="consensus"><span class="nav-icon">[brain]</span> Consensus</div>
 <div class="nav-item" onclick="showSection('models')" data-section="models"><span class="nav-icon">[cpu]</span> Modelos</div>
+<div class="nav-item" onclick="showSection('autonomy')" data-section="autonomy"><span class="nav-icon">[brain]</span> Autonomia</div>
 <div style="margin-top:14px;text-align:center;padding:10px;border:1px solid var(--border);border-radius:10px">
 <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px">Life Balance</div>
 <div style="width:50px;height:50px;border-radius:50%;background:conic-gradient(var(--cyan),var(--orange) 78%,var(--border) 0);display:flex;align-items:center;justify-content:center;margin:0 auto">
@@ -264,6 +265,38 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div id="voice-result" style="margin-top:8px;min-height:24px;font-size:13px"></div>
 </div></div>
 
+<div class="section" id="section-autonomy">
+<div class="card">
+<div class="card-title">🔬 Painel de Autonomia</div>
+<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">JARVIS opera em loop autonomo — monitorando servicos, analizando logs e aplicando politicas de seguranca em tempo real.</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:14px">
+<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Orquestrador</div>
+<div id="auto-orchestrator" style="font-size:16px;font-weight:600;color:var(--green)">Inicializando...</div>
+</div>
+<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:14px">
+<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Ciclos Executados</div>
+<div id="auto-cycles" style="font-size:16px;font-weight:600;color:var(--cyan)">--</div>
+</div>
+<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:14px">
+<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Servicos Monitorados</div>
+<div id="auto-services" style="font-size:16px;font-weight:600;color:var(--cyan)">--/--</div>
+</div>
+<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:14px">
+<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Saude do Sistema</div>
+<div id="auto-health" style="font-size:16px;font-weight:600;color:var(--green)">--%</div>
+</div>
+</div>
+<div id="auto-services-detail" style="margin-bottom:16px"></div>
+<div id="auto-errors" style="margin-bottom:16px"></div>
+<div style="display:flex;gap:8px;margin-bottom:16px">
+<button class="btn" onclick="runSelfTest()" id="self-test-btn">🧪 Executar Self-Test</button>
+<button class="btn btn-orange" onclick="loadAutonomy()">🔄 Atualizar</button>
+</div>
+<div id="self-test-result" style="margin-bottom:16px"></div>
+<div id="auto-policies"></div>
+</div>
+</div>
 <div class="section" id="section-skills"><div class="card"><div class="card-title">Skills Autonomas</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">JARVIS detecta automaticamente qual skill usar. <span id="skills-total" style="color:var(--cyan)"></span></div><div id="skills-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"><div class="loading"><span class="spinner"></span> Carregando skills...</div></div><div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="card-title">Modo Autonomo</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Digite qualquer coisa e JARVIS decide qual skill usar</div><div class="chat-input-row"><input type="text" class="chat-input" id="auto-input" placeholder="Ex: auditar seguranca..."><button class="btn" onclick="autonomousMode()">Executar</button></div><div id="auto-result" style="margin-top:12px"></div></div></div></div><div class="section" id="section-services"><div class="card"><div class="card-title">Servicos Self-Hosted</div><div class="services-grid" id="services-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
 <div class="section" id="section-vault"><div class="card"><div class="card-title">Knowledge Vault</div><div id="vault-info" style="margin-bottom:12px;font-size:13px;color:var(--text-muted)"></div><div class="vault-grid" id="vault-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
 <div class="section" id="section-iot"><div class="card"><div class="card-title">Dispositivos IoT</div><div class="iot-grid" id="iot-grid"></div></div></div>
@@ -425,7 +458,96 @@ async function sendChat() {
     const d = await r.json();
     const resposta = d.resposta_jarvis||'Sem resposta';
     box.innerHTML += '<div class="chat-msg hub3">' + resposta + '</div>';
-    speakText(resposta);
+    // ===== AUTONOMIA =====
+async function loadAutonomy() {
+    try {
+        const r = await fetch(API + '/autonomy/status');
+        const d = await r.json();
+
+        document.getElementById('auto-orchestrator').textContent = d.online ? '🟢 Online' : '🔴 Offline';
+        document.getElementById('auto-orchestrator').style.color = d.online ? 'var(--green)' : 'var(--red)';
+        document.getElementById('auto-cycles').textContent = (d.cycle_count || 0) + ' ciclos';
+        document.getElementById('auto-services').textContent = (d.services_online || 0) + '/' + (d.services_total || 0);
+        document.getElementById('auto-health').textContent = (d.health_pct || 0) + '%';
+        document.getElementById('auto-health').style.color = (d.health_pct || 0) > 50 ? 'var(--green)' : 'var(--red)';
+
+        // Servicos detalhados
+        let svcHtml = '<div style="font-size:14px;font-weight:600;color:var(--cyan);margin-bottom:8px">📊 Servicos Monitorados</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">';
+        for (const [name, s] of Object.entries(d.services || {})) {
+            svcHtml += '<div style="background:var(--bg-input);border:1px solid ' + (s.online ? 'var(--green)' : 'var(--red)') + ';border-radius:8px;padding:10px;text-align:center">';
+            svcHtml += '<div style="font-size:13px;font-weight:600">' + name + '</div>';
+            svcHtml += '<div style="font-size:12px;color:' + (s.online ? 'var(--green)' : 'var(--red)') + '">' + (s.online ? '🟢 Online' : '🔴 Offline') + '</div>';
+            svcHtml += '</div>';
+        }
+        svcHtml += '</div>';
+        document.getElementById('auto-services-detail').innerHTML = svcHtml;
+
+        // Erros recentes
+        const errors = d.errors_recent || [];
+        let errHtml = '<div style="font-size:14px;font-weight:600;color:var(--orange);margin-bottom:8px">⚠️ Erros Recentes (' + errors.length + ')</div>';
+        if (errors.length === 0) {
+            errHtml += '<div style="font-size:13px;color:var(--text-muted)">Nenhum erro na ultima hora</div>';
+        } else {
+            for (const e of errors.slice(0, 5)) {
+                errHtml += '<div style="font-size:12px;color:var(--red);padding:4px 0;border-bottom:1px solid var(--border)">[' + (e.time || '').slice(11,19) + '] ' + (e.error || '') + '</div>';
+            }
+        }
+        document.getElementById('auto-errors').innerHTML = errHtml;
+
+        // Politicas
+        document.getElementById('auto-policies').innerHTML = '<div style="font-size:14px;font-weight:600;color:var(--cyan);margin-bottom:8px">⚙️ Politicas Ativas: ' + (d.policies_active || 0) + '</div>';
+    } catch(e) {
+        Toast.error('Erro ao carregar autonomia: ' + e.message);
+    }
+}
+
+async function runSelfTest() {
+    const btn = document.getElementById('self-test-btn');
+    const resultDiv = document.getElementById('self-test-result');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Executando...';
+    resultDiv.innerHTML = '<div class="loading"><span class="spinner"></span> Rodando testes...</div>';
+    try {
+        const r = await fetch(API + '/api/jarvis/self-test');
+        const d = await r.json();
+        const statusColor = d.status === 'passed' ? 'var(--green)' : 'var(--red)';
+        const statusIcon = d.status === 'passed' ? '✅' : '❌';
+        let html = '<div style="background:var(--bg-input);border:1px solid ' + statusColor + ';border-radius:10px;padding:14px">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+        html += '<div><span style="font-size:20px">' + statusIcon + '</span> <strong style="color:' + statusColor + '">' + d.passed + '/' + d.total + ' passed</strong></div>';
+        html += '<div style="font-size:12px;color:var(--text-muted)">' + d.duration_ms + 'ms</div>';
+        html += '</div>';
+        if (d.failed > 0 || d.errors > 0) {
+            html += '<div style="font-size:12px;color:var(--red)">❌ ' + d.failed + ' falhas ⚠️ ' + d.errors + ' erros</div>';
+        }
+        // Resultados individuais
+        if (d.results && d.results.length > 0) {
+            html += '<div style="margin-top:10px;font-size:12px">';
+            for (const t of d.results.slice(0, 10)) {
+                const ic = t.outcome === 'passed' ? '✅' : '❌';
+                html += '<div style="padding:3px 0">' + ic + ' ' + t.test.split('::').pop() + '</div>';
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+        resultDiv.innerHTML = html;
+        Toast.success('Self-Test: ' + d.passed + '/' + d.total + ' passed');
+    } catch(e) {
+        resultDiv.innerHTML = '<div style="color:var(--red);font-size:13px">Erro: ' + e.message + '</div>';
+        Toast.error('Self-Test falhou: ' + e.message);
+    }
+    btn.disabled = false;
+    btn.innerHTML = '🧪 Executar Self-Test';
+}
+
+// Adicionar autonomia ao showSection
+const origShow = window.showSection;
+window.showSection = function(name) {
+    if (origShow) origShow(name);
+    if (name === 'autonomy') loadAutonomy();
+};
+
+speakText(resposta);
   } catch(e) { Toast.error('Erro: '+e.message);
     box.innerHTML += '<div class="chat-msg hub3" style="color:var(--red)">Erro: ' + e.message + '</div>';
   }
