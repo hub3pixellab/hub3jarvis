@@ -421,4 +421,75 @@ async def ai_models():
     return {"modelos": AI_MODELS}
 
 
+
+
+# ===== SKILLS AUTONOMAS =====
+from enum import Enum
+
+class SkillCategory(str, Enum):
+    cybersecurity = "cybersecurity"
+    seo = "seo"
+    ui_ux = "ui_ux"
+    marketing = "marketing"
+    escrita = "escrita"
+    design = "design"
+    vendas = "vendas"
+    desenvolvimento = "desenvolvimento"
+    produtividade = "produtividade"
+    conhecimento = "conhecimento"
+    dados = "dados"
+
+SKILLS_DATA = {
+    "cybersecurity": {"title": "CyberSecurity Expert", "description": "817 skills de ciberseguranca em 29 dominios", "subskills": 817, "icon": "shield", "color": "red", "domains": ["Cloud Security", "Threat Hunting", "Malware Analysis", "DFIR", "Red Teaming", "SOC", "Web AppSec"], "commands": ["auditar seguranca", "detectar vulnerabilidades", "forense digital"]},
+    "seo": {"title": "SEO Agent Expert", "description": "25 sub-skills com 18 agentes especialistas em auditoria SEO", "subskills": 25, "icon": "target", "color": "green", "domains": ["SEO Tecnico", "E-E-A-T", "Schema.org", "GEO"], "commands": ["auditar site", "analisar pagina", "schema markup"]},
+    "ui_ux": {"title": "UI Recreation Agent", "description": "Recria interfaces HTML a partir de referencias visuais com fidelidade total", "subskills": 6, "icon": "camera", "color": "violet", "domains": ["Replicacao Layout", "Extracao Conteudo", "Animacoes"], "commands": ["recriar interface", "extrair design", "gerar variacoes"]},
+    "marketing": {"title": "Marketing Skills", "description": "30+ agentes de marketing: auditorias SEO, copywriting, CRO", "subskills": 30, "icon": "trending", "color": "orange", "domains": ["Auditoria SEO", "Copywriting", "Email", "CRO"], "commands": ["auditoria seo", "copy landing page", "sequencia emails"]},
+    "escrita": {"title": "Stop-Slop", "description": "Remove sinais de texto IA: aberturas genericas, cliches", "subskills": 1, "icon": "pen", "color": "yellow", "domains": ["Humanizacao", "Revisao Estilo"], "commands": ["humanizar texto", "revisar estilo"]},
+    "design": {"title": "UI/UX + Design Tools", "description": "50+ estilos de UI, Picsart GenAI, Algorithmic Art", "subskills": 4, "icon": "palette", "color": "fuchsia", "domains": ["Design System", "Interface", "Arte Generativa"], "commands": ["criar design system", "gerar interface", "criar arte"]},
+    "vendas": {"title": "AI Sales Team", "description": "14 skills e 5 agentes: prospeccao, qualificacao BANT/MEDDIC", "subskills": 14, "icon": "dollar", "color": "green", "domains": ["Prospeccao", "Qualificacao", "Pipeline"], "commands": ["pesquisar prospects", "qualificar lead", "criar sequencia"]},
+    "desenvolvimento": {"title": "Superpowers + React Native", "description": "Ciclo completo: TDD, subagentes, revisao codigo, merge", "subskills": 2, "icon": "code", "color": "blue", "domains": ["Planejamento", "Execucao", "Testes"], "commands": ["planejar projeto", "executar tarefas", "revisar codigo"]},
+    "produtividade": {"title": "Context Engineering + Caveman", "description": "Otimizacao de tokens e contexto + respostas ultracompactas", "subskills": 2, "icon": "zap", "color": "yellow", "domains": ["Otimizacao", "Economia Tokens"], "commands": ["otimizar contexto", "modo compacto"]},
+    "conhecimento": {"title": "Obsidian Second Brain", "description": "31 comandos para gerenciar base Obsidian com IA", "subskills": 31, "icon": "brain", "color": "violet", "domains": ["Gestao Notas", "Pesquisa Web"], "commands": ["pesquisar base", "sintetizar notas"]},
+    "dados": {"title": "D3.js Visualization", "description": "Visualizacoes interativas com D3.js", "subskills": 1, "icon": "chart", "color": "sky", "domains": ["Visualizacao", "Graficos"], "commands": ["criar grafico", "visualizar dados"]}
+}
+
+@app.get('/skills')
+async def list_skills():
+    return {'skills': SKILLS_DATA, 'total': len(SKILLS_DATA)}
+
+@app.get('/skills/{category}')
+async def get_skill(category: SkillCategory):
+    skill = SKILLS_DATA.get(category.value)
+    if not skill:
+        raise HTTPException(404, 'Skill nao encontrada')
+    return skill
+
+@app.post('/skills/autonomous')
+async def autonomous_analysis(data: dict):
+    user_input = data.get('input', '').lower()
+    keywords = [
+        ('seguran', 'cybersecurity'), ('vulnerabilidad', 'cybersecurity'), ('hack', 'cybersecurity'),
+        ('malware', 'cybersecurity'), ('pentest', 'cybersecurity'),
+        ('seo', 'seo'), ('google', 'seo'), ('schema', 'seo'), ('backlink', 'seo'),
+        ('ui', 'ui_ux'), ('ux', 'ui_ux'), ('interface', 'ui_ux'), ('layout', 'ui_ux'),
+        ('marketing', 'marketing'), ('copy', 'marketing'), ('landing page', 'marketing'),
+        ('humanizar', 'escrita'), ('revisar texto', 'escrita'),
+        ('venda', 'vendas'), ('prospect', 'vendas'), ('lead', 'vendas'),
+        ('codigo', 'desenvolvimento'), ('react', 'desenvolvimento'), ('api', 'desenvolvimento'),
+        ('produtividade', 'produtividade'), ('token', 'produtividade'),
+        ('obsidian', 'conhecimento'), ('segundo cerebro', 'conhecimento'),
+        ('grafico', 'dados'), ('dashboard', 'dados'), ('visualizar', 'dados'),
+    ]
+    detected = []
+    for kw, cat in keywords:
+        if kw in user_input and cat not in detected:
+            detected.append(cat)
+    if not detected:
+        return {'detected_skills': [], 'message': 'Nenhuma skill detectada'}
+    results = []
+    for cat in detected[:3]:
+        skill = SKILLS_DATA.get(cat, {})
+        results.append({'skill': cat, 'title': skill.get('title', cat), 'description': skill.get('description', ''), 'suggested_command': skill.get('commands', [''])[0]})
+    return {'detected_skills': detected, 'analysis': results, 'message': f'JARVIS detectou {len(detected)} skill(s)'}
+
 app.mount("/frontend", StaticFiles(directory="/Volumes/JARVIS HUB3/hub3-jarvis/frontend"), name="frontend")
