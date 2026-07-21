@@ -1,63 +1,42 @@
 /**
- * JARVIS v4.2 — Sistema de Toast Notifications
- * Hub3 Pixel Lab
- *
- * Uso: Toast.success('Mensagem'), Toast.error('Erro'), Toast.warning('Aviso')
+ * Toast Notification System para JARVIS v4.2
+ * Versao robusta — aguarda o body existir antes de criar o container
  */
+(function() {
+    function initToast() {
+        if (!document.body) {
+            setTimeout(initToast, 50);
+            return;
+        }
+        var container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:360px';
+            document.body.appendChild(container);
+        }
 
-const Toast = (() => {
-    const container = document.createElement('div');
-    container.id = 'toast-container';
-    container.style.cssText = `
-        position:fixed;top:20px;right:20px;z-index:9999;
-        display:flex;flex-direction:column;gap:8px;
-        pointer-events:none;max-width:400px;
-    `;
-    document.body.appendChild(container);
-
-    const icons = {
-        success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️',
-    };
-    const bgColors = {
-        success: 'var(--green, #00e676)',
-        error: 'var(--red, #ff4444)',
-        warning: 'var(--orange, #ff8c00)',
-        info: 'var(--cyan, #00d4ff)',
-    };
-
-    function show(type, message, duration = 4000) {
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            background:var(--bg-card,#0f1d3a);border:1px solid ${bgColors[type]};
-            border-radius:10px;padding:14px 18px;font-size:14px;color:var(--text,#e0e7f0);
-            display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);
-            pointer-events:auto;animation:toastIn 0.3s ease-out;
-            backdrop-filter:blur(8px);
-        `;
-        toast.innerHTML = `<span style="font-size:18px">${icons[type]}</span><span style="flex:1">${message}</span>`;
-        container.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'toastOut 0.3s ease-in forwards';
-            setTimeout(() => toast.remove(), 300);
-        }, duration);
+        window.Toast = {
+            show: function(message, type, duration) {
+                type = type || 'info';
+                duration = duration || 4000;
+                var colors = {success:'#00e676',error:'#ff4444',warning:'#ff8c00',info:'#00d4ff'};
+                var bgColors = {success:'rgba(0,230,118,0.1)',error:'rgba(255,68,68,0.1)',warning:'rgba(255,140,0,0.1)',info:'rgba(0,212,255,0.1)'};
+                var el = document.createElement('div');
+                el.style.cssText = 'background:'+bgColors[type]+';border:1px solid '+colors[type]+';border-radius:8px;padding:12px 16px;color:#e0e7f0;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px';
+                el.innerHTML = '<span style="color:'+colors[type]+';font-size:16px">'+(type==='success'?'✓':type==='error'?'✕':type==='warning'?'⚠':'ℹ')+'</span>'+message;
+                container.appendChild(el);
+                setTimeout(function(){
+                    el.style.opacity='0';
+                    el.style.transition='opacity 0.3s';
+                    setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},300);
+                }, duration);
+            },
+            success: function(m){this.show(m,'success')},
+            error: function(m){this.show(m,'error')},
+            warning: function(m){this.show(m,'warning')},
+            info: function(m){this.show(m,'info')}
+        };
     }
-
-    if (!document.getElementById('toast-styles')) {
-        const style = document.createElement('style');
-        style.id = 'toast-styles';
-        style.textContent = `
-            @keyframes toastIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
-            @keyframes toastOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(40px); } }
-        `;
-        document.head.appendChild(style);
-    }
-
-    return {
-        success: (msg, dur) => show('success', msg, dur),
-        error: (msg, dur) => show('error', msg, dur),
-        warning: (msg, dur) => show('warning', msg, dur),
-        info: (msg, dur) => show('info', msg, dur),
-    };
+    initToast();
 })();
-
-window.Toast = Toast;

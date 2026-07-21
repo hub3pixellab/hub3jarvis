@@ -1,13 +1,26 @@
 from fastapi import FastAPI, Body, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
 from pydantic import BaseModel
 import httpx
 import os
 import subprocess
 import json
+from modules.orchestrator import orchestrator
 
-app = FastAPI(title="JARVIS Backend v4.2", version="4.2")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Ciclo de vida: inicia orquestrador autônomo no startup"""
+    app.state.orchestrator_status = orchestrator.status
+    orchestrator.configure(SERVICES)
+    await orchestrator.start(app.state)
+    print(f"[JARVIS] Orquestrador autonomo iniciado - {len(SERVICES)} servicos monitorados")
+    yield
+    await orchestrator.stop()
+    print("[JARVIS] Orquestrador autonomo parado")
+
+app = FastAPI(title="JARVIS Backend v4.2", version="4.2", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 VAULT_DIR = "/Volumes/JARVIS HUB3/hub3-jarvis/knowledge-vault"
@@ -491,5 +504,9 @@ async def autonomous_analysis(data: dict):
         skill = SKILLS_DATA.get(cat, {})
         results.append({'skill': cat, 'title': skill.get('title', cat), 'description': skill.get('description', ''), 'suggested_command': skill.get('commands', [''])[0]})
     return {'detected_skills': detected, 'analysis': results, 'message': f'JARVIS detectou {len(detected)} skill(s)'}
+
+# ===== ROTAS DE AUTONOMIA =====
+from routes.autonomy_routes import register_routes
+app = register_routes(app, orchestrator)
 
 app.mount("/frontend", StaticFiles(directory="/Volumes/JARVIS HUB3/hub3-jarvis/frontend"), name="frontend")
