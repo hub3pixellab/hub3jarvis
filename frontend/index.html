@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hub3 v4.2</title>
+<script src="config.js"></script>
+<script src="toast.js"></script>
 <style>
 :root{--bg:#050810;--bg-card:#0d1420;--bg-input:#131c2e;--cyan:#00d4ff;--orange:#ff8c00;--green:#00e676;--red:#ff4444;--text:#e0e7f0;--text-muted:#5a6d8a;--border:#1a2d52;--glow-cyan:0 0 20px rgba(0,212,255,0.15);--glow-orange:0 0 20px rgba(255,140,0,0.15)}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
@@ -304,7 +306,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
 
 <script>
-const API = 'http://127.0.0.1:8000';
+const API = CONFIG.API_BASE;
 const COLORS = {red:'#ff4444',green:'#00e676',blue:'#00d4ff',orange:'#ff8c00',yellow:'#ffd700',violet:'#b388ff',fuchsia:'#e040fb',sky:'#4fc3f7'};
 
 function showSection(name) {
@@ -388,7 +390,7 @@ function startMicrophone() {
         isListening = false;
         if (autoRestart) setTimeout(startMicrophone, 500);
     };
-    try { recognition.start(); } catch(e) {}
+    try { recognition.start(); } catch(e) { Toast.error('Erro: '+e.message);}
 }
 
 function toggleVoice() {
@@ -424,7 +426,7 @@ async function sendChat() {
     const resposta = d.resposta_jarvis||'Sem resposta';
     box.innerHTML += '<div class="chat-msg hub3">' + resposta + '</div>';
     speakText(resposta);
-  } catch(e) {
+  } catch(e) { Toast.error('Erro: '+e.message);
     box.innerHTML += '<div class="chat-msg hub3" style="color:var(--red)">Erro: ' + e.message + '</div>';
   }
   btn.disabled = false;
@@ -446,7 +448,7 @@ async function loadServices() {
       h += '<div class="service-card ' + (on?'online':'offline') + '"><div class="service-name">' + n + '</div><div class="service-status">' + (on?'Online':'Offline') + '</div></div>';
     }
     g.innerHTML = h || '<div class="loading">Nenhum servico</div>';
-  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
 }
 
 async function loadVault() {
@@ -464,7 +466,7 @@ async function loadVault() {
       h += '<div class="vault-item"><div class="vault-cat">' + c + '</div><div class="vault-count">' + (typeof v === 'object' ? v.count||v.size||v : v) + '</div></div>';
     }
     g.innerHTML = h || '<div class="loading">Vault vazio</div>';
-  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
 }
 
 async function loadGithub() {
@@ -490,7 +492,7 @@ async function loadGithub() {
       }
       cd.innerHTML = ch || '<div class="loading">Nenhum commit</div>';
     }
-  } catch(e) { rd.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); rd.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
 }
 
 async function loadReposLocal() {
@@ -505,7 +507,7 @@ async function loadReposLocal() {
       h += '<div class="repo-card"><div class="repo-name">' + (repo.name||repo.path||repo) + '</div></div>';
     }
     g.innerHTML = h || '<div class="loading">Nenhum repo local</div>';
-  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
 }
 
 async function loadIssues() {
@@ -520,7 +522,7 @@ async function loadIssues() {
       h += '<div class="repo-card"><div class="repo-name">#' + (issue.number||'') + ' ' + (issue.title||'') + '</div></div>';
     }
     g.innerHTML = h || '<div class="loading">Nenhuma issue</div>';
-  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
 }
 
 async function loadSkills() {
@@ -548,7 +550,7 @@ async function loadSkills() {
       h += '</div></div>';
     }
     g.innerHTML = h || '<div class="loading">Nenhuma skill encontrada</div>';
-  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
 }
 
 async function autonomousMode() {
@@ -575,7 +577,7 @@ async function autonomousMode() {
       result.innerHTML = h;
     }
     input.value = '';
-  } catch(e) { result.innerHTML = '<div style="color:var(--red)">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); result.innerHTML = '<div style="color:var(--red)">Erro: ' + e.message + '</div>'; }
 }
 
 async function loadModels() {
@@ -589,7 +591,7 @@ async function loadModels() {
     let h = '';
     for (const m of models) h += '<div class="service-card online"><div class="service-name">' + (m.name||m.model||m) + '</div></div>';
     g.innerHTML = h || '<div class="loading">Nenhum modelo Ollama</div>';
-  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
 }
 
 async function loadIoT() {
@@ -622,7 +624,7 @@ async function loadAIModels() {
     sel.innerHTML = models.map(m => '<option value="' + (m.name||m.model||m) + '">' + (m.name||m.model||m) + '</option>').join('');
     const info = document.getElementById('ai-models-info');
     if (info) info.innerHTML = models.slice(0,12).map(m => '<div style="background:var(--bg-input);padding:8px 12px;border-radius:6px;font-size:12px;border:1px solid var(--border);color:var(--cyan)">' + (m.name||m.model||m) + '</div>').join('');
-  } catch(e) { sel.innerHTML = '<option>Erro ao carregar</option>'; }
+  } catch(e) { Toast.error('Erro: '+e.message); sel.innerHTML = '<option>Erro ao carregar</option>'; }
 }
 
 function updateClock() {
