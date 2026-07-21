@@ -572,6 +572,20 @@ async function installScraper(id){const s=SCRAPERS.find(x=>x.id===id);const t=do
 async function checkScraper(id){const t=document.getElementById('scraper-status-'+id);t.innerHTML='<span class="spinner"></span> Verificando...';try{const resp=await fetch(API+'/scrapers/status/'+id,{headers:authHeaders});const data=await resp.json();if(data.instalado){t.innerHTML='<span class="status-badge installed">INSTALADO</span> '+data.versao;document.getElementById('scraper-'+id).classList.add('installed');}else{t.innerHTML='<span class="status-badge offline">NAO INSTALADO</span>';}}catch(e){t.innerHTML='Erro';}}
 async function runScraper(){const tool=document.getElementById('scraper-select').value;const url=document.getElementById('scraper-url').value.trim();const btn=document.getElementById('scraper-run-btn');const res=document.getElementById('scraper-result');if(!url){alert('URL obrigatoria');return;}btn.disabled=true;res.innerHTML='<span class="spinner"></span> Executando '+tool+'...';try{const resp=await fetch(API+'/scrapers/run',{method:'POST',headers:authHeaders,body:JSON.stringify({tool,url})});const data=await resp.json();res.innerHTML='<div class="chat-msg hub3" style="max-width:100%;max-height:400px;overflow-y:auto">'+(data.resultado||data.erro||'Sem resultado')+'</div>';}catch(e){res.innerHTML='Erro';}btn.disabled=false;}
 function loadIoT(){const grid=document.getElementById('iot-grid');let html='';for(const d of IOT_DEVICES){html+='<div class="iot-card"><div class="iot-card-header"><span class="iot-card-name">'+d.nome+'</span><div class="iot-toggle '+(d.on?'on':'')+'" onclick="this.classList.toggle(\'on\')"></div></div>';if(d.tipo==='light'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:75%"></div></div><div class="iot-value">Brilho: 75%</div>';}else if(d.tipo==='thermostat'){html+='<div style="text-align:center;font-size:28px;font-weight:800;color:var(--orange)">23C</div><div class="iot-value">Resfriando</div>';}else if(d.tipo==='camera'){html+='<div style="background:var(--bg);border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:11px;font-weight:700">[LIVE FEED]</div>';}else if(d.tipo==='speaker'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:60%"></div></div><div class="iot-value">Volume: 60%</div>';}else{html+='<div class="iot-value">'+d.extra+'</div>';}html+='</div>';}grid.innerHTML=html;}
+
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.pitch = 0.9;
+        utterance.rate = 1.0;
+        window.speechSynthesis.speak(utterance);
+    } else {
+        console.error("Este navegador nao suporta sintese de voz.");
+    }
+}
+
 let recognition;
 let isListening = false;
 let autoRestart = true;
