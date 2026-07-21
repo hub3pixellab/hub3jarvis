@@ -161,7 +161,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <h3>Hub3</h3>
 <div class="nav-item active" onclick="showSection('overview')" data-section="overview"><span class="nav-icon">[home]</span> Visao Geral</div>
 <div class="nav-item" onclick="showSection('chat')" data-section="chat"><span class="nav-icon">[chat]</span> Conversar</div>
-<div class="nav-item" onclick="showSection('voice')" data-section="voice"><span class="nav-icon">[mic]</span> Ei Hub</div>
+
 <h3>Infra</h3>
 <div class="nav-item" onclick="showSection('services')" data-section="services"><span class="nav-icon">[gear]</span> Servicos</div>
 <div class="nav-item" onclick="showSection('vault')" data-section="vault"><span class="nav-icon">[vault]</span> Vault</div>
@@ -254,21 +254,14 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div class="section" id="section-chat">
 <div class="card card-glow"><div class="card-title">Conversar com Hub3</div>
 <div class="chat-box" id="chat-box"><div class="chat-msg hub3">Ola Sou o Hub3 v4.2 rodando Llama 3.2 localmente</div></div>
-<div class="chat-input-row"><input type="text" class="chat-input" id="chat-input" placeholder="Digite..." onkeypress="if(event.key==='Enter')sendChat()"><button class="btn" onclick="sendChat()" id="chat-btn">Enviar</button></div>
-</div></div>
-<div class="section" id="section-voice">
-<div class="card card-glow"><div class="card-title">Ativacao por Voz</div>
-<div class="voice-bar" onclick="toggleVoice()" id="voice-bar">
-<div class="voice-icon" id="voice-icon">[mic]</div>
-<div class="voice-text">Ei Hub</div>
-<div class="voice-sub" id="voice-sub">Clique para falar</div>
-<div class="waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+<div class="chat-input-row">
+  <input type="text" class="chat-input" id="chat-input" placeholder="Digite ou fale..." onkeypress="if(event.key==='Enter')sendChat()">
+  <button class="btn btn-mic" onclick="toggleVoice()" id="voice-btn" title="Falar">🎤</button>
+  <button class="btn" onclick="sendChat()" id="chat-btn">Enviar</button>
 </div>
-<div id="voice-result" style="margin-top:12px"></div></div>
-<div class="card" style="margin-top:12px"><div class="card-title">Transcricao Whisper</div>
-<div class="form-group"><label class="form-label">Caminho do Audio</label><input type="text" class="form-input" id="whisper-path" placeholder="/Volumes/JARVIS HUB3/..."></div>
-<button class="btn btn-orange btn-sm" onclick="transcribeAudio()">Transcrever</button>
-<div id="whisper-result" style="margin-top:10px"></div></div></div>
+<div id="voice-result" style="margin-top:8px;min-height:24px;font-size:13px"></div>
+</div></div>
+
 <div class="section" id="section-skills"><div class="card"><div class="card-title">Skills Autonomas</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">JARVIS detecta automaticamente qual skill usar. <span id="skills-total" style="color:var(--cyan)"></span></div><div id="skills-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"><div class="loading"><span class="spinner"></span> Carregando skills...</div></div><div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="card-title">Modo Autonomo</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Digite qualquer coisa e JARVIS decide qual skill usar</div><div class="chat-input-row"><input type="text" class="chat-input" id="auto-input" placeholder="Ex: auditar seguranca..."><button class="btn" onclick="autonomousMode()">Executar</button></div><div id="auto-result" style="margin-top:12px"></div></div></div></div><div class="section" id="section-services"><div class="card"><div class="card-title">Servicos Self-Hosted</div><div class="services-grid" id="services-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
 <div class="section" id="section-vault"><div class="card"><div class="card-title">Knowledge Vault</div><div id="vault-info" style="margin-bottom:12px;font-size:13px;color:var(--text-muted)"></div><div class="vault-grid" id="vault-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
 <div class="section" id="section-iot"><div class="card"><div class="card-title">Dispositivos IoT</div><div class="iot-grid" id="iot-grid"></div></div></div>
@@ -318,7 +311,8 @@ function updateGreeting(){const now=new Date();const days=['Domingo','Segunda','
 setInterval(updateGreeting,1000);updateGreeting();
 function updateTime(){document.getElementById('header-time').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
 setInterval(updateTime,1000);updateTime();
-function showSection(name){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('section-'+name).classList.add('active');const nav=document.querySelector('[data-section="'+name+'"]');if(nav)nav.classList.add('active');if(name==='services')loadServices();if(name==='vault')loadVault();if(name==='github')loadGithub();if(name==='repos')loadReposLocal();if(name==='models')loadModels();if(name==='scrapers')loadScrapers();if(name==='aistudio')loadAIModels();if(name==='iot')loadIoT();}
+function showSection(name){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('section-'+name).classList.add('active');const nav=document.querySelector('[data-section="'+name+'"]');if(nav)nav.classList.add('active');if(name==='services')loadServices();
+  setTimeout(startMicrophone, 1000);if(name==='vault')loadVault();if(name==='github')loadGithub();if(name==='repos')loadReposLocal();if(name==='models')loadModels();if(name==='scrapers')loadScrapers();if(name==='aistudio')loadAIModels();if(name==='iot')loadIoT();}
 async function sendChat(){const input=document.getElementById('chat-input');const btn=document.getElementById('chat-btn');const msg=input.value.trim();if(!msg)return;const box=document.getElementById('chat-box');box.innerHTML+='<div class="chat-msg user">'+msg+'</div>';input.value='';btn.disabled=true;btn.textContent='...';box.innerHTML+='<div class="chat-msg hub3" id="typing">Digitando...</div>';box.scrollTop=box.scrollHeight;try{const resp=await fetch(API+'/api/jarvis/conversar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagem:msg})});const data=await resp.json();document.getElementById('typing').remove();box.innerHTML+='<div class="chat-msg hub3">'+(data.resposta_jarvis||data.detail||'Erro')+'</div>';box.scrollTop=box.scrollHeight;}catch(e){document.getElementById('typing').remove();box.innerHTML+='<div class="chat-msg hub3">Erro: '+e.message+'</div>';}btn.disabled=false;btn.textContent='Enviar';}
 
 async function loadSkills() {
@@ -580,62 +574,110 @@ async function runScraper(){const tool=document.getElementById('scraper-select')
 function loadIoT(){const grid=document.getElementById('iot-grid');let html='';for(const d of IOT_DEVICES){html+='<div class="iot-card"><div class="iot-card-header"><span class="iot-card-name">'+d.nome+'</span><div class="iot-toggle '+(d.on?'on':'')+'" onclick="this.classList.toggle(\'on\')"></div></div>';if(d.tipo==='light'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:75%"></div></div><div class="iot-value">Brilho: 75%</div>';}else if(d.tipo==='thermostat'){html+='<div style="text-align:center;font-size:28px;font-weight:800;color:var(--orange)">23C</div><div class="iot-value">Resfriando</div>';}else if(d.tipo==='camera'){html+='<div style="background:var(--bg);border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:11px;font-weight:700">[LIVE FEED]</div>';}else if(d.tipo==='speaker'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:60%"></div></div><div class="iot-value">Volume: 60%</div>';}else{html+='<div class="iot-value">'+d.extra+'</div>';}html+='</div>';}grid.innerHTML=html;}
 let recognition;
 let isListening = false;
-function toggleVoice() {
-    const bar = document.getElementById('voice-bar');
-    const icon = document.getElementById('voice-icon');
-    const sub = document.getElementById('voice-sub');
-    const res = document.getElementById('voice-result');
-    const chatInput = document.getElementById('chat-input');
-    if (isListening) {
-        if (recognition) recognition.stop();
-        return;
-    }
+let autoRestart = true;
+
+function startMicrophone() {
+    if (isListening) return;
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        res.innerHTML = '<div style="color:var(--red);text-align:center;margin-top:8px">Seu navegador nao suporta reconhecimento de voz.</div>';
+        const res = document.getElementById('voice-result');
+        if (res) res.innerHTML = '<div style="color:var(--red);text-align:center;margin-top:8px">Navegador nao suporta reconhecimento de voz.</div>';
         return;
     }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    
     recognition.onstart = function() {
         isListening = true;
-        bar.classList.add('listening');
-        icon.textContent = '[stop]';
-        sub.textContent = 'Ouvindo... Fale agora';
-        res.innerHTML = '';
+        const bar = document.getElementById('voice-bar');
+        const icon = document.getElementById('voice-icon');
+        const sub = document.getElementById('voice-sub');
+        if (bar) bar.classList.add('listening');
+        if (icon) icon.textContent = '[stop]';
+        if (sub) sub.textContent = 'Sempre ouvindo... Clique para parar';
     };
-        recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        res.innerHTML = '<div style="color:var(--cyan);text-align:center;margin-top:8px;font-weight:bold;">"' + transcript + '"</div>';
-        
-        // Joga o texto capturado direto no input do chat e envia
-        if (chatInput) {
-            chatInput.value = transcript;
-            
-            // Simula a tecla "Enter" para disparar o envio automaticamente
+    
+    recognition.onresult = function(event) {
+        const res = document.getElementById('voice-result');
+        const chatInput = document.getElementById('chat-input');
+        let finalTranscript = '';
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+        if (res) {
+            if (finalTranscript) {
+                res.innerHTML = '<div style="color:var(--cyan);text-align:center;margin-top:4px;font-size:13px;font-weight:bold;">"' + finalTranscript + '"</div>';
+            } else if (interimTranscript) {
+                res.innerHTML = '<div style="color:var(--text-muted);text-align:center;margin-top:4px;font-size:12px">' + interimTranscript + '...</div>';
+            }
+        }
+        if (finalTranscript && chatInput) {
+            chatInput.value = finalTranscript;
             const enterEvent = new KeyboardEvent('keypress', {
-                key: 'Enter',
-                code: 'Enter',
-                which: 13,
-                keyCode: 13,
-                bubbles: true
+                key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true
             });
             chatInput.dispatchEvent(enterEvent);
         }
     };
+    
     recognition.onerror = function(event) {
-        res.innerHTML = '<div style="color:var(--red);text-align:center;margin-top:8px">Erro no microfone: ' + event.error + '</div>';
+        const res = document.getElementById('voice-result');
+        if (res) res.innerHTML = '<div style="color:var(--red);text-align:center;margin-top:8px;font-size:12px">Erro: ' + event.error + '</div>';
+        isListening = false;
+        // Tentar reiniciar automaticamente se nao for erro de permissao
+        if (autoRestart && event.error !== 'not-allowed') {
+            setTimeout(startMicrophone, 1000);
+        }
     };
+    
     recognition.onend = function() {
         isListening = false;
-        bar.classList.remove('listening');
-        icon.textContent = '[mic]';
-        sub.textContent = 'Clique para falar';
+        const bar = document.getElementById('voice-bar');
+        const icon = document.getElementById('voice-icon');
+        const sub = document.getElementById('voice-sub');
+        if (bar) bar.classList.remove('listening');
+        if (icon) icon.textContent = '[mic]';
+        if (sub) sub.textContent = 'Microfone desligado';
+        // Reiniciar automaticamente se autoRestart estiver ativo
+        if (autoRestart) {
+            setTimeout(startMicrophone, 500);
+        }
     };
-    recognition.start();
+    
+    try {
+        recognition.start();
+    } catch(e) {
+        console.log('Erro ao iniciar microfone:', e);
+    }
 }
-</script>
-</body>
-</html>
+
+function toggleVoice() {
+    const bar = document.getElementById('voice-bar');
+    const icon = document.getElementById('voice-icon');
+    const sub = document.getElementById('voice-sub');
+    
+    if (isListening) {
+        // Parar o microfone
+        autoRestart = false;
+        if (recognition) {
+            recognition.stop();
+            recognition = null;
+        }
+        isListening = false;
+        if (bar) bar.classList.remove('listening');
+        if (icon) icon.textContent = '[mic]';
+        if (sub) sub.textContent = 'Microfone desligado';
+    } else {
+        // Ligar o microfone
+        autoRestart = true;
+        startMicrophone();
+    }
+}
+
