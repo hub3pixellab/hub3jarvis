@@ -270,7 +270,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div class="section" id="section-issues"><div class="card"><div class="card-title">Criar Issue</div><div class="form-group"><label class="form-label">Repo</label><select class="form-select" id="issue-repo"><option value="hub3jarvis">hub3jarvis</option><option value="Site">Site</option></select></div><div class="form-group"><label class="form-label">Titulo</label><input type="text" class="form-input" id="issue-title" placeholder="Titulo"></div><div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="issue-body" placeholder="Descreva..."></textarea></div><div class="form-group"><label class="form-label">Labels</label><input type="text" class="form-input" id="issue-labels" placeholder="bug,cliente"></div><button class="btn btn-orange" onclick="createIssue()" id="issue-btn">Criar Issue</button><div id="issue-result" style="margin-top:10px"></div></div></div>
 <div class="section" id="section-scrapers"><div class="card"><div class="card-title">Ferramentas de Scraping</div><div class="scraper-grid" id="scraper-grid"></div></div><div class="card" style="margin-top:12px"><div class="card-title">Executar Scrape</div><div class="form-group"><label class="form-label">Ferramenta</label><select class="form-select" id="scraper-select"><option value="firecrawl">Firecrawl</option><option value="crawl4ai">Crawl4AI</option><option value="browser_use">Browser Use</option><option value="crawlee">Crawlee</option><option value="scrapy">Scrapy</option><option value="markitdown">MarkItDown</option><option value="scrapling">Scrapling</option><option value="autoscaper">AutoScraper</option><option value="curl_impersonate">curl-impersonate</option><option value="scrcpy">scrcpy</option></select></div><div class="form-group"><label class="form-label">URL</label><input type="text" class="form-input" id="scraper-url" placeholder="https://exemplo.com"></div><button class="btn" onclick="runScraper()" id="scraper-run-btn">Executar</button><div id="scraper-result" style="margin-top:10px"></div></div></div>
 <div class="section" id="section-aistudio"><div class="card card-glow"><div class="card-title">AI Studio - Geracao de Imagens e Videos</div>
-<div class="form-group"><label class="form-label">Muapi API Key</label><input type="password" class="form-input" id="muapi-key" placeholder="Cole sua API key da Muapi.ai"></div>
+<div class="form-group"><label class="form-label">Muapi API Key</label><input type="password" class="form-input" id="muapi-key" placeholder="Cole sua API key da Muapi.ai" onchange="localStorage.setItem('muapi-key', this.value)" onkeyup="localStorage.setItem('muapi-key', this.value)"></div>
 <div class="form-group"><label class="form-label">Tipo</label><select class="form-select" id="ai-type" onchange="loadAIModels()"><option value="image">Imagem</option><option value="video">Video</option><option value="lipsync">Lip Sync</option></select></div>
 <div class="form-group"><label class="form-label">Modelo</label><select class="form-select" id="ai-model"></select></div>
 <div class="form-group"><label class="form-label">Prompt</label><textarea class="form-textarea" id="ai-prompt" placeholder="Descreva o que quer gerar..."></textarea></div>
@@ -626,6 +626,18 @@ updateClock();
 document.addEventListener('DOMContentLoaded', function() {
   loadServices();
   setTimeout(startMicrophone, 1000);
+  // Restaurar muapi-key salva
+  const savedKey = localStorage.getItem('muapi-key');
+  const keyInput = document.getElementById('muapi-key');
+  if (savedKey && keyInput) {
+    keyInput.value = savedKey;
+  }
+  // Salvar chave fornecida se ainda nao estiver salva
+  if (!savedKey && keyInput) {
+    localStorage.setItem('muapi-key', 'b917bd66fac33aa022f4e06496f017316a3d0edbaa866d72a2cb23a91ef8da9f');
+    keyInput.value = 'b917bd66fac33aa022f4e06496f017316a3d0edbaa866d72a2cb23a91ef8da9f';
+    keyInput.style.borderColor = 'var(--green)';
+  }
 });
 </script>
 </body>
