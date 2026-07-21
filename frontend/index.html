@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub3 v4.2</title>
+<style>
+:root{--bg:#050810;--bg-card:#0d1420;--bg-input:#131c2e;--cyan:#00d4ff;--orange:#ff8c00;--green:#00e676;--red:#ff4444;--text:#e0e7f0;--text-muted:#5a6d8a;--border:#1a2d52;--glow-cyan:0 0 20px rgba(0,212,255,0.15);--glow-orange:0 0 20px rgba(255,140,0,0.15)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.header{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{font-size:24px;font-weight:800;color:var(--cyan);letter-spacing:3px;text-shadow:0 0 15px rgba(0,212,255,0.4)}
+.version{font-size:10px;color:var(--text-muted);border:1px solid var(--border);padding:2px 10px;border-radius:4px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.header-right{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-muted)}
+.layout{display:grid;grid-template-columns:210px 1fr 310px;gap:12px;padding:12px;max-width:1920px;margin:0 auto;height:calc(100vh - 54px)}
+@media(max-width:1400px){.layout{grid-template-columns:200px 1fr 280px}}
+@media(max-width:1100px){.layout{grid-template-columns:200px 1fr}.right-panel{display:none}}
+@media(max-width:768px){.layout{grid-template-columns:1fr;height:auto}.sidebar{display:none}}
+.sidebar{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.sidebar h3{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin:10px 4px 6px}
+.sidebar h3:first-child{margin-top:0}
+.nav-item{padding:9px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);transition:all 0.2s;margin-bottom:1px;border-left:3px solid transparent}
+.nav-item:hover{background:var(--bg-input);color:var(--text)}
+.nav-item.active{background:var(--bg-input);color:var(--cyan);border-left-color:var(--cyan);box-shadow:var(--glow-cyan)}
+.nav-icon{width:16px;text-align:center;font-size:14px}
+.sidebar-quote{margin-top:auto;padding:10px;font-size:11px;color:var(--text-muted);font-style:italic;border-top:1px solid var(--border);line-height:1.5}
+.main{display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.card-glow{border-color:rgba(0,212,255,0.2);box-shadow:var(--glow-cyan)}
+.card-title{font-size:13px;font-weight:600;color:var(--cyan);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+.chat-box{height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:10px;background:var(--bg);border-radius:10px;border:1px solid var(--border);margin-bottom:10px}
+.chat-msg{max-width:75%;padding:9px 13px;border-radius:13px;font-size:14px;line-height:1.5}
+.chat-msg.user{align-self:flex-end;background:var(--cyan);color:var(--bg);font-weight:500}
+.chat-msg.hub3{align-self:flex-start;background:var(--bg-input);color:var(--text);border:1px solid var(--border)}
+.chat-input-row{display:flex;gap:8px}
+.chat-input{flex:1;background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:11px 16px;color:var(--text);font-size:14px;outline:none}
+.chat-input:focus{border-color:var(--cyan);box-shadow:var(--glow-cyan)}
+.btn{background:var(--cyan);color:var(--bg);border:none;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.btn:hover{box-shadow:var(--glow-cyan);transform:translateY(-1px)}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-orange{background:var(--orange)}
+.btn-orange:hover{box-shadow:var(--glow-orange)}
+.btn-green{background:var(--green)}
+.btn-sm{padding:7px 14px;font-size:12px}
+.voice-bar{background:linear-gradient(135deg,var(--bg-card),var(--bg-input));border:1px solid rgba(0,212,255,0.3);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s;box-shadow:var(--glow-cyan);position:relative;overflow:hidden}
+.voice-bar:hover{border-color:var(--cyan)}
+.voice-bar.listening{border-color:var(--orange);box-shadow:var(--glow-orange)}
+.voice-icon{font-size:32px;margin-bottom:6px}
+.voice-text{font-size:18px;font-weight:700;color:var(--cyan);letter-spacing:3px}
+.voice-bar.listening .voice-text{color:var(--orange)}
+.voice-sub{font-size:11px;color:var(--text-muted);margin-top:4px}
+.waveform{display:flex;gap:3px;justify-content:center;margin-top:10px;height:24px;align-items:center}
+.wave-bar{width:3px;background:var(--cyan);border-radius:2px;animation:wave 1s ease-in-out infinite}
+.voice-bar.listening .wave-bar{background:var(--orange)}
+@keyframes wave{0%,100%{height:6px}50%{height:20px}}
+.wave-bar:nth-child(2){animation-delay:0.1s}
+.wave-bar:nth-child(3){animation-delay:0.2s}
+.wave-bar:nth-child(4){animation-delay:0.3s}
+.wave-bar:nth-child(5){animation-delay:0.15s}
+.wave-bar:nth-child(6){animation-delay:0.25s}
+.wave-bar:nth-child(7){animation-delay:0.05s}
+.right-panel{display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.mini-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:13px}
+.mini-card-title{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:6px}
+.mini-card-value{font-size:20px;font-weight:800;color:var(--cyan)}
+.mini-card-value.orange{color:var(--orange)}
+.mini-card-value.green{color:var(--green)}
+.mini-card-sub{font-size:11px;color:var(--text-muted);margin-top:3px}
+.mini-card-text{font-size:12px;color:var(--text);line-height:1.4;margin-top:4px}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase}
+.status-badge.online{background:rgba(0,230,118,0.15);color:var(--green);border:1px solid rgba(0,230,118,0.3)}
+.status-badge.offline{background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3)}
+.status-badge.installed{background:rgba(0,212,255,0.15);color:var(--cyan);border:1px solid rgba(0,212,255,0.3)}
+.progress-ring{width:54px;height:54px;border-radius:50%;background:conic-gradient(var(--orange) 72%,var(--border) 0);display:flex;align-items:center;justify-content:center;margin:6px auto 0}
+.progress-inner{width:42px;height:42px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--orange)}
+.consensus-bar-container{height:5px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:3px}
+.consensus-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan),var(--orange));transition:width 0.5s}
+.ai-model-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:11px;border-bottom:1px solid var(--border)}
+.ai-model-row:last-child{border-bottom:none}
+.ai-model-name{color:var(--text)}
+.ai-model-score{color:var(--cyan);font-weight:700}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.service-card{background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:13px;text-align:center}
+.service-card.online{border-color:rgba(0,230,118,0.3)}
+.service-card.offline{border-color:rgba(255,68,68,0.3)}
+.service-name{font-size:13px;font-weight:600;margin-bottom:5px}
+.vault-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.vault-item{background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:11px;text-align:center}
+.vault-cat{font-size:11px;font-weight:600;color:var(--cyan);margin-bottom:3px}
+.vault-count{font-size:17px;font-weight:800}
+.vault-size{font-size:10px;color:var(--text-muted)}
+.repo-card{background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:9px}
+.repo-name{font-size:14px;font-weight:600;color:var(--cyan);margin-bottom:5px}
+.commit-item{font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.commit-sha{color:var(--orange);font-family:monospace;font-size:11px}
+.commit-msg{color:var(--text);flex:1}
+.commit-date{color:var(--text-muted);font-size:10px}
+.lang-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;margin:2px;background:var(--bg);border:1px solid var(--border)}
+.scraper-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}
+.scraper-card{background:var(--bg-input);border:1px solid var(--border);border-radius:12px;padding:14px}
+.scraper-card.installed{border-color:rgba(0,230,118,0.3)}
+.scraper-name{font-size:14px;font-weight:700;color:var(--cyan)}
+.scraper-desc{font-size:11px;color:var(--text-muted);line-height:1.4;margin:6px 0 8px}
+.scraper-meta{font-size:10px;color:var(--text-muted);margin-bottom:7px}
+.scraper-actions{display:flex;gap:5px}
+.form-group{margin-bottom:9px}
+.form-label{font-size:12px;color:var(--text-muted);margin-bottom:3px;display:block}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:14px;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--cyan)}
+.form-textarea{min-height:65px;resize:vertical}
+.section{display:none}
+.section.active{display:block}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.loading{text-align:center;padding:14px;color:var(--text-muted);font-size:13px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse-glow{0%,100%{filter:drop-shadow(0 0 12px var(--cyan))}50%{filter:drop-shadow(0 0 24px var(--cyan))}}
+.quote{text-align:center;font-size:10px;color:var(--text-muted);font-style:italic;padding:6px}
+.neural-container{position:relative;width:100%;height:320px;display:flex;align-items:center;justify-content:center}
+.neural-svg{width:100%;height:100%}
+.neural-node{fill:var(--bg-input);stroke:var(--cyan);stroke-width:2;cursor:pointer;transition:all 0.3s;filter:drop-shadow(0 0 4px rgba(0,212,255,0.3))}
+.neural-node:hover{fill:var(--cyan);filter:drop-shadow(0 0 8px var(--cyan))}
+.neural-node.center{fill:var(--cyan);stroke:var(--cyan);filter:drop-shadow(0 0 16px var(--cyan));animation:pulse-glow 3s infinite}
+.neural-line{stroke:var(--cyan);stroke-width:1.5;opacity:0.4;transition:opacity 0.3s;filter:drop-shadow(0 0 3px rgba(0,212,255,0.3))}
+.neural-node:hover+.neural-line{opacity:1}
+.neural-label{fill:var(--text-muted);font-size:10px;text-anchor:middle;font-weight:600}
+.neural-label.center{fill:var(--cyan);font-size:13px;font-weight:800}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-value{font-size:22px;font-weight:800;color:var(--cyan)}
+.stat-value.orange{color:var(--orange)}
+.stat-value.green{color:var(--green)}
+.stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.personality-text{font-size:13px;color:var(--text);line-height:1.5;text-align:center;padding:10px;font-style:italic}
+.iot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px}
+.iot-card{background:var(--bg-input);border:1px solid var(--border);border-radius:12px;padding:14px}
+.iot-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.iot-card-name{font-size:13px;font-weight:600;color:var(--cyan)}
+.iot-toggle{width:36px;height:20px;border-radius:10px;background:var(--border);position:relative;cursor:pointer;transition:background 0.2s}
+.iot-toggle.on{background:var(--green)}
+.iot-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:2px;transition:transform 0.2s}
+.iot-toggle.on::after{transform:translateX(16px)}
+.iot-slider{width:100%;height:5px;border-radius:3px;background:var(--border);position:relative;margin:8px 0}
+.iot-slider-fill{height:100%;border-radius:3px;background:var(--orange)}
+.iot-value{font-size:11px;color:var(--text-muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="header-left"><span class="status-dot"></span><span class="logo">Hub3</span><span class="version">v4.2</span></div>
+<div class="header-right"><span id="header-time">--:--</span><span>Hub3 Pixel Lab</span></div>
+</div>
+<div class="layout">
+<div class="sidebar">
+<h3>Hub3</h3>
+<div class="nav-item active" onclick="showSection('overview')" data-section="overview"><span class="nav-icon">[home]</span> Visao Geral</div>
+<div class="nav-item" onclick="showSection('chat')" data-section="chat"><span class="nav-icon">[chat]</span> Conversar</div>
+<div class="nav-item" onclick="showSection('voice')" data-section="voice"><span class="nav-icon">[mic]</span> Ei Hub</div>
+<h3>Infra</h3>
+<div class="nav-item" onclick="showSection('services')" data-section="services"><span class="nav-icon">[gear]</span> Servicos</div>
+<div class="nav-item" onclick="showSection('vault')" data-section="vault"><span class="nav-icon">[vault]</span> Vault</div>
+<div class="nav-item" onclick="showSection('iot')" data-section="iot"><span class="nav-icon">[home]</span> IoT</div>
+<h3>Dev</h3>
+<div class="nav-item" onclick="showSection('github')" data-section="github"><span class="nav-icon">[git]</span> GitHub</div>
+<div class="nav-item" onclick="showSection('repos')" data-section="repos"><span class="nav-icon">[code]</span> Repos</div>
+<div class="nav-item" onclick="showSection('issues')" data-section="issues"><span class="nav-icon">[issue]</span> Issue</div>
+<div class="nav-item" onclick="showSection('scrapers')" data-section="scrapers"><span class="nav-icon">[spider]</span> Scrapers</div>
+<h3>Sistema</h3>
+<div class="nav-item" onclick="showSection('consensus')" data-section="consensus"><span class="nav-icon">[brain]</span> Consensus</div>
+<div class="nav-item" onclick="showSection('models')" data-section="models"><span class="nav-icon">[cpu]</span> Modelos</div>
+<div style="margin-top:14px;text-align:center;padding:10px;border:1px solid var(--border);border-radius:10px">
+<div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px">Life Balance</div>
+<div style="width:50px;height:50px;border-radius:50%;background:conic-gradient(var(--cyan),var(--orange) 78%,var(--border) 0);display:flex;align-items:center;justify-content:center;margin:0 auto">
+<div style="width:38px;height:38px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--cyan)">78%</div>
+</div>
+<div style="font-size:10px;color:var(--green);margin-top:4px">Balanced</div>
+</div>
+<div class="sidebar-quote">"Voce nao precisa de motivacao. Voce precisa de direcao."<br>— Hub3</div>
+</div>
+<div class="main">
+<div class="section active" id="section-overview">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+<div>
+<div style="font-size:20px;font-weight:700;color:var(--text)">Bem-vindo de volta, Diogo</div>
+<div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="greeting-date">--</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<div onclick="showSection('voice')" style="background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(255,140,0,0.15));border:1px solid rgba(0,212,255,0.3);border-radius:20px;padding:10px 20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='rgba(0,212,255,0.3)'">
+<span style="font-size:18px">🎤</span>
+<span style="font-size:14px;font-weight:700;color:var(--cyan);letter-spacing:2px">Ei Hub</span>
+<div style="display:flex;gap:2px;align-items:center"><div style="width:2px;height:8px;background:var(--cyan);border-radius:1px;animation:wave 0.8s infinite"></div><div style="width:2px;height:12px;background:var(--cyan);border-radius:1px;animation:wave 0.8s infinite 0.1s"></div><div style="width:2px;height:6px;background:var(--cyan);border-radius:1px;animation:wave 0.8s infinite 0.2s"></div><div style="width:2px;height:10px;background:var(--cyan);border-radius:1px;animation:wave 0.8s infinite 0.15s"></div></div>
+</div>
+</div>
+</div>
+<div class="card card-glow">
+<div class="card-title">AI Brain Network</div>
+<div class="personality-text">Voce nao precisa de motivacao. Voce precisa de direcao. Mas, como sempre, voce veio so para ouvir, ne? Tudo bem. Vamos fazer acontecer mesmo assim.</div>
+<div class="neural-container">
+<svg class="neural-svg" viewBox="0 0 400 300">
+<line class="neural-line" x1="200" y1="150" x2="80" y2="50"/>
+<line class="neural-line" x1="200" y1="150" x2="320" y2="50"/>
+<line class="neural-line" x1="200" y1="150" x2="50" y2="150"/>
+<line class="neural-line" x1="200" y1="150" x2="350" y2="150"/>
+<line class="neural-line" x1="200" y1="150" x2="80" y2="250"/>
+<line class="neural-line" x1="200" y1="150" x2="320" y2="250"/>
+<line class="neural-line" x1="200" y1="150" x2="150" y2="30"/>
+<line class="neural-line" x1="200" y1="150" x2="250" y2="270"/>
+<circle class="neural-node center" cx="200" cy="150" r="28"/>
+<text class="neural-label center" x="200" y="155">Hub3</text>
+<circle class="neural-node" cx="80" cy="50" r="18"/>
+<text class="neural-label" x="80" y="53">Voce</text>
+<circle class="neural-node" cx="320" cy="50" r="18"/>
+<text class="neural-label" x="320" y="53">Objetivos</text>
+<circle class="neural-node" cx="50" cy="150" r="18"/>
+<text class="neural-label" x="50" y="153">Carreira</text>
+<circle class="neural-node" cx="350" cy="150" r="18"/>
+<text class="neural-label" x="350" y="153">Projetos</text>
+<circle class="neural-node" cx="80" cy="250" r="18"/>
+<text class="neural-label" x="80" y="253">Financas</text>
+<circle class="neural-node" cx="320" cy="250" r="18"/>
+<text class="neural-label" x="320" y="253">Saude</text>
+<circle class="neural-node" cx="150" cy="30" r="16"/>
+<text class="neural-label" x="150" y="33">Aprendizado</text>
+<circle class="neural-node" cx="250" cy="270" r="16"/>
+<text class="neural-label" x="250" y="273">Relacoes</text>
+</svg>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="card-title">Estatísticas</div>
+<div class="stats-row">
+<div class="stat-card"><div class="stat-value" id="stat-insights">28</div><div class="stat-label">Insights Hoje</div><div style="font-size:10px;color:var(--green);margin-top:2px">↑ 18% vs ontem</div></div>
+<div class="stat-card"><div class="stat-value orange" id="stat-decisions">7</div><div class="stat-label">Decisões Apoiadas</div><div style="font-size:10px;color:var(--green);margin-top:2px">↑ 12% vs ontem</div></div>
+<div class="stat-card"><div class="stat-value green" id="stat-time">2.4h</div><div class="stat-label">Tempo Economizado</div><div style="font-size:10px;color:var(--green);margin-top:2px">↑ 0.8h vs ontem</div></div>
+<div class="stat-card"><div class="stat-value orange" id="stat-momentum">85%</div><div class="stat-label">Life Momentum</div><div style="font-size:10px;color:var(--green);margin-top:2px">↑ 5% vs ontem</div></div>
+</div>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="card-title">Atividades Recentes</div>
+<div style="font-size:12px;color:var(--text-muted);line-height:2">
+<div>Plano de carreira atualizado 09:42</div>
+<div>Projeto Q3 revisado 08:15</div>
+<div>Investimento analisado 07:30</div>
+<div>Treino concluido 06:45</div>
+</div>
+</div>
+</div>
+<div class="section" id="section-chat">
+<div class="card card-glow"><div class="card-title">Conversar com Hub3</div>
+<div class="chat-box" id="chat-box"><div class="chat-msg hub3">Ola Sou o Hub3 v4.2 rodando Llama 3.2 localmente</div></div>
+<div class="chat-input-row"><input type="text" class="chat-input" id="chat-input" placeholder="Digite..." onkeypress="if(event.key==='Enter')sendChat()"><button class="btn" onclick="sendChat()" id="chat-btn">Enviar</button></div>
+</div></div>
+<div class="section" id="section-voice">
+<div class="card card-glow"><div class="card-title">Ativacao por Voz</div>
+<div class="voice-bar" onclick="toggleVoice()" id="voice-bar">
+<div class="voice-icon" id="voice-icon">[mic]</div>
+<div class="voice-text">Ei Hub</div>
+<div class="voice-sub" id="voice-sub">Clique para falar</div>
+<div class="waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+</div>
+<div id="voice-result" style="margin-top:12px"></div></div>
+<div class="card" style="margin-top:12px"><div class="card-title">Transcricao Whisper</div>
+<div class="form-group"><label class="form-label">Caminho do Audio</label><input type="text" class="form-input" id="whisper-path" placeholder="/Volumes/JARVIS HUB3/..."></div>
+<button class="btn btn-orange btn-sm" onclick="transcribeAudio()">Transcrever</button>
+<div id="whisper-result" style="margin-top:10px"></div></div></div>
+<div class="section" id="section-services"><div class="card"><div class="card-title">Servicos Self-Hosted</div><div class="services-grid" id="services-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
+<div class="section" id="section-vault"><div class="card"><div class="card-title">Knowledge Vault</div><div id="vault-info" style="margin-bottom:12px;font-size:13px;color:var(--text-muted)"></div><div class="vault-grid" id="vault-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
+<div class="section" id="section-iot"><div class="card"><div class="card-title">Dispositivos IoT</div><div class="iot-grid" id="iot-grid"></div></div></div>
+<div class="section" id="section-github"><div class="card"><div class="card-title">GitHub</div><div id="github-repos"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div><div class="card" style="margin-top:12px"><div class="card-title">Commits</div><div id="github-commits"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
+<div class="section" id="section-repos"><div class="card"><div class="card-title">Repos Locais</div><div id="repos-local"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
+<div class="section" id="section-issues"><div class="card"><div class="card-title">Criar Issue</div><div class="form-group"><label class="form-label">Repo</label><select class="form-select" id="issue-repo"><option value="hub3jarvis">hub3jarvis</option><option value="Site">Site</option></select></div><div class="form-group"><label class="form-label">Titulo</label><input type="text" class="form-input" id="issue-title" placeholder="Titulo"></div><div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="issue-body" placeholder="Descreva..."></textarea></div><div class="form-group"><label class="form-label">Labels</label><input type="text" class="form-input" id="issue-labels" placeholder="bug,cliente"></div><button class="btn btn-orange" onclick="createIssue()" id="issue-btn">Criar Issue</button><div id="issue-result" style="margin-top:10px"></div></div></div>
+<div class="section" id="section-scrapers"><div class="card"><div class="card-title">Ferramentas de Scraping</div><div class="scraper-grid" id="scraper-grid"></div></div><div class="card" style="margin-top:12px"><div class="card-title">Executar Scrape</div><div class="form-group"><label class="form-label">Ferramenta</label><select class="form-select" id="scraper-select"><option value="firecrawl">Firecrawl</option><option value="crawl4ai">Crawl4AI</option><option value="browser_use">Browser Use</option><option value="crawlee">Crawlee</option><option value="scrapy">Scrapy</option><option value="markitdown">MarkItDown</option><option value="scrapling">Scrapling</option><option value="autoscaper">AutoScraper</option><option value="curl_impersonate">curl-impersonate</option><option value="scrcpy">scrcpy</option></select></div><div class="form-group"><label class="form-label">URL</label><input type="text" class="form-input" id="scraper-url" placeholder="https://exemplo.com"></div><button class="btn" onclick="runScraper()" id="scraper-run-btn">Executar</button><div id="scraper-result" style="margin-top:10px"></div></div></div>
+<div class="section" id="section-aistudio"><div class="card card-glow"><div class="card-title">AI Studio - Geracao de Imagens e Videos</div>
+<div class="form-group"><label class="form-label">Muapi API Key</label><input type="password" class="form-input" id="muapi-key" placeholder="Cole sua API key da Muapi.ai"></div>
+<div class="form-group"><label class="form-label">Tipo</label><select class="form-select" id="ai-type" onchange="loadAIModels()"><option value="image">Imagem</option><option value="video">Video</option><option value="lipsync">Lip Sync</option></select></div>
+<div class="form-group"><label class="form-label">Modelo</label><select class="form-select" id="ai-model"></select></div>
+<div class="form-group"><label class="form-label">Prompt</label><textarea class="form-textarea" id="ai-prompt" placeholder="Descreva o que quer gerar..."></textarea></div>
+<div class="form-group"><label class="form-label">Aspect Ratio</label><select class="form-select" id="ai-aspect"><option value="1:1">1:1 (Quadrado)</option><option value="16:9">16:9 (Widescreen)</option><option value="9:16">9:16 (Vertical)</option><option value="4:3">4:3 (Classico)</option><option value="3:2">3:2 (Foto)</option></select></div>
+<div class="form-group"><label class="form-label">URL Imagem Referencia (opcional)</label><input type="text" class="form-input" id="ai-image-url" placeholder="https://..."></div>
+<button class="btn" onclick="generateAI()" id="ai-btn">Gerar</button>
+<div id="ai-result" style="margin-top:14px"></div>
+<div id="ai-history" style="margin-top:14px"></div>
+</div>
+<div class="card" style="margin-top:12px"><div class="card-title">Modelos Disponiveis</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px" id="ai-models-info"></div>
+</div></div>
+<div class="section" id="section-consensus"><div class="card"><div class="card-title">Multi-AI Consensus</div><div class="form-group"><label class="form-label">Prompt</label><textarea class="form-textarea" id="consensus-prompt" placeholder="Digite sua pergunta..."></textarea></div><button class="btn" onclick="runConsensus()" id="consensus-btn">Executar Consensus</button><div id="consensus-result" style="margin-top:12px"></div></div></div>
+<div class="section" id="section-models"><div class="card"><div class="card-title">Modelos Ollama</div><div id="models-list"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
+</div>
+<div class="right-panel">
+<div class="mini-card"><div class="mini-card-title">Status do Hub</div><div class="mini-card-value green">ONLINE</div><div class="mini-card-sub">Conexoes: 4/4 | Inteligencia: 94%</div></div>
+<div class="mini-card"><div class="mini-card-title">Top Recommendation</div><div class="mini-card-text" style="color:var(--orange);font-weight:600">Focus on Project Orion</div><div class="mini-card-text" style="font-size:11px">High impact opportunity aligned with your goals.</div><div style="margin-top:6px"><span class="status-badge online">92% Consensus</span></div></div>
+<div class="mini-card"><div class="mini-card-title">Proximo Passo</div><div class="mini-card-text">Focar no que move a agulha, nao no que enche a agenda.</div><button class="btn btn-sm" style="margin-top:6px">Ver Plano</button></div>
+<div class="mini-card"><div class="mini-card-title">Insight do Dia</div><div class="mini-card-text" style="font-size:11px">Voce nao precisa de mais tempo. Voce precisa de menos distracoes. Dificil, eu sei. Mas nao impossivel.</div></div>
+<div class="mini-card"><div class="mini-card-title">Progresso Geral</div><div class="progress-ring"><div class="progress-inner">72%</div></div><div class="mini-card-sub" style="text-align:center;margin-top:4px">Evoluindo</div></div>
+<div class="mini-card"><div class="mini-card-title">AI Model Breakdown</div>
+<div class="ai-model-row"><span class="ai-model-name">GPT-4o</span><span class="ai-model-score">94%</span></div><div class="consensus-bar-container" style="margin-bottom:4px"><div class="consensus-bar-fill" style="width:94%"></div></div>
+<div class="ai-model-row"><span class="ai-model-name">Claude 3.5</span><span class="ai-model-score">91%</span></div><div class="consensus-bar-container" style="margin-bottom:4px"><div class="consensus-bar-fill" style="width:91%"></div></div>
+<div class="ai-model-row"><span class="ai-model-name">Gemini 1.5</span><span class="ai-model-score">89%</span></div><div class="consensus-bar-container" style="margin-bottom:4px"><div class="consensus-bar-fill" style="width:89%"></div></div>
+<div class="ai-model-row"><span class="ai-model-name">Llama 3.1</span><span class="ai-model-score">86%</span></div><div class="consensus-bar-container" style="margin-bottom:4px"><div class="consensus-bar-fill" style="width:86%"></div></div>
+<div class="ai-model-row"><span class="ai-model-name">Mistral Large</span><span class="ai-model-score">84%</span></div><div class="consensus-bar-container"><div class="consensus-bar-fill" style="width:84%"></div></div>
+</div>
+<div class="mini-card"><div class="mini-card-title">Lembrete Sarcastico</div><div class="mini-card-text" style="font-size:11px;font-style:italic">Parabens por sobreviver a mais um dia fazendo coisas que voce poderia ter feito melhor ontem. Amanha e uma nova chance. Ou mais uma desculpa.</div></div>
+<div class="quote">"A melhor forma de prever o futuro e cria-lo"<br>— Peter Drucker</div>
+
+const API=window.location.origin;
+const authHeaders={'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTVkYTUxMDlkZTI2OGRlMjYwYjE1MTMiLCJlbWFpbCI6ImRpb2dvLnphY2hpb2xpdmVpcmFAZ21haWwuY29tIiwicGxhbiI6ImFkbWluIiwiaWF0IjoxNzg0NTIyMDI0LCJleHAiOjE3ODUxMjY4MjR9.lVnKt9-lpSDnHEFdtXFQZvCCbpUBp5pNWUO5CM0LqCw','Content-Type':'application/json'};
+const SCRAPERS=[{id:'firecrawl',nome:'Firecrawl',desc:'API de crawling que converte qualquer site em markdown limpo para LLMs.',repo:'mendableai/firecrawl',lang:'TypeScript'},{id:'crawl4ai',nome:'Crawl4AI',desc:'Crawler async open-source otimizado para LLMs.',repo:'unclecode/crawl4ai',lang:'Python'},{id:'browser_use',nome:'Browser Use',desc:'Automacao de navegador com IA. LLMs controlam browsers.',repo:'browser-use/browser-use',lang:'Python'},{id:'crawlee',nome:'Crawlee',desc:'Framework de web scraping em Node.js com Puppeteer e Playwright.',repo:'apify/crawlee',lang:'TypeScript'},{id:'scrapy',nome:'Scrapy',desc:'Framework de scraping em Python rapido e de alto nivel.',repo:'scrapy/scrapy',lang:'Python'},{id:'markitdown',nome:'MarkItDown',desc:'Converte PDF, Word, Excel, imagens para markdown. Da Microsoft.',repo:'microsoft/markitdown',lang:'Python'},{id:'scrapling',nome:'Scrapling',desc:'Parser HTML de alta performance com seletor CSS adaptativo.',repo:'D4Vinci/Scrapling',lang:'Python'},{id:'autoscaper',nome:'AutoScraper',desc:'Extracao automatica. Voce da exemplos e ele aprende os padroes.',repo:'keras-team/autoscrape',lang:'Python'},{id:'curl_impersonate',nome:'curl-impersonate',desc:'Curl que impersona browsers reais. Bypassa TLS fingerprint.',repo:'lwthiker/curl-impersonate',lang:'C'},{id:'scrcpy',nome:'scrcpy (Bonus)',desc:'Espelha e controla dispositivos Android via USB/TCP.',repo:'Genymobile/scrcpy',lang:'C'}];
+const IOT_DEVICES=[{nome:'Luzes da Sala',tipo:'light',on:true,extra:'Brilho 75%'},{nome:'Termostato',tipo:'thermostat',on:true,extra:'23C'},{nome:'Camera da Entrada',tipo:'camera',on:true,extra:'LIVE'},{nome:'TV da Sala',tipo:'tv',on:false,extra:'HDMI 1'},{nome:'Fechadura',tipo:'lock',on:true,extra:'LOCKED'},{nome:'Speaker',tipo:'speaker',on:true,extra:'60% Vol'}];
+function updateGreeting(){const now=new Date();const days=['Domingo','Segunda','Terca','Quarta','Quinta','Sexta','Sabado'];const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];const el=document.getElementById('greeting-date');if(el)el.textContent=days[now.getDay()]+', '+now.getDate()+' de '+months[now.getMonth()]+' de '+now.getFullYear()+' - '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+setInterval(updateGreeting,1000);updateGreeting();
+function updateTime(){document.getElementById('header-time').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+setInterval(updateTime,1000);updateTime();
+function showSection(name){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('section-'+name).classList.add('active');const nav=document.querySelector('[data-section="'+name+'"]');if(nav)nav.classList.add('active');if(name==='services')loadServices();if(name==='vault')loadVault();if(name==='github')loadGithub();if(name==='repos')loadReposLocal();if(name==='models')loadModels();if(name==='scrapers')loadScrapers();if(name==='aistudio')loadAIModels();if(name==='iot')loadIoT();}
+async function sendChat(){const input=document.getElementById('chat-input');const btn=document.getElementById('chat-btn');const msg=input.value.trim();if(!msg)return;const box=document.getElementById('chat-box');box.innerHTML+='<div class="chat-msg user">'+msg+'</div>';input.value='';btn.disabled=true;btn.textContent='...';box.innerHTML+='<div class="chat-msg hub3" id="typing">Digitando...</div>';box.scrollTop=box.scrollHeight;try{const resp=await fetch(API+'/api/jarvis/conversar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagem:msg})});const data=await resp.json();document.getElementById('typing').remove();box.innerHTML+='<div class="chat-msg hub3">'+(data.resposta_jarvis||data.detail||'Erro')+'</div>';box.scrollTop=box.scrollHeight;}catch(e){document.getElementById('typing').remove();box.innerHTML+='<div class="chat-msg hub3">Erro: '+e.message+'</div>';}btn.disabled=false;btn.textContent='Enviar';}
+async function loadServices(){const grid=document.getElementById('services-grid');grid.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/services/status');const data=await resp.json();let html='';for(const[nome,info]of Object.entries(data.servicos)){const cls=info.status==='online'?'online':'offline';html+='<div class="service-card '+cls+'"><div class="service-name">'+nome+'</div><span class="status-badge '+cls+'">'+info.status.toUpperCase()+'</span></div>';}grid.innerHTML=html;}catch(e){grid.innerHTML='Erro';}}
+async function loadVault(){const grid=document.getElementById('vault-grid');const info=document.getElementById('vault-info');grid.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/vault/stats',{headers:authHeaders});const data=await resp.json();info.innerHTML='<strong>'+data.total_arquivos+' arquivos</strong> - '+data.tamanho_total_gb+' GB';let html='';for(const[cat,dados]of Object.entries(data.categorias)){if(dados.arquivos>0)html+='<div class="vault-item"><div class="vault-cat">'+cat+'</div><div class="vault-count">'+dados.arquivos+'</div><div class="vault-size">'+dados.tamanho_mb+' MB</div></div>';}grid.innerHTML=html;}catch(e){grid.innerHTML='Erro';}}
+async function loadGithub(){const rd=document.getElementById('github-repos');const cd=document.getElementById('github-commits');rd.innerHTML='<div class="loading"><span class="spinner"></span></div>';cd.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/github/repos');const data=await resp.json();let html='';for(const r of data.repositorios){html+='<div class="repo-card"><div class="repo-name">'+r.name+'</div><a href="'+r.url+'" target="_blank" style="color:var(--cyan);font-size:12px">'+r.url+'</a><br><span style="font-size:11px;color:var(--text-muted)">'+r.updatedAt+'</span></div>';}rd.innerHTML=html;}catch(e){rd.innerHTML='Erro';}try{const resp=await fetch(API+'/github/repos/hub3jarvis/commits');const data=await resp.json();let html='';for(const c of data.commits){html+='<div class="commit-item"><span class="commit-sha">'+c.sha+'</span><span class="commit-msg">'+c.msg.split(String.fromCharCode(92,110))[0]+'</span><span class="commit-date">'+c.data.split('T')[0]+'</span></div>';}cd.innerHTML=html||'Nenhum commit';}catch(e){cd.innerHTML='Erro';}}
+async function loadReposLocal(){const div=document.getElementById('repos-local');div.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/repos/local');const data=await resp.json();let html='';for(const r of data.repositorios){html+='<div class="repo-card"><div class="repo-name">'+r.nome+'</div><div style="font-size:11px;color:var(--text-muted)">'+r.caminho+'</div><div style="margin-top:6px;font-size:12px">Arquivos: '+r.arquivos+'</div><button class="btn btn-sm" style="margin-top:8px" onclick="analyzeRepo(\''+r.nome+'\')">Analisar</button><div id="analysis-'+r.nome+'" style="margin-top:8px"></div></div>';}div.innerHTML=html;}catch(e){div.innerHTML='Erro';}}
+async function analyzeRepo(name){const t=document.getElementById('analysis-'+name);t.innerHTML='<span class="spinner"></span>';try{const resp=await fetch(API+'/repos/local/'+name+'/analyze',{headers:authHeaders});const data=await resp.json();let langs='';for(const[l,v]of Object.entries(data.linguagens)){langs+='<span class="lang-badge">'+l+': '+v+'</span>';}t.innerHTML='<div style="font-size:11px;padding-top:6px">Linhas: '+data.total_linhas+'<br>'+langs+'</div>';}catch(e){t.innerHTML='Erro';}}
+async function createIssue(){const repo=document.getElementById('issue-repo').value;const title=document.getElementById('issue-title').value;const body=document.getElementById('issue-body').value;const labels=document.getElementById('issue-labels').value;const btn=document.getElementById('issue-btn');const res=document.getElementById('issue-result');if(!title){alert('Titulo obrigatorio');return;}btn.disabled=true;res.innerHTML='Criando...';try{const resp=await fetch(API+'/github/repos/'+repo+'/issues',{method:'POST',headers:authHeaders,body:JSON.stringify({repo,titulo:title,corpo:body,labels})});const data=await resp.json();res.innerHTML='<div style="color:var(--green);font-size:12px">Sucesso: '+data.url+'</div>';}catch(e){res.innerHTML='Erro';}btn.disabled=false;}
+async function loadModels(){const div=document.getElementById('models-list');div.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/ollama/models');const data=await resp.json();let html='';for(const m of data.modelos){html+='<div class="ai-model-row"><span class="ai-model-name">'+m.nome+'</span><span class="ai-model-score">'+m.tamanho+'</span></div>';}div.innerHTML=html||'Nenhum modelo';}catch(e){div.innerHTML='Erro';}}
+async function runConsensus(){const prompt=document.getElementById('consensus-prompt').value.trim();const btn=document.getElementById('consensus-btn');const res=document.getElementById('consensus-result');if(!prompt){alert('Digite um prompt');return;}btn.disabled=true;res.innerHTML='<span class="spinner"></span> Executando...';try{const resp=await fetch(API+'/consensus/ollama',{method:'POST',headers:authHeaders,body:JSON.stringify({prompt:prompt,model:'llama3.2:1b'})});const data=await resp.json();res.innerHTML='<div class="chat-msg hub3" style="max-width:100%">'+(data.resposta||data.detail||'Erro')+'</div>';}catch(e){res.innerHTML='Erro';}btn.disabled=false;}
+async function transcribeAudio(){const path=document.getElementById('whisper-path').value.trim();const res=document.getElementById('whisper-result');if(!path){alert('Caminho obrigatorio');return;}res.innerHTML='<span class="spinner"></span> Transcrevendo...';try{const resp=await fetch(API+'/whisper/transcribe',{method:'POST',headers:authHeaders,body:JSON.stringify({audio_path:path})});const data=await resp.json();res.innerHTML='<div class="chat-msg hub3" style="max-width:100%">'+(data.transcricao||data.detail||'Erro')+'</div>';}catch(e){res.innerHTML='Erro';}}
+function loadScrapers(){const grid=document.getElementById('scraper-grid');let html='';for(const s of SCRAPERS){html+='<div class="scraper-card" id="scraper-'+s.id+'"><div class="scraper-name">'+s.nome+'</div><div class="scraper-meta">'+s.lang+' | '+s.repo+'</div><div class="scraper-desc">'+s.desc+'</div><div class="scraper-actions"><button class="btn btn-sm" onclick="installScraper(\''+s.id+'\')">Instalar</button><button class="btn btn-sm btn-orange" onclick="checkScraper(\''+s.id+'\')">Status</button></div><div id="scraper-status-'+s.id+'" style="margin-top:7px;font-size:12px"></div></div>';}grid.innerHTML=html;}
+async function installScraper(id){const s=SCRAPERS.find(x=>x.id===id);const t=document.getElementById('scraper-status-'+id);t.innerHTML='<span class="spinner"></span> Instalando '+s.nome+'...';try{const resp=await fetch(API+'/scrapers/install',{method:'POST',headers:authHeaders,body:JSON.stringify({tool:id,repo:s.repo})});const data=await resp.json();if(data.sucesso){t.innerHTML='<span class="status-badge installed">INSTALADO</span>';document.getElementById('scraper-'+id).classList.add('installed');}else{t.innerHTML='<span class="status-badge offline">ERRO</span> '+data.erro;}}catch(e){t.innerHTML='Erro';}}
+async function checkScraper(id){const t=document.getElementById('scraper-status-'+id);t.innerHTML='<span class="spinner"></span> Verificando...';try{const resp=await fetch(API+'/scrapers/status/'+id,{headers:authHeaders});const data=await resp.json();if(data.instalado){t.innerHTML='<span class="status-badge installed">INSTALADO</span> '+data.versao;document.getElementById('scraper-'+id).classList.add('installed');}else{t.innerHTML='<span class="status-badge offline">NAO INSTALADO</span>';}}catch(e){t.innerHTML='Erro';}}
+async function runScraper(){const tool=document.getElementById('scraper-select').value;const url=document.getElementById('scraper-url').value.trim();const btn=document.getElementById('scraper-run-btn');const res=document.getElementById('scraper-result');if(!url){alert('URL obrigatoria');return;}btn.disabled=true;res.innerHTML='<span class="spinner"></span> Executando '+tool+'...';try{const resp=await fetch(API+'/scrapers/run',{method:'POST',headers:authHeaders,body:JSON.stringify({tool,url})});const data=await resp.json();res.innerHTML='<div class="chat-msg hub3" style="max-width:100%;max-height:400px;overflow-y:auto">'+(data.resultado||data.erro||'Sem resultado')+'</div>';}catch(e){res.innerHTML='Erro';}btn.disabled=false;}
+function loadIoT(){const grid=document.getElementById('iot-grid');let html='';for(const d of IOT_DEVICES){html+='<div class="iot-card"><div class="iot-card-header"><span class="iot-card-name">'+d.nome+'</span><div class="iot-toggle '+(d.on?'on':'')+'" onclick="this.classList.toggle(\'on\')"></div></div>';if(d.tipo==='light'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:75%"></div></div><div class="iot-value">Brilho: 75%</div>';}else if(d.tipo==='thermostat'){html+='<div style="text-align:center;font-size:28px;font-weight:800;color:var(--orange)">23C</div><div class="iot-value">Resfriando</div>';}else if(d.tipo==='camera'){html+='<div style="background:var(--bg);border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:11px;font-weight:700">[LIVE FEED]</div>';}else if(d.tipo==='speaker'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:60%"></div></div><div class="iot-value">Volume: 60%</div>';}else{html+='<div class="iot-value">'+d.extra+'</div>';}html+='</div>';}grid.innerHTML=html;}
+function toggleVoice(){const bar=document.getElementById('voice-bar');const icon=document.getElementById('voice-icon');const sub=document.getElementById('voice-sub');const res=document.getElementById('voice-result');if(bar.classList.contains('listening')){bar.classList.remove('listening');icon.textContent='[mic]';sub.textContent='Clique para falar';res.innerHTML='';}else{bar.classList.add('listening');icon.textContent='[stop]';sub.textContent='Ouvindo...';res.innerHTML='<div style="text-align:center;color:var(--text-muted);font-size:12px;margin-top:8px">Reconhecimento de voz requer HTTPS ou localhost</div>';}}
+</script>
+</body>
+</html>
