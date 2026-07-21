@@ -410,9 +410,9 @@ async function sendChat() {
   btn.disabled = true;
   box.scrollTop = box.scrollHeight;
   try {
-    const r = await fetch(API + '/ai/chat', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,model:'llama3.2:1b'})});
+    const r = await fetch(API + '/api/jarvis/conversar', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagem:text})});
     const d = await r.json();
-    const resposta = d.response||d.message||'Sem resposta';
+    const resposta = d.resposta_jarvis||'Sem resposta';
     box.innerHTML += '<div class="chat-msg hub3">' + resposta + '</div>';
     speakText(resposta);
   } catch(e) {
