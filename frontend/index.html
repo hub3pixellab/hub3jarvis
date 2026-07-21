@@ -302,276 +302,29 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div class="mini-card"><div class="mini-card-title">Lembrete Sarcastico</div><div class="mini-card-text" style="font-size:11px;font-style:italic">Parabens por sobreviver a mais um dia fazendo coisas que voce poderia ter feito melhor ontem. Amanha e uma nova chance. Ou mais uma desculpa.</div></div>
 <div class="quote">"A melhor forma de prever o futuro e cria-lo"<br>— Peter Drucker</div>
 
+
 <script>
 const API = 'http://127.0.0.1:8000';
-const authHeaders={'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTVkYTUxMDlkZTI2OGRlMjYwYjE1MTMiLCJlbWFpbCI6ImRpb2dvLnphY2hpb2xpdmVpcmFAZ21haWwuY29tIiwicGxhbiI6ImFkbWluIiwiaWF0IjoxNzg0NTIyMDI0LCJleHAiOjE3ODUxMjY4MjR9.lVnKt9-lpSDnHEFdtXFQZvCCbpUBp5pNWUO5CM0LqCw','Content-Type':'application/json'};
-const SCRAPERS=[{id:'firecrawl',nome:'Firecrawl',desc:'API de crawling que converte qualquer site em markdown limpo para LLMs.',repo:'mendableai/firecrawl',lang:'TypeScript'},{id:'crawl4ai',nome:'Crawl4AI',desc:'Crawler async open-source otimizado para LLMs.',repo:'unclecode/crawl4ai',lang:'Python'},{id:'browser_use',nome:'Browser Use',desc:'Automacao de navegador com IA. LLMs controlam browsers.',repo:'browser-use/browser-use',lang:'Python'},{id:'crawlee',nome:'Crawlee',desc:'Framework de web scraping em Node.js com Puppeteer e Playwright.',repo:'apify/crawlee',lang:'TypeScript'},{id:'scrapy',nome:'Scrapy',desc:'Framework de scraping em Python rapido e de alto nivel.',repo:'scrapy/scrapy',lang:'Python'},{id:'markitdown',nome:'MarkItDown',desc:'Converte PDF, Word, Excel, imagens para markdown. Da Microsoft.',repo:'microsoft/markitdown',lang:'Python'},{id:'scrapling',nome:'Scrapling',desc:'Parser HTML de alta performance com seletor CSS adaptativo.',repo:'D4Vinci/Scrapling',lang:'Python'},{id:'autoscaper',nome:'AutoScraper',desc:'Extracao automatica. Voce da exemplos e ele aprende os padroes.',repo:'keras-team/autoscrape',lang:'Python'},{id:'curl_impersonate',nome:'curl-impersonate',desc:'Curl que impersona browsers reais. Bypassa TLS fingerprint.',repo:'lwthiker/curl-impersonate',lang:'C'},{id:'scrcpy',nome:'scrcpy (Bonus)',desc:'Espelha e controla dispositivos Android via USB/TCP.',repo:'Genymobile/scrcpy',lang:'C'}];
-const IOT_DEVICES=[{nome:'Luzes da Sala',tipo:'light',on:true,extra:'Brilho 75%'},{nome:'Termostato',tipo:'thermostat',on:true,extra:'23C'},{nome:'Camera da Entrada',tipo:'camera',on:true,extra:'LIVE'},{nome:'TV da Sala',tipo:'tv',on:false,extra:'HDMI 1'},{nome:'Fechadura',tipo:'lock',on:true,extra:'LOCKED'},{nome:'Speaker',tipo:'speaker',on:true,extra:'60% Vol'}];
-function updateGreeting(){const now=new Date();const days=['Domingo','Segunda','Terca','Quarta','Quinta','Sexta','Sabado'];const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];const el=document.getElementById('greeting-date');if(el)el.textContent=days[now.getDay()]+', '+now.getDate()+' de '+months[now.getMonth()]+' de '+now.getFullYear()+' - '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
-setInterval(updateGreeting,1000);updateGreeting();
-function updateTime(){document.getElementById('header-time').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
-setInterval(updateTime,1000);updateTime();
-function showSection(name){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('section-'+name).classList.add('active');const nav=document.querySelector('[data-section="'+name+'"]');if(nav)nav.classList.add('active');if(name==='services')loadServices();
-  setTimeout(startMicrophone, 1000);if(name==='vault')loadVault();if(name==='github')loadGithub();if(name==='repos')loadReposLocal();if(name==='models')loadModels();if(name==='scrapers')loadScrapers();if(name==='aistudio')loadAIModels();if(name==='iot')loadIoT();}
-async function sendChat(){const input=document.getElementById('chat-input');const btn=document.getElementById('chat-btn');const msg=input.value.trim();if(!msg)return;const box=document.getElementById('chat-box');box.innerHTML+='<div class="chat-msg user">'+msg+'</div>';input.value='';btn.disabled=true;btn.textContent='...';box.innerHTML+='<div class="chat-msg hub3" id="typing">Digitando...</div>';box.scrollTop=box.scrollHeight;try{const resp=await fetch(API+'/api/jarvis/conversar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagem:msg})});const data=await resp.json();document.getElementById('typing').remove();box.innerHTML+='<div class="chat-msg hub3">'+(data.resposta_jarvis||data.detail||'Erro')+'</div>';box.scrollTop=box.scrollHeight;}catch(e){document.getElementById('typing').remove();box.innerHTML+='<div class="chat-msg hub3">Erro: '+e.message+'</div>';}btn.disabled=false;btn.textContent='Enviar';}
+const COLORS = {red:'#ff4444',green:'#00e676',blue:'#00d4ff',orange:'#ff8c00',yellow:'#ffd700',violet:'#b388ff',fuchsia:'#e040fb',sky:'#4fc3f7'};
 
-async function loadSkills() {
-  const grid = document.getElementById('skills-grid');
-  const total = document.getElementById('skills-total');
-  grid.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
-  try {
-    const resp = await fetch(API + '/skills');
-    const data = await resp.json();
-    const skills = data.skills || {};
-    total.textContent = '(' + Object.keys(skills).length + ' skills)';
-    let html = '';
-    const colors = {red:'#ff4444',green:'#00e676',blue:'#00d4ff',orange:'#ff8c00',yellow:'#ffd700',violet:'#b388ff',fuchsia:'#e040fb',sky:'#4fc3f7'};
-    for (const [key, skill] of Object.entries(skills)) {
-      const c = colors[skill.color] || '#00d4ff';
-      html += '<div style="background:var(--bg-input);border:1px solid ' + c + ';border-radius:10px;padding:16px">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">';
-      html += '<span style="font-size:14px;font-weight:600;color:' + c + '">' + skill.title + '</span>';
-      html += '<span style="font-size:11px;background:' + c + ';color:#000;padding:2px 8px;border-radius:10px">' + skill.subskills + '</span></div>';
-      html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + (skill.description||'').slice(0,80) + '...</div>';
-      html += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
-      for (const cmd of (skill.commands||[]).slice(0,3)) {
-        html += '<span style="font-size:10px;background:var(--bg);color:var(--cyan);border:1px solid var(--border);padding:2px 6px;border-radius:4px">' + cmd + '</span>';
-      }
-      html += '</div></div>';
-    }
-    grid.innerHTML = html;
-  } catch(e) {
-    grid.innerHTML = '<div class="loading">Erro ao carregar skills</div>';
-  }
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const section = document.getElementById('section-' + name);
+  if (section) section.classList.add('active');
+  const nav = document.querySelector('[data-section="' + name + '"]');
+  if (nav) nav.classList.add('active');
+  if (name === 'services') loadServices();
+  if (name === 'vault') loadVault();
+  if (name === 'github') loadGithub();
+  if (name === 'repos') loadReposLocal();
+  if (name === 'issues') loadIssues();
+  if (name === 'skills') loadSkills();
+  if (name === 'models') loadModels();
+  if (name === 'scrapers') loadScrapers();
+  if (name === 'aistudio') loadAIModels();
+  if (name === 'iot') loadIoT();
 }
-async function autonomousMode() {
-  const input = document.getElementById('auto-input');
-  const result = document.getElementById('auto-result');
-  const text = input.value.trim();
-  if (!text) return;
-  result.innerHTML = '<span class="spinner"></span> JARVIS analisando...';
-  try {
-    const resp = await fetch(API + '/skills/autonomous', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({input: text})
-    });
-    const data = await resp.json();
-    if (!data.detected_skills || data.detected_skills.length === 0) {
-      result.innerHTML = '<div style="background:var(--bg-input);border:1px solid var(--orange);border-radius:8px;padding:12px;font-size:13px">' + data.message + '</div>';
-    } else {
-      let h = '<div style="background:var(--bg-input);border:1px solid var(--green);border-radius:8px;padding:12px">';
-      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">JARVIS detectou ' + data.detected_skills.length + ' skill(s):</div>';
-      for (const s of data.analysis) {
-        h += '<div style="display:flex;justify-content:space-between;padding:8px;margin-bottom:4px;background:var(--bg);border-radius:6px;border-left:3px solid var(--cyan)">';
-        h += '<span><strong>' + s.title + '</strong></span>';
-        h += '<span style="color:var(--text-muted);font-size:12px">' + (s.suggested_command||'') + '</span></div>';
-      }
-      h += '<div style="font-size:12px;color:var(--text-muted);margin-top:8px">' + data.message + '</div></div>';
-      result.innerHTML = h;
-    }
-    input.value = '';
-  } catch(e) {
-    result.innerHTML = '<div style="color:var(--red)">Erro: ' + e.message + '</div>';
-  }
-}
-
-
-async function loadSkills() {
-  const grid = document.getElementById('skills-grid');
-  const total = document.getElementById('skills-total');
-  grid.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
-  try {
-    const resp = await fetch(API + '/skills');
-    const data = await resp.json();
-    const skills = data.skills || {};
-    total.textContent = '(' + Object.keys(skills).length + ' skills)';
-    let h = '';
-    const colors = {red:'#ff4444',green:'#00e676',blue:'#00d4ff',orange:'#ff8c00',yellow:'#ffd700',violet:'#b388ff',fuchsia:'#e040fb',sky:'#4fc3f7'};
-    for (const [k, s] of Object.entries(skills)) {
-      const c = colors[s.color] || '#00d4ff';
-      h += '<div style="background:var(--bg-input);border:1px solid ' + c + ';border-radius:10px;padding:16px">';
-      h += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">';
-      h += '<span style="font-size:14px;font-weight:600;color:' + c + '">' + s.title + '</span>';
-      h += '<span style="font-size:11px;background:' + c + ';color:#000;padding:2px 8px;border-radius:10px">' + s.subskills + '</span></div>';
-      h += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + (s.description||'').slice(0,80) + '...</div>';
-      h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
-      for (const cmd of (s.commands||[]).slice(0,3)) {
-        h += '<span style="font-size:10px;background:var(--bg);color:var(--cyan);border:1px solid var(--border);padding:2px 6px;border-radius:4px">' + cmd + '</span>';
-      }
-      h += '</div></div>';
-    }
-    grid.innerHTML = h;
-  } catch(e) {
-    grid.innerHTML = '<div class="loading">Erro ao carregar skills</div>';
-  }
-}
-async function autonomousMode() {
-  const input = document.getElementById('auto-input');
-  const result = document.getElementById('auto-result');
-  const text = input.value.trim();
-  if (!text) return;
-  result.innerHTML = '<span class="spinner"></span> JARVIS analisando...';
-  try {
-    const resp = await fetch(API + '/skills/autonomous', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({input: text})
-    });
-    const data = await resp.json();
-    if (!data.detected_skills || data.detected_skills.length === 0) {
-      result.innerHTML = '<div style="background:var(--bg-input);border:1px solid var(--orange);border-radius:8px;padding:12px;font-size:13px">' + data.message + '</div>';
-    } else {
-      let h = '<div style="background:var(--bg-input);border:1px solid var(--green);border-radius:8px;padding:12px">';
-      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">JARVIS detectou ' + data.detected_skills.length + ' skill(s):</div>';
-      for (const s of data.analysis) {
-        h += '<div style="display:flex;justify-content:space-between;padding:8px;margin-bottom:4px;background:var(--bg);border-radius:6px;border-left:3px solid var(--cyan)">';
-        h += '<span><strong>' + s.title + '</strong></span>';
-        h += '<span style="color:var(--text-muted);font-size:12px">' + (s.suggested_command||'') + '</span></div>';
-      }
-      h += '<div style="font-size:12px;color:var(--text-muted);margin-top:8px">' + data.message + '</div></div>';
-      result.innerHTML = h;
-    }
-    input.value = '';
-  } catch(e) {
-    result.innerHTML = '<div style="color:var(--red)">Erro: ' + e.message + '</div>';
-  }
-}
-
-
-async function loadSkills() {
-  const grid = document.getElementById('skills-grid');
-  const total = document.getElementById('skills-total');
-  grid.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
-  try {
-    const resp = await fetch(API + '/skills');
-    const data = await resp.json();
-    const skills = data.skills || {};
-    total.textContent = '(' + Object.keys(skills).length + ' skills)';
-    let h = '';
-    const colors = {red:'#ff4444',green:'#00e676',blue:'#00d4ff',orange:'#ff8c00',yellow:'#ffd700',violet:'#b388ff',fuchsia:'#e040fb',sky:'#4fc3f7'};
-    for (const [k, s] of Object.entries(skills)) {
-      const c = colors[s.color] || '#00d4ff';
-      h += '<div style="background:var(--bg-input);border:1px solid ' + c + ';border-radius:10px;padding:16px">';
-      h += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">';
-      h += '<span style="font-size:14px;font-weight:600;color:' + c + '">' + s.title + '</span>';
-      h += '<span style="font-size:11px;background:' + c + ';color:#000;padding:2px 8px;border-radius:10px">' + s.subskills + '</span></div>';
-      h += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + (s.description||'').slice(0,80) + '...</div>';
-      h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
-      for (const cmd of (s.commands||[]).slice(0,3)) {
-        h += '<span style="font-size:10px;background:var(--bg);color:var(--cyan);border:1px solid var(--border);padding:2px 6px;border-radius:4px">' + cmd + '</span>';
-      }
-      h += '</div></div>';
-    }
-    grid.innerHTML = h;
-  } catch(e) {
-    grid.innerHTML = '<div class="loading">Erro ao carregar skills</div>';
-  }
-}
-async function autonomousMode() {
-  const input = document.getElementById('auto-input');
-  const result = document.getElementById('auto-result');
-  const text = input.value.trim();
-  if (!text) return;
-  result.innerHTML = '<span class="spinner"></span> JARVIS analisando...';
-  try {
-    const resp = await fetch(API + '/skills/autonomous', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({input: text})
-    });
-    const data = await resp.json();
-    if (!data.detected_skills || data.detected_skills.length === 0) {
-      result.innerHTML = '<div style="background:var(--bg-input);border:1px solid var(--orange);border-radius:8px;padding:12px;font-size:13px">' + data.message + '</div>';
-    } else {
-      let h = '<div style="background:var(--bg-input);border:1px solid var(--green);border-radius:8px;padding:12px">';
-      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">JARVIS detectou ' + data.detected_skills.length + ' skill(s):</div>';
-      for (const s of data.analysis) {
-        h += '<div style="display:flex;justify-content:space-between;padding:8px;margin-bottom:4px;background:var(--bg);border-radius:6px;border-left:3px solid var(--cyan)">';
-        h += '<span><strong>' + s.title + '</strong></span>';
-        h += '<span style="color:var(--text-muted);font-size:12px">' + (s.suggested_command||'') + '</span></div>';
-      }
-      h += '<div style="font-size:12px;color:var(--text-muted);margin-top:8px">' + data.message + '</div></div>';
-      result.innerHTML = h;
-    }
-    input.value = '';
-  } catch(e) {
-    result.innerHTML = '<div style="color:var(--red)">Erro: ' + e.message + '</div>';
-  }
-}
-
-
-async function loadSkills() {
-  const grid = document.getElementById('skills-grid');
-  const total = document.getElementById('skills-total');
-  grid.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
-  try {
-    const resp = await fetch(API + '/skills');
-    const data = await resp.json();
-    const skills = data.skills || {};
-    total.textContent = '(' + Object.keys(skills).length + ' skills)';
-    let h = '';
-    const colors = {red:'#ff4444',green:'#00e676',blue:'#00d4ff',orange:'#ff8c00',yellow:'#ffd700',violet:'#b388ff',fuchsia:'#e040fb',sky:'#4fc3f7'};
-    for (const [k, s] of Object.entries(skills)) {
-      const c = colors[s.color] || '#00d4ff';
-      h += '<div style="background:var(--bg-input);border:1px solid ' + c + ';border-radius:10px;padding:16px">';
-      h += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">';
-      h += '<span style="font-size:14px;font-weight:600;color:' + c + '">' + s.title + '</span>';
-      h += '<span style="font-size:11px;background:' + c + ';color:#000;padding:2px 8px;border-radius:10px">' + s.subskills + '</span></div>';
-      h += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + (s.description||'').slice(0,80) + '...</div>';
-      h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
-      for (const cmd of (s.commands||[]).slice(0,3)) {
-        h += '<span style="font-size:10px;background:var(--bg);color:var(--cyan);border:1px solid var(--border);padding:2px 6px;border-radius:4px">' + cmd + '</span>';
-      }
-      h += '</div></div>';
-    }
-    grid.innerHTML = h;
-  } catch(e) {
-    grid.innerHTML = '<div class="loading">Erro ao carregar skills</div>';
-  }
-}
-async function autonomousMode() {
-  const input = document.getElementById('auto-input');
-  const result = document.getElementById('auto-result');
-  const text = input.value.trim();
-  if (!text) return;
-  result.innerHTML = '<span class="spinner"></span> JARVIS analisando...';
-  try {
-    const resp = await fetch(API + '/skills/autonomous', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({input: text})
-    });
-    const data = await resp.json();
-    if (!data.detected_skills || data.detected_skills.length === 0) {
-      result.innerHTML = '<div style="background:var(--bg-input);border:1px solid var(--orange);border-radius:8px;padding:12px;font-size:13px">' + data.message + '</div>';
-    } else {
-      let h = '<div style="background:var(--bg-input);border:1px solid var(--green);border-radius:8px;padding:12px">';
-      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">JARVIS detectou ' + data.detected_skills.length + ' skill(s):</div>';
-      for (const s of data.analysis) {
-        h += '<div style="display:flex;justify-content:space-between;padding:8px;margin-bottom:4px;background:var(--bg);border-radius:6px;border-left:3px solid var(--cyan)">';
-        h += '<span><strong>' + s.title + '</strong></span>';
-        h += '<span style="color:var(--text-muted);font-size:12px">' + (s.suggested_command||'') + '</span></div>';
-      }
-      h += '<div style="font-size:12px;color:var(--text-muted);margin-top:8px">' + data.message + '</div></div>';
-      result.innerHTML = h;
-    }
-    input.value = '';
-  } catch(e) {
-    result.innerHTML = '<div style="color:var(--red)">Erro: ' + e.message + '</div>';
-  }
-}
-
-async function loadServices(){const grid=document.getElementById('services-grid');grid.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/services/status');const data=await resp.json();let html='';for(const[nome,info]of Object.entries(data.servicos)){const cls=info.status==='online'?'online':'offline';html+='<div class="service-card '+cls+'"><div class="service-name">'+nome+'</div><span class="status-badge '+cls+'">'+info.status.toUpperCase()+'</span></div>';}grid.innerHTML=html;}catch(e){grid.innerHTML='Erro';}}
-async function loadVault(){const grid=document.getElementById('vault-grid');const info=document.getElementById('vault-info');grid.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/vault/stats',{headers:authHeaders});const data=await resp.json();info.innerHTML='<strong>'+data.total_arquivos+' arquivos</strong> - '+data.tamanho_total_gb+' GB';let html='';for(const[cat,dados]of Object.entries(data.categorias)){if(dados.arquivos>0)html+='<div class="vault-item"><div class="vault-cat">'+cat+'</div><div class="vault-count">'+dados.arquivos+'</div><div class="vault-size">'+dados.tamanho_mb+' MB</div></div>';}grid.innerHTML=html;}catch(e){grid.innerHTML='Erro';}}
-async function loadGithub(){const rd=document.getElementById('github-repos');const cd=document.getElementById('github-commits');rd.innerHTML='<div class="loading"><span class="spinner"></span></div>';cd.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/github/repos');const data=await resp.json();let html='';for(const r of data.repositorios){html+='<div class="repo-card"><div class="repo-name">'+r.name+'</div><a href="'+r.url+'" target="_blank" style="color:var(--cyan);font-size:12px">'+r.url+'</a><br><span style="font-size:11px;color:var(--text-muted)">'+r.updatedAt+'</span></div>';}rd.innerHTML=html;}catch(e){rd.innerHTML='Erro';}try{const resp=await fetch(API+'/github/repos/hub3jarvis/commits');const data=await resp.json();let html='';for(const c of data.commits){html+='<div class="commit-item"><span class="commit-sha">'+c.sha+'</span><span class="commit-msg">'+c.msg.split(String.fromCharCode(92,110))[0]+'</span><span class="commit-date">'+c.data.split('T')[0]+'</span></div>';}cd.innerHTML=html||'Nenhum commit';}catch(e){cd.innerHTML='Erro';}}
-async function loadReposLocal(){const div=document.getElementById('repos-local');div.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/repos/local');const data=await resp.json();let html='';for(const r of data.repositorios){html+='<div class="repo-card"><div class="repo-name">'+r.nome+'</div><div style="font-size:11px;color:var(--text-muted)">'+r.caminho+'</div><div style="margin-top:6px;font-size:12px">Arquivos: '+r.arquivos+'</div><button class="btn btn-sm" style="margin-top:8px" onclick="analyzeRepo(\''+r.nome+'\')">Analisar</button><div id="analysis-'+r.nome+'" style="margin-top:8px"></div></div>';}div.innerHTML=html;}catch(e){div.innerHTML='Erro';}}
-async function analyzeRepo(name){const t=document.getElementById('analysis-'+name);t.innerHTML='<span class="spinner"></span>';try{const resp=await fetch(API+'/repos/local/'+name+'/analyze',{headers:authHeaders});const data=await resp.json();let langs='';for(const[l,v]of Object.entries(data.linguagens)){langs+='<span class="lang-badge">'+l+': '+v+'</span>';}t.innerHTML='<div style="font-size:11px;padding-top:6px">Linhas: '+data.total_linhas+'<br>'+langs+'</div>';}catch(e){t.innerHTML='Erro';}}
-async function createIssue(){const repo=document.getElementById('issue-repo').value;const title=document.getElementById('issue-title').value;const body=document.getElementById('issue-body').value;const labels=document.getElementById('issue-labels').value;const btn=document.getElementById('issue-btn');const res=document.getElementById('issue-result');if(!title){alert('Titulo obrigatorio');return;}btn.disabled=true;res.innerHTML='Criando...';try{const resp=await fetch(API+'/github/repos/'+repo+'/issues',{method:'POST',headers:authHeaders,body:JSON.stringify({repo,titulo:title,corpo:body,labels})});const data=await resp.json();res.innerHTML='<div style="color:var(--green);font-size:12px">Sucesso: '+data.url+'</div>';}catch(e){res.innerHTML='Erro';}btn.disabled=false;}
-async function loadModels(){const div=document.getElementById('models-list');div.innerHTML='<div class="loading"><span class="spinner"></span></div>';try{const resp=await fetch(API+'/ollama/models');const data=await resp.json();let html='';for(const m of data.modelos){html+='<div class="ai-model-row"><span class="ai-model-name">'+m.nome+'</span><span class="ai-model-score">'+m.tamanho+'</span></div>';}div.innerHTML=html||'Nenhum modelo';}catch(e){div.innerHTML='Erro';}}
-async function runConsensus(){const prompt=document.getElementById('consensus-prompt').value.trim();const btn=document.getElementById('consensus-btn');const res=document.getElementById('consensus-result');if(!prompt){alert('Digite um prompt');return;}btn.disabled=true;res.innerHTML='<span class="spinner"></span> Executando...';try{const resp=await fetch(API+'/consensus/ollama',{method:'POST',headers:authHeaders,body:JSON.stringify({prompt:prompt,model:'llama3.2:1b'})});const data=await resp.json();res.innerHTML='<div class="chat-msg hub3" style="max-width:100%">'+(data.resposta||data.detail||'Erro')+'</div>';}catch(e){res.innerHTML='Erro';}btn.disabled=false;}
-async function transcribeAudio(){const path=document.getElementById('whisper-path').value.trim();const res=document.getElementById('whisper-result');if(!path){alert('Caminho obrigatorio');return;}res.innerHTML='<span class="spinner"></span> Transcrevendo...';try{const resp=await fetch(API+'/whisper/transcribe',{method:'POST',headers:authHeaders,body:JSON.stringify({audio_path:path})});const data=await resp.json();res.innerHTML='<div class="chat-msg hub3" style="max-width:100%">'+(data.transcricao||data.detail||'Erro')+'</div>';}catch(e){res.innerHTML='Erro';}}
-function loadScrapers(){const grid=document.getElementById('scraper-grid');let html='';for(const s of SCRAPERS){html+='<div class="scraper-card" id="scraper-'+s.id+'"><div class="scraper-name">'+s.nome+'</div><div class="scraper-meta">'+s.lang+' | '+s.repo+'</div><div class="scraper-desc">'+s.desc+'</div><div class="scraper-actions"><button class="btn btn-sm" onclick="installScraper(\''+s.id+'\')">Instalar</button><button class="btn btn-sm btn-orange" onclick="checkScraper(\''+s.id+'\')">Status</button></div><div id="scraper-status-'+s.id+'" style="margin-top:7px;font-size:12px"></div></div>';}grid.innerHTML=html;}
-async function installScraper(id){const s=SCRAPERS.find(x=>x.id===id);const t=document.getElementById('scraper-status-'+id);t.innerHTML='<span class="spinner"></span> Instalando '+s.nome+'...';try{const resp=await fetch(API+'/scrapers/install',{method:'POST',headers:authHeaders,body:JSON.stringify({tool:id,repo:s.repo})});const data=await resp.json();if(data.sucesso){t.innerHTML='<span class="status-badge installed">INSTALADO</span>';document.getElementById('scraper-'+id).classList.add('installed');}else{t.innerHTML='<span class="status-badge offline">ERRO</span> '+data.erro;}}catch(e){t.innerHTML='Erro';}}
-async function checkScraper(id){const t=document.getElementById('scraper-status-'+id);t.innerHTML='<span class="spinner"></span> Verificando...';try{const resp=await fetch(API+'/scrapers/status/'+id,{headers:authHeaders});const data=await resp.json();if(data.instalado){t.innerHTML='<span class="status-badge installed">INSTALADO</span> '+data.versao;document.getElementById('scraper-'+id).classList.add('installed');}else{t.innerHTML='<span class="status-badge offline">NAO INSTALADO</span>';}}catch(e){t.innerHTML='Erro';}}
-async function runScraper(){const tool=document.getElementById('scraper-select').value;const url=document.getElementById('scraper-url').value.trim();const btn=document.getElementById('scraper-run-btn');const res=document.getElementById('scraper-result');if(!url){alert('URL obrigatoria');return;}btn.disabled=true;res.innerHTML='<span class="spinner"></span> Executando '+tool+'...';try{const resp=await fetch(API+'/scrapers/run',{method:'POST',headers:authHeaders,body:JSON.stringify({tool,url})});const data=await resp.json();res.innerHTML='<div class="chat-msg hub3" style="max-width:100%;max-height:400px;overflow-y:auto">'+(data.resultado||data.erro||'Sem resultado')+'</div>';}catch(e){res.innerHTML='Erro';}btn.disabled=false;}
-function loadIoT(){const grid=document.getElementById('iot-grid');let html='';for(const d of IOT_DEVICES){html+='<div class="iot-card"><div class="iot-card-header"><span class="iot-card-name">'+d.nome+'</span><div class="iot-toggle '+(d.on?'on':'')+'" onclick="this.classList.toggle(\'on\')"></div></div>';if(d.tipo==='light'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:75%"></div></div><div class="iot-value">Brilho: 75%</div>';}else if(d.tipo==='thermostat'){html+='<div style="text-align:center;font-size:28px;font-weight:800;color:var(--orange)">23C</div><div class="iot-value">Resfriando</div>';}else if(d.tipo==='camera'){html+='<div style="background:var(--bg);border-radius:8px;height:60px;display:flex;align-items:center;justify-content:center;color:var(--green);font-size:11px;font-weight:700">[LIVE FEED]</div>';}else if(d.tipo==='speaker'){html+='<div class="iot-slider"><div class="iot-slider-fill" style="width:60%"></div></div><div class="iot-value">Volume: 60%</div>';}else{html+='<div class="iot-value">'+d.extra+'</div>';}html+='</div>';}grid.innerHTML=html;}
 
 function speakText(text) {
     if ('speechSynthesis' in window) {
@@ -581,8 +334,6 @@ function speakText(text) {
         utterance.pitch = 0.9;
         utterance.rate = 1.0;
         window.speechSynthesis.speak(utterance);
-    } else {
-        console.error("Este navegador nao suporta sintese de voz.");
     }
 }
 
@@ -592,17 +343,12 @@ let autoRestart = true;
 
 function startMicrophone() {
     if (isListening) return;
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        const res = document.getElementById('voice-result');
-        if (res) res.innerHTML = '<div style="color:var(--red);text-align:center;margin-top:8px">Navegador nao suporta reconhecimento de voz.</div>';
-        return;
-    }
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
     recognition.continuous = true;
     recognition.interimResults = true;
-    
     recognition.onstart = function() {
         isListening = true;
         const bar = document.getElementById('voice-bar');
@@ -612,86 +358,275 @@ function startMicrophone() {
         if (icon) icon.textContent = '[stop]';
         if (sub) sub.textContent = 'Sempre ouvindo... Clique para parar';
     };
-    
     recognition.onresult = function(event) {
         const res = document.getElementById('voice-result');
         const chatInput = document.getElementById('chat-input');
         let finalTranscript = '';
-        let interimTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) {
-                finalTranscript += event.results[i][0].transcript;
-            } else {
-                interimTranscript += event.results[i][0].transcript;
-            }
-        }
-        if (res) {
-            if (finalTranscript) {
-                res.innerHTML = '<div style="color:var(--cyan);text-align:center;margin-top:4px;font-size:13px;font-weight:bold;">"' + finalTranscript + '"</div>';
-            } else if (interimTranscript) {
-                res.innerHTML = '<div style="color:var(--text-muted);text-align:center;margin-top:4px;font-size:12px">' + interimTranscript + '...</div>';
-            }
+            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
         }
         if (finalTranscript && chatInput) {
             chatInput.value = finalTranscript;
-            const enterEvent = new KeyboardEvent('keypress', {
-                key: 'Enter', code: 'Enter', which: 13, keyCode: 13, bubbles: true
-            });
+            const enterEvent = new KeyboardEvent('keypress', {key:'Enter', code:'Enter', which:13, keyCode:13, bubbles:true});
             chatInput.dispatchEvent(enterEvent);
         }
     };
-    
     recognition.onerror = function(event) {
-        const res = document.getElementById('voice-result');
-        if (res) res.innerHTML = '<div style="color:var(--red);text-align:center;margin-top:8px;font-size:12px">Erro: ' + event.error + '</div>';
         isListening = false;
-        // Tentar reiniciar automaticamente se nao for erro de permissao
-        if (autoRestart && event.error !== 'not-allowed') {
-            setTimeout(startMicrophone, 1000);
-        }
+        if (autoRestart && event.error !== 'not-allowed') setTimeout(startMicrophone, 1000);
     };
-    
     recognition.onend = function() {
         isListening = false;
-        const bar = document.getElementById('voice-bar');
-        const icon = document.getElementById('voice-icon');
-        const sub = document.getElementById('voice-sub');
-        if (bar) bar.classList.remove('listening');
-        if (icon) icon.textContent = '[mic]';
-        if (sub) sub.textContent = 'Microfone desligado';
-        // Reiniciar automaticamente se autoRestart estiver ativo
-        if (autoRestart) {
-            setTimeout(startMicrophone, 500);
-        }
+        if (autoRestart) setTimeout(startMicrophone, 500);
     };
-    
-    try {
-        recognition.start();
-    } catch(e) {
-        console.log('Erro ao iniciar microfone:', e);
-    }
+    try { recognition.start(); } catch(e) {}
 }
 
 function toggleVoice() {
     const bar = document.getElementById('voice-bar');
     const icon = document.getElementById('voice-icon');
     const sub = document.getElementById('voice-sub');
-    
     if (isListening) {
-        // Parar o microfone
         autoRestart = false;
-        if (recognition) {
-            recognition.stop();
-            recognition = null;
-        }
+        if (recognition) { recognition.stop(); recognition = null; }
         isListening = false;
         if (bar) bar.classList.remove('listening');
         if (icon) icon.textContent = '[mic]';
         if (sub) sub.textContent = 'Microfone desligado';
     } else {
-        // Ligar o microfone
         autoRestart = true;
         startMicrophone();
     }
 }
 
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const box = document.getElementById('chat-box');
+  const btn = document.getElementById('chat-btn');
+  const text = input.value.trim();
+  if (!text) return;
+  box.innerHTML += '<div class="chat-msg user">' + text.replace(/</g,'&lt;') + '</div>';
+  input.value = '';
+  btn.disabled = true;
+  box.scrollTop = box.scrollHeight;
+  try {
+    const r = await fetch(API + '/ai/chat', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,model:'llama3.2:1b'})});
+    const d = await r.json();
+    const resposta = d.response||d.message||'Sem resposta';
+    box.innerHTML += '<div class="chat-msg hub3">' + resposta + '</div>';
+    speakText(resposta);
+  } catch(e) {
+    box.innerHTML += '<div class="chat-msg hub3" style="color:var(--red)">Erro: ' + e.message + '</div>';
+  }
+  btn.disabled = false;
+  box.scrollTop = box.scrollHeight;
+}
+
+async function loadServices() {
+  const g = document.getElementById('services-grid');
+  if (!g) return;
+  g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  try {
+    const r = await fetch(API + '/services/status');
+    const d = await r.json();
+    const sv = d.services || d || {};
+    let h = '';
+    for (const [n, s] of Object.entries(sv)) {
+      if (n === 'ollama') continue;
+      const on = s === 'online' || s === true || (typeof s === 'object' && s.status === 'online');
+      h += '<div class="service-card ' + (on?'online':'offline') + '"><div class="service-name">' + n + '</div><div class="service-status">' + (on?'Online':'Offline') + '</div></div>';
+    }
+    g.innerHTML = h || '<div class="loading">Nenhum servico</div>';
+  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+}
+
+async function loadVault() {
+  const g = document.getElementById('vault-grid');
+  const n = document.getElementById('vault-info');
+  if (!g) return;
+  g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  try {
+    const r = await fetch(API + '/vault/stats');
+    const d = await r.json();
+    if (n) n.textContent = 'Total: ' + (d.total_files||0) + ' arquivos, ' + (d.total_size_formatted||d.total_size||'0 MB');
+    let h = '';
+    for (const [c, v] of Object.entries(d)) {
+      if (c === 'total_files' || c === 'total_size' || c === 'total_size_formatted') continue;
+      h += '<div class="vault-item"><div class="vault-cat">' + c + '</div><div class="vault-count">' + (typeof v === 'object' ? v.count||v.size||v : v) + '</div></div>';
+    }
+    g.innerHTML = h || '<div class="loading">Vault vazio</div>';
+  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+}
+
+async function loadGithub() {
+  const rd = document.getElementById('github-repos');
+  const cd = document.getElementById('github-commits');
+  if (!rd) return;
+  rd.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  if (cd) cd.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  try {
+    const r = await fetch(API + '/github/repos');
+    const d = await r.json();
+    let h = '';
+    for (const repo of (d.repos||d||[])) {
+      h += '<div class="repo-card"><div class="repo-name">' + (repo.name||repo) + '</div></div>';
+    }
+    rd.innerHTML = h || '<div class="loading">Nenhum repo</div>';
+    if (cd) {
+      const rc = await fetch(API + '/github/repos/hub3jarvis/commits');
+      const dc = await rc.json();
+      let ch = '';
+      for (const c of (dc.commits||dc||[]).slice(0,10)) {
+        ch += '<div class="commit-item"><span class="commit-sha">' + (c.sha||'').slice(0,7) + '</span><span class="commit-msg">' + (c.commit?.message||c.message||'') + '</span></div>';
+      }
+      cd.innerHTML = ch || '<div class="loading">Nenhum commit</div>';
+    }
+  } catch(e) { rd.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+}
+
+async function loadReposLocal() {
+  const g = document.getElementById('repos-local');
+  if (!g) return;
+  g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  try {
+    const r = await fetch(API + '/repos/local');
+    const d = await r.json();
+    let h = '';
+    for (const repo of (d.repos||d||[])) {
+      h += '<div class="repo-card"><div class="repo-name">' + (repo.name||repo.path||repo) + '</div></div>';
+    }
+    g.innerHTML = h || '<div class="loading">Nenhum repo local</div>';
+  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+}
+
+async function loadIssues() {
+  const g = document.getElementById('issues-list');
+  if (!g) return;
+  g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  try {
+    const r = await fetch(API + '/github/repos/hub3jarvis/issues');
+    const d = await r.json();
+    let h = '';
+    for (const issue of (d.issues||d||[]).slice(0,10)) {
+      h += '<div class="repo-card"><div class="repo-name">#' + (issue.number||'') + ' ' + (issue.title||'') + '</div></div>';
+    }
+    g.innerHTML = h || '<div class="loading">Nenhuma issue</div>';
+  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+}
+
+async function loadSkills() {
+  const g = document.getElementById('skills-grid');
+  const t = document.getElementById('skills-total');
+  if (!g) return;
+  g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  try {
+    const r = await fetch(API + '/skills');
+    const d = await r.json();
+    const skills = d.skills || {};
+    if (t) t.textContent = '(' + Object.keys(skills).length + ' skills)';
+    let h = '';
+    for (const [k, s] of Object.entries(skills)) {
+      const c = COLORS[s.color] || '#00d4ff';
+      h += '<div style="background:var(--bg-input);border:1px solid ' + c + ';border-radius:10px;padding:16px">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">';
+      h += '<span style="font-size:14px;font-weight:600;color:' + c + '">' + s.title + '</span>';
+      h += '<span style="font-size:11px;background:' + c + ';color:#000;padding:2px 8px;border-radius:10px">' + s.subskills + '</span></div>';
+      h += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + (s.description||'').slice(0,80) + '...</div>';
+      h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+      for (const cmd of (s.commands||[]).slice(0,3)) {
+        h += '<span style="font-size:10px;background:var(--bg);color:var(--cyan);border:1px solid var(--border);padding:2px 6px;border-radius:4px">' + cmd + '</span>';
+      }
+      h += '</div></div>';
+    }
+    g.innerHTML = h || '<div class="loading">Nenhuma skill encontrada</div>';
+  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+}
+
+async function autonomousMode() {
+  const input = document.getElementById('auto-input');
+  const result = document.getElementById('auto-result');
+  if (!input || !result) return;
+  const text = input.value.trim();
+  if (!text) return;
+  result.innerHTML = '<span class="spinner"></span> JARVIS analisando...';
+  try {
+    const r = await fetch(API + '/skills/autonomous', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:text})});
+    const d = await r.json();
+    if (!d.detected_skills || d.detected_skills.length === 0) {
+      result.innerHTML = '<div style="background:var(--bg-input);border:1px solid var(--orange);border-radius:8px;padding:12px;font-size:13px">' + d.message + '</div>';
+    } else {
+      let h = '<div style="background:var(--bg-input);border:1px solid var(--green);border-radius:8px;padding:12px">';
+      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">JARVIS detectou ' + d.detected_skills.length + ' skill(s):</div>';
+      for (const s of d.analysis) {
+        h += '<div style="display:flex;justify-content:space-between;padding:8px;margin-bottom:4px;background:var(--bg);border-radius:6px;border-left:3px solid var(--cyan)">';
+        h += '<span><strong>' + s.title + '</strong></span>';
+        h += '<span style="color:var(--text-muted);font-size:12px">' + (s.suggested_command||'') + '</span></div>';
+      }
+      h += '<div style="font-size:12px;color:var(--text-muted);margin-top:8px">' + d.message + '</div></div>';
+      result.innerHTML = h;
+    }
+    input.value = '';
+  } catch(e) { result.innerHTML = '<div style="color:var(--red)">Erro: ' + e.message + '</div>'; }
+}
+
+async function loadModels() {
+  const g = document.getElementById('models-list');
+  if (!g) return;
+  g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  try {
+    const r = await fetch(API + '/ai/models');
+    const d = await r.json();
+    const models = d.models || d || [];
+    let h = '';
+    for (const m of models) h += '<div class="service-card online"><div class="service-name">' + (m.name||m.model||m) + '</div></div>';
+    g.innerHTML = h || '<div class="loading">Nenhum modelo Ollama</div>';
+  } catch(e) { g.innerHTML = '<div class="loading">Erro: ' + e.message + '</div>'; }
+}
+
+async function loadIoT() {
+  const g = document.getElementById('iot-grid');
+  if (!g) return;
+  g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
+  const devices = [
+    {name:'Smart Lights',status:'online',value:'Ligado 83%'},{name:'Thermostat',status:'online',value:'22 C'},
+    {name:'Security Cam',status:'online',value:'Transmitindo'},{name:'Smart TV',status:'offline',value:'Desligada'},
+    {name:'Door Lock',status:'online',value:'Trancada'},{name:'Speaker',status:'online',value:'Volume 45%'}
+  ];
+  g.innerHTML = devices.map(d => '<div class="service-card ' + d.status + '"><div class="service-name">' + d.name + '</div><div class="service-status">' + d.value + '</div></div>').join('');
+}
+
+async function loadScrapers() {
+  const g = document.getElementById('scraper-grid');
+  if (!g) return;
+  const scrapers = ['Firecrawl','Crawl4AI','Browser Use','Crawlee','Scrapy','MarkItDown','Scrapling','AutoScraper','curl-impersonate','scrcpy'];
+  g.innerHTML = scrapers.map(s => '<div class="service-card online"><div class="service-name">' + s + '</div><div class="service-status">Disponivel</div></div>').join('');
+}
+
+async function loadAIModels() {
+  const sel = document.getElementById('ai-model');
+  if (!sel) return;
+  sel.innerHTML = '<option>Carregando...</option>';
+  try {
+    const r = await fetch(API + '/ai/models');
+    const d = await r.json();
+    const models = d.models || d || [];
+    sel.innerHTML = models.map(m => '<option value="' + (m.name||m.model||m) + '">' + (m.name||m.model||m) + '</option>').join('');
+    const info = document.getElementById('ai-models-info');
+    if (info) info.innerHTML = models.slice(0,12).map(m => '<div style="background:var(--bg-input);padding:8px 12px;border-radius:6px;font-size:12px;border:1px solid var(--border);color:var(--cyan)">' + (m.name||m.model||m) + '</div>').join('');
+  } catch(e) { sel.innerHTML = '<option>Erro ao carregar</option>'; }
+}
+
+function updateClock() {
+  const el = document.getElementById('header-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('pt-BR');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadServices();
+  setTimeout(startMicrophone, 1000);
+});
+</script>
+</body>
+</html>
