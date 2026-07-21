@@ -606,11 +606,23 @@ function toggleVoice() {
         sub.textContent = 'Ouvindo... Fale agora';
         res.innerHTML = '';
     };
-    recognition.onresult = function(event) {
+        recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
         res.innerHTML = '<div style="color:var(--cyan);text-align:center;margin-top:8px;font-weight:bold;">"' + transcript + '"</div>';
+        
+        // Joga o texto capturado direto no input do chat e envia
         if (chatInput) {
             chatInput.value = transcript;
+            
+            // Simula a tecla "Enter" para disparar o envio automaticamente
+            const enterEvent = new KeyboardEvent('keypress', {
+                key: 'Enter',
+                code: 'Enter',
+                which: 13,
+                keyCode: 13,
+                bubbles: true
+            });
+            chatInput.dispatchEvent(enterEvent);
         }
     };
     recognition.onerror = function(event) {
