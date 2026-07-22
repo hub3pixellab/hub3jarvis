@@ -509,6 +509,10 @@ async def autonomous_analysis(data: dict):
 from routes.autonomy_routes import register_routes
 app = register_routes(app, orchestrator)
 
+# ===== ROTA DE INTEGRACOES =====
+from routes.integrations_route import register_integrations_route
+app = register_integrations_route(app)
+
 @app.get("/groq/models")
 async def groq_models():
 	"""Lista modelos disponiveis no Groq"""
@@ -524,6 +528,22 @@ async def chat_status():
 		"groq_configured": groq_chat.configured,
 		"groq_model": groq_chat.model,
 		"fallback": "ollama (llama3.2:1b)"
+	}
+
+@app.get("/embeddings/status")
+async def embeddings_status():
+	"""Status do servico de embeddings Hugging Face"""
+	from modules.huggingface_embeddings import hf_embeddings
+	from modules.second_brain import second_brain
+	brain = second_brain.get_stats()
+	emb = await hf_embeddings.get_status()
+	return {
+		"embeddings": emb,
+		"second_brain": brain,
+		"total_knowledge_indexed": brain.get("total_knowledge", 0),
+		"model": "paraphrase-multilingual-MiniLM-L12-v2",
+		"dimensao": 384,
+		"plan": "gratuito (huggingface inference api)"
 	}
 
 app.mount("/frontend", StaticFiles(directory="/Volumes/JARVIS HUB3/hub3-jarvis/frontend"), name="frontend")

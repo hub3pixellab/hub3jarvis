@@ -123,15 +123,26 @@ class KnowledgeVault:
             index = [i for i in index if i.get("category") == category]
         return {"total": len(index), "items": index}
 
-    async def search_vault(self, query: str) -> dict:
+    async def search_vault(self, query: str, use_semantic=True) -> dict:
         log_path = os.path.join(self.root, "vault_index.json")
         if not os.path.exists(log_path):
             return {"results": [], "total": 0}
         with open(log_path, "r", encoding="utf-8") as f:
             index = json.load(f)
+        # Busca semantica via Hugging Face
+        if use_semantic:
+            try:
+                from modules.huggingface_embeddings import hf_embeddings
+                docs = [{"content": f"{i.get('filename','')} - {i.get('category','')} - {i.get('mime_type','')}", "entry": i} for i in index]
+                results = await hf_embeddings.semantic_search(query, docs, top_k=10, text_key="content", score_key="relevance_score")
+                if results:
+                    return {"query": query, "results": [r["entry"] for r in results], "total": len(results), "mode": "semantico"}
+            except:
+                pass
+        # Fallback: busca por keyword
         q = query.lower()
         results = [i for i in index if q in i.get("filename", "").lower() or q in i.get("category", "").lower()]
-        return {"query": query, "results": results, "total": len(results)}
+        return {"query": query, "results": results, "total": len(results), "mode": "keyword"}
 
     async def get_stats(self) -> dict:
         log_path = os.path.join(self.root, "vault_index.json")
