@@ -509,4 +509,21 @@ async def autonomous_analysis(data: dict):
 from routes.autonomy_routes import register_routes
 app = register_routes(app, orchestrator)
 
+@app.get("/groq/models")
+async def groq_models():
+	"""Lista modelos disponiveis no Groq"""
+	from modules.groq_chat import groq_chat
+	return await groq_chat.models_available()
+
+@app.get("/chat/status")
+async def chat_status():
+	"""Status do motor de chat"""
+	from modules.groq_chat import groq_chat
+	return {
+		"primary": "groq" if groq_chat.configured else "ollama (fallback)",
+		"groq_configured": groq_chat.configured,
+		"groq_model": groq_chat.model,
+		"fallback": "ollama (llama3.2:1b)"
+	}
+
 app.mount("/frontend", StaticFiles(directory="/Volumes/JARVIS HUB3/hub3-jarvis/frontend"), name="frontend")
