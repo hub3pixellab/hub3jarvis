@@ -5,7 +5,6 @@ def register_integrations_route(app):
     @app.get("/api/integrations")
     async def list_integrations():
         """Lista todas as APIs disponiveis e seus status de configuracao"""
-        # Chat APIs (Consensus)
         chat_apis = {
             "groq":       {"key": bool(os.getenv("GROQ_API_KEY")),       "type": "chat",  "plan": "gratis",  "model": "Llama 3.1 70B"},
             "mistral":    {"key": bool(os.getenv("MISTRAL_API_KEY")),     "type": "chat",  "plan": "pago",    "model": "Mistral Large"},
@@ -65,4 +64,4 @@ def register_integrations_route(app):
                                "desc": "Busca semantica para Second Brain + Knowledge Vault"}
             }
         }
-        return app
+    return app
