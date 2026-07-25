@@ -42,3 +42,15 @@ MIT
 ## 👤 Autor
 
 Diogo Zachi Oliveira (@diogozachi)
+
+## 📦 Repositórios
+
+Este projeto possui dois repositórios:
+
+| Repositório | Descrição |
+|-------------|-----------|
+| [hub3jarvis](https://github.com/hub3pixellab/hub3jarvis) | Frontend vanilla (HTML/CSS/JS) + backend Node.js |
+| [hub3jarvis-2.0](https://github.com/hub3pixellab/hub3jarvis-2.0) | **NOVO** — Backend FastAPI + Frontend React + LiteLLM |
+
+> ⚠️ O desenvolvimento ativo está no **hub3jarvis-2.0**.
+> Este repositório (hub3jarvis) mantém o frontend vanilla funcional como fallback.
