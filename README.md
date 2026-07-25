@@ -2,50 +2,7 @@
 
 Hub3 é seu segundo cérebro — um assistente pessoal que busca em arquivos locais, usa cache próprio, consulta múltiplas IAs e retorna a melhor resposta com menor custo.
 
-## ✨ Características
-
-- ✅ **Busca Local Primeiro**
-- ✅ **Cache Inteligente**
-- ✅ **Tokens Grátis Primeiro**
-- ✅ **Consenso Multi-IA**
-- ✅ **Integração com 5 Plataformas Pagas**
-- ✅ **Grafo Neural Animado**
-- ✅ **Reconhecimento de Voz**
-- ✅ **Roda do HD Externo**
-
-## 🚀 Quick Start
-
-\`\`\`bash
-npm install
-npm run dev
-\`\`\`
-
-## 📚 Documentação
-
-- [Setup Completo](./docs/SETUP.md)
-- [Arquitetura](./docs/ARCHITECTURE.md)
-- [APIs Disponíveis](./docs/API.md)
-- [Deploy](./docs/DEPLOYMENT.md)
-
-## 🛠️ Stack Técnico
-
-- **Frontend:** HTML5 + CSS3 + Vanilla JS
-- **Backend:** Node.js (opcional)
-- **Banco de Dados:** IndexedDB (local) + JSON (cache)
-- **APIs:** Anthropic, OpenAI, Google, Groq, Mistral, Suno, Moisés, etc
-- **Deploy:** Vercel, GitHub Pages, ou seu próprio servidor
-
-## 📝 Licença
-
-MIT
-
-## 👤 Autor
-
-Diogo Zachi Oliveira (@diogozachi)
-
 ## 📦 Repositórios
-
-Este projeto possui dois repositórios:
 
 | Repositório | Descrição |
 |-------------|-----------|
@@ -54,3 +11,19 @@ Este projeto possui dois repositórios:
 
 > ⚠️ O desenvolvimento ativo está no **hub3jarvis-2.0**.
 > Este repositório (hub3jarvis) mantém o frontend vanilla funcional como fallback.
+
+## 🚀 Tecnologias
+
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
+- **Backend:** Python, FastAPI, LiteLLM
+- **IA Local:** Ollama (Llama 3.2, TinyLlama)
+- **IA Cloud:** Groq, OpenAI, Anthropic (via LiteLLM)
+- **Banco:** MongoDB
+- **Memória:** Episódica com resumos automáticos
+
+## 📚 Documentação
+
+* [Setup Completo](docs/SETUP.md)
+* [Arquitetura](docs/ARCHITECTURE.md)
+* [APIs Disponíveis](docs/API.md)
+* [Deploy](docs/DEPLOYMENT.md)
