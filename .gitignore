@@ -20,4 +20,6 @@ build/
 
 # Logs
 *.log
-mongodb-logs/
+
+# PDFs brutos (ficam locais; o vault versiona o texto processado)
+literature-raw/
