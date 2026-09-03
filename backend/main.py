@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="JARVIS Backend v4.2", version="4.2", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-VAULT_DIR = "/Volumes/JARVIS HUB3/hub3-jarvis/knowledge-vault"
+VAULT_DIR = "../knowledge-vault"
 REPOS_DIR = "/Volumes/JARVIS HUB3/hub3-jarvis/repos"
 GITHUB_USER = "hub3pixellab"
 
@@ -546,4 +546,4 @@ async def embeddings_status():
 		"plan": "gratuito (huggingface inference api)"
 	}
 
-app.mount("/frontend", StaticFiles(directory="/Volumes/JARVIS HUB3/hub3-jarvis/frontend"), name="frontend")
+app.mount("/frontend", StaticFiles(directory="../frontend"), name="frontend")
