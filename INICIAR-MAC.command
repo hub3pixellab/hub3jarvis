@@ -1,5 +1,5 @@
 #!/bin/bash
-HD_ROOT="/Volumes/JARVIS HUB3"
+HD_ROOT="/Users/diogozachioliveira/projetos/hub3jarvis"
 PROJECT="$HD_ROOT/hub3-jarvis/backend"
 MONGO_DATA="$HD_ROOT/mongodb-data"
 MONGO_LOGS="$HD_ROOT/mongodb-logs"
