@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 SECOND_BRAIN_PATH = os.getenv(
     "SECOND_BRAIN_PATH",
-    "/Volumes/JARVIS HUB3/hub3-jarvis/data/second-brain.json"
+    "/Users/diogozachioliveira/projetos/hub3jarvis/data/second-brain.json"
 )
 
 class SecondBrain:

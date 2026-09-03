@@ -24,7 +24,7 @@ app = FastAPI(title="JARVIS Backend v4.2", version="4.2", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 VAULT_DIR = "../knowledge-vault"
-REPOS_DIR = "/Volumes/JARVIS HUB3/hub3-jarvis/repos"
+REPOS_DIR = "/Users/diogozachioliveira/projetos/hub3jarvis/repos"
 GITHUB_USER = "hub3pixellab"
 
 SERVICES = {

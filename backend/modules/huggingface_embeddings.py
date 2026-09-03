@@ -25,7 +25,7 @@ class HuggingFaceEmbeddings:
         if self.api_key:
             self.headers["Authorization"] = f"Bearer {self.api_key}"
         self._cache = {}  # cache em memoria de embeddings
-        self.cache_path = "/Volumes/JARVIS HUB3/hub3-jarvis/data/embeddings_cache.json"
+        self.cache_path = "/Users/diogozachioliveira/projetos/hub3jarvis/data/embeddings_cache.json"
         self._load_cache()
 
     @property

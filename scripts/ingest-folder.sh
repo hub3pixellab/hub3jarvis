@@ -1,5 +1,5 @@
 #!/bin/bash
-VAULT="/Volumes/JARVIS HUB3/hub3-jarvis/knowledge-vault"
+VAULT="/Users/diogozachioliveira/projetos/hub3jarvis/knowledge-vault"
 SOURCE="$1"
 
 if [ -z "$SOURCE" ]; then
