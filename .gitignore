@@ -1,17 +1,23 @@
-# Ambientes virtuais e Python
+# Python
 venv/
 __pycache__/
 *.pyc
+*.pyo
+.pytest_cache/
 
-# Dados de containers e bancos de dados pesados
-ollama/
-mongodb-data/
-bitwarden/
-n8n/
-data/
-repos/
-knowledge-vault/
+# Environment / SEGREDOS — nunca subir
+.env
+backend/.env
+*.env.local
 
-# Arquivos de sistema do macOS
+# macOS
 .DS_Store
-._*
+
+# Node
+node_modules/
+dist/
+build/
+
+# Logs
+*.log
+mongodb-logs/
