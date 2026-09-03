@@ -1,5 +1,5 @@
 #!/bin/bash
-VAULT="/Volumes/JARVIS HUB3/hub3-jarvis/knowledge-vault"
+VAULT="/Users/diogozachioliveira/projetos/hub3jarvis/knowledge-vault"
 
 echo "========================================"
 echo "  Knowledge Vault - Limpeza de Duplicatas"

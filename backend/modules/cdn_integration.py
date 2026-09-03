@@ -45,11 +45,11 @@ class CDNIntegration:
             "config.js": self.jsdelivr_url("frontend/config.js"),
             "toast.js": self.jsdelivr_url("frontend/toast.js"),
             "favicon": self.jsdelivr_url("frontend/favicon.ico") if os.path.exists(
-                "/Volumes/JARVIS HUB3/hub3-jarvis/frontend/favicon.ico"
+                "/Users/diogozachioliveira/projetos/hub3jarvis/frontend/favicon.ico"
             ) else None,
         }
         # Assets de imagem do repositorio
-        img_dir = "/Volumes/JARVIS HUB3/hub3-jarvis/frontend/img"
+        img_dir = "/Users/diogozachioliveira/projetos/hub3jarvis/frontend/img"
         if os.path.exists(img_dir):
             for f in os.listdir(img_dir):
                 if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico")):

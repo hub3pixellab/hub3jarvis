@@ -15,7 +15,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 SOURCE_DIR = os.environ.get("JARVIS_WATCH_DIR", "/Users/diogozachioliveira/Downloads")
-VAULT_DIR = "/Volumes/JARVIS HUB3/hub3-jarvis/knowledge-vault"
+VAULT_DIR = "/Users/diogozachioliveira/projetos/hub3jarvis/knowledge-vault"
 HASH_DB = os.path.join(VAULT_DIR, ".hash_registry.json")
 
 CATEGORIES = {
