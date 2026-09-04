@@ -121,7 +121,8 @@ async def gerar_relatorio(
             "- Essencia: " + num_info["positivo"] + "\n"
             "- A desenvolver: " + num_info["negativo"] + "\n"
         )
-    vault_texto = _ler_vault()
+    from humanizador import REGRAS_HUMANIZADOR
+    vault_texto = _ler_vault() + "\n\n=== REGRAS DE ESCRITA HUMANA (OBRIGATORIAS - humanizer) ===\n" + REGRAS_HUMANIZADOR
 
     # Monta o bloco de conhecimento ANTES do f-string (evita backslash dentro de {})
     if vault_texto:
