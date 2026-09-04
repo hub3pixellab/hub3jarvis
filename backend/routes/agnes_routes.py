@@ -96,6 +96,31 @@ async def gerar_relatorio(
     _check_rate_limit(client_ip)
 
     numero = _numero_caminho_vida(req.data_nascimento)
+    # ==== Conhecimento da Agnes (signos e numeros) ====
+    from conhecimento_agnes import obter_conhecimento, NUMEROS as NUMEROS_AGNES
+    conhecimento = obter_conhecimento(req.signo, req.foco)
+    signo_info = conhecimento["signo"]
+    chave_foco = req.foco.lower().strip()
+    texto_foco = signo_info.get(chave_foco, signo_info.get("carreira", ""))
+    bloco_signo = (
+        "SIGNO (" + signo_info["nome"] + "):\n"
+        "- Elemento: " + signo_info["elemento"] + " | Qualidade: " + signo_info["qualidade"] + "\n"
+        "- Palavra-chave: " + signo_info["palavra_chave"] + "\n"
+        "- Perfil positivo: " + signo_info["positivo"] + "\n"
+        "- Perfil a desenvolver: " + signo_info["negativo"] + "\n"
+        "- Foco em " + req.foco + ": " + texto_foco + "\n"
+        "- Cores favoraveis: " + signo_info["cores"] + "\n"
+        "- Numerologia: " + signo_info["numerologia"] + "\n"
+        "- Numeros harmonicos: " + signo_info.get("numeros_harmonicos", "") + "\n"
+    )
+    bloco_numero = ""
+    if numero and str(numero) in NUMEROS_AGNES:
+        num_info = NUMEROS_AGNES[str(numero)]
+        bloco_numero = (
+            "NUMERO DO CAMINHO DE VIDA [" + str(numero) + "]:\n"
+            "- Essencia: " + num_info["positivo"] + "\n"
+            "- A desenvolver: " + num_info["negativo"] + "\n"
+        )
     vault_texto = _ler_vault()
 
     # Monta o bloco de conhecimento ANTES do f-string (evita backslash dentro de {})
@@ -115,6 +140,7 @@ Dados do cliente:
 - Numero do caminho de vida calculado: {numero}
 
 Gere o relatorio completo seguindo a estrutura definida, usando o conhecimento abaixo.
+{bloco_signo}{bloco_numero}
 {bloco_conhecimento}
 """
 
