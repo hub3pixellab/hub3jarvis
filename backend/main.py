@@ -23,6 +23,11 @@ async def lifespan(app: FastAPI):
     print("[Mestre Agnes] Orquestrador autonomo parado")
 
 app = FastAPI(title="Mestre Agnes Backend v4.2", version="4.2", lifespan=lifespan)
+from routes.chat_routes import router as chat_router
+from routes.upload_routes import router as upload_router
+app.include_router(chat_router)
+app.include_router(upload_router)
+
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 VAULT_DIR = "../knowledge-vault"
