@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JARVIS - Organizador de Arquivos
+Mestre Agnes - Organizador de Arquivos
 Monitora uma pasta de origem, move arquivos para o Knowledge Vault,
 detecta duplicatas por hash SHA-256 e renomeia se for diferente.
 """
@@ -14,8 +14,8 @@ from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-SOURCE_DIR = os.environ.get("JARVIS_WATCH_DIR", "/Users/diogozachioliveira/Downloads")
-VAULT_DIR = "/Users/diogozachioliveira/projetos/hub3jarvis/knowledge-vault"
+SOURCE_DIR = os.environ.get("Mestre Agnes_WATCH_DIR", "/Users/diogozachioliveira/Downloads")
+VAULT_DIR = "/Users/diogozachioliveira/projetos/hub3Mestre Agnes/knowledge-vault"
 HASH_DB = os.path.join(VAULT_DIR, ".hash_registry.json")
 
 CATEGORIES = {
@@ -118,7 +118,7 @@ def process_file(filepath):
     save_hash_db(hash_db)
     print(f"[MOVIDO] {filename} -> {category}/")
 
-class JarvisHandler(FileSystemEventHandler):
+class Mestre AgnesHandler(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory:
             process_file(event.src_path)
@@ -128,33 +128,33 @@ class JarvisHandler(FileSystemEventHandler):
             process_file(event.dest_path)
 
 def scan_existing():
-    print(f"\n[JARVIS] Escaneando {SOURCE_DIR}...")
+    print(f"\n[Mestre Agnes] Escaneando {SOURCE_DIR}...")
     count = 0
     for item in os.listdir(SOURCE_DIR):
         filepath = os.path.join(SOURCE_DIR, item)
         if os.path.isfile(filepath) and not item.startswith("."):
             process_file(filepath)
             count += 1
-    print(f"[JARVIS] {count} arquivos processados.\n")
+    print(f"[Mestre Agnes] {count} arquivos processados.\n")
 
 def start_monitor():
     ensure_vault_dirs()
     scan_existing()
 
     observer = Observer()
-    observer.schedule(JarvisHandler(), SOURCE_DIR, recursive=False)
+    observer.schedule(Mestre AgnesHandler(), SOURCE_DIR, recursive=False)
     observer.start()
 
-    print(f"[JARVIS] Monitorando {SOURCE_DIR} em tempo real...")
-    print(f"[JARVIS] Vault: {VAULT_DIR}")
-    print(f"[JARVIS] Pressione Ctrl+C para parar.\n")
+    print(f"[Mestre Agnes] Monitorando {SOURCE_DIR} em tempo real...")
+    print(f"[Mestre Agnes] Vault: {VAULT_DIR}")
+    print(f"[Mestre Agnes] Pressione Ctrl+C para parar.\n")
 
     try:
         while True:
             observer.join(1)
     except KeyboardInterrupt:
         observer.stop()
-        print("\n[JARVIS] Monitoramento interrompido.")
+        print("\n[Mestre Agnes] Monitoramento interrompido.")
 
 if __name__ == "__main__":
     start_monitor()

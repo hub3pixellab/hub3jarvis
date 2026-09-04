@@ -4,7 +4,7 @@ router = APIRouter()
 
 @router.get("/")
 async def health():
-    return {"status": "online", "service": "Hub3 JARVIS", "version": "4.1.0"}
+    return {"status": "online", "service": "Hub3 Mestre Agnes", "version": "4.1.0"}
 
 @router.get("/db")
 async def db_health():

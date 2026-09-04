@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI, Body, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -15,16 +17,16 @@ async def lifespan(app: FastAPI):
     app.state.orchestrator_status = orchestrator.status
     orchestrator.configure(SERVICES)
     await orchestrator.start(app.state)
-    print(f"[JARVIS] Orquestrador autonomo iniciado - {len(SERVICES)} servicos monitorados")
+    print(f"[Mestre Agnes] Orquestrador autonomo iniciado - {len(SERVICES)} servicos monitorados")
     yield
     await orchestrator.stop()
-    print("[JARVIS] Orquestrador autonomo parado")
+    print("[Mestre Agnes] Orquestrador autonomo parado")
 
-app = FastAPI(title="JARVIS Backend v4.2", version="4.2", lifespan=lifespan)
+app = FastAPI(title="Mestre Agnes Backend v4.2", version="4.2", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 VAULT_DIR = "../knowledge-vault"
-REPOS_DIR = "/Users/diogozachioliveira/projetos/hub3jarvis/repos"
+REPOS_DIR = "/Users/diogozachioliveira/projetos/hub3MestreAgnes/repos"
 GITHUB_USER = "hub3pixellab"
 
 SERVICES = {
@@ -34,7 +36,7 @@ SERVICES = {
     "bitwarden": "http://localhost:8080"
 }
 
-class RequisicaoJarvis(BaseModel):
+class RequisicaoMestreAgnes(BaseModel):
     mensagem: str
 
 class RequisicaoConsensus(BaseModel):
@@ -53,13 +55,13 @@ class RequisicaoWhisper(BaseModel):
 @app.get("/")
 async def root():
     return {
-        "sistema": "JARVIS",
+        "sistema": "Mestre Agnes",
         "versao": "4.2",
         "status": "online",
         "modelos": ["llama3.2:1b", "tinyllama:latest"],
         "vault": VAULT_DIR,
         "github_user": GITHUB_USER,
-        "repos": ["hub3jarvis", "Site"],
+        "repos": ["hub3MestreAgnes", "Site"],
         "servicos": SERVICES
     }
 
@@ -75,15 +77,15 @@ async def status_servicos():
             resultados[nome] = {"status": "offline"}
     return {"servicos": resultados}
 
-@app.post("/api/jarvis/conversar")
-async def conversar_com_jarvis(req: RequisicaoJarvis):
+@app.post("/api/Mestre Agnes/conversar")
+async def conversar_com_MestreAgnes(req: RequisicaoMestreAgnes):
     url_ollama = "http://localhost:11434/api/generate"
     payload = {"model": "llama3.2:1b", "prompt": req.mensagem, "stream": False}
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             resposta = await client.post(url_ollama, json=payload)
             resposta.raise_for_status()
-            return {"resposta_jarvis": resposta.json().get("response")}
+            return {"resposta_MestreAgnes": resposta.json().get("response")}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro Ollama: {str(e)}")
 
@@ -503,14 +505,16 @@ async def autonomous_analysis(data: dict):
     for cat in detected[:3]:
         skill = SKILLS_DATA.get(cat, {})
         results.append({'skill': cat, 'title': skill.get('title', cat), 'description': skill.get('description', ''), 'suggested_command': skill.get('commands', [''])[0]})
-    return {'detected_skills': detected, 'analysis': results, 'message': f'JARVIS detectou {len(detected)} skill(s)'}
+    return {'detected_skills': detected, 'analysis': results, 'message': f'Mestre Agnes detectou {len(detected)} skill(s)'}
 
 # ===== ROTAS DE AUTONOMIA =====
 from routes.autonomy_routes import register_routes
+from routes.agnes_routes import router as agnes_router
 app = register_routes(app, orchestrator)
 
 # ===== ROTA DE INTEGRACOES =====
 from routes.integrations_route import register_integrations_route
+from routes.agnes_routes import router as agnes_router
 app = register_integrations_route(app)
 
 @app.get("/groq/models")
@@ -546,4 +550,5 @@ async def embeddings_status():
 		"plan": "gratuito (huggingface inference api)"
 	}
 
+app.include_router(agnes_router)
 app.mount("/frontend", StaticFiles(directory="../frontend"), name="frontend")

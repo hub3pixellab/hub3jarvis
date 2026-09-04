@@ -1,25 +1,8 @@
-# Python
-venv/
+.env
 __pycache__/
 *.pyc
-*.pyo
-.pytest_cache/
-
-# Environment / SEGREDOS — nunca subir
-.env
-backend/.env
-*.env.local
-
-# macOS
-.DS_Store
-
-# Node
-node_modules/
-dist/
-build/
-
-# Logs
-*.log
-
-# PDFs brutos (ficam locais; o vault versiona o texto processado)
-literature-raw/
+venv/
+relatorio_*.pdf
+fix_*.py
+test_*.py
+renomear_*.py

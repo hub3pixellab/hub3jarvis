@@ -1,5 +1,5 @@
 """
-Groq Chat Engine — Motor principal de conversa do JARVIS
+Groq Chat Engine — Motor principal de conversa do Mestre Agnes
 Usa Groq (Llama 3.1 70B) como padrao com fallback para Ollama local
 Velocidade ultrarrápida via LPUs, 100% gratuito
 """
@@ -14,9 +14,9 @@ class GroqChatEngine:
     def __init__(self):
         self.api_key = os.getenv("GROQ_API_KEY")
         self.base_url = "https://api.groq.com/openai/v1/chat/completions"
-        self.model = "llama-3.1-70b-versatile"
+        self.model = "openai/gpt-oss-120b"
         self.system_prompt = (
-            "Voce e o JARVIS, assistente pessoal do Hub3 Pixel Lab. "
+            "Voce e o Mestre Agnes, assistente pessoal do Hub3 Pixel Lab. "
             "Responda SEMPRE em portugues brasileiro, de forma clara, direta e objetiva. "
             "Seja profissional mas com personalidade. "
             "Quando nao souber algo, admita. "

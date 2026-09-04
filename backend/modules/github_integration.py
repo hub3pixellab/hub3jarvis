@@ -1,5 +1,5 @@
 """
-GitHub Integration Module — JARVIS v4.2
+GitHub Integration Module — Mestre Agnes v4.2
 Unifica TODO o acesso ao GitHub: API REST + gh CLI fallback
 Centraliza todas as operacoes para evitar duplicacao com main.py
 """
@@ -16,11 +16,11 @@ class GitHubIntegration:
     def __init__(self):
         self.token = os.getenv("GITHUB_TOKEN")
         self.username = os.getenv("GITHUB_USER", "hub3pixellab")
-        self.repo = os.getenv("GITHUB_REPO", "hub3pixellab/hub3jarvis")
+        self.repo = os.getenv("GITHUB_REPO", "hub3pixellab/hub3MestreAgnes")
         self.api = "https://api.github.com"
         self.headers = {
             "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "Hub3-JARVIS-v4.2"
+            "User-Agent": "Hub3-Mestre Agnes-v4.2"
         }
         if self.token:
             self.headers["Authorization"] = f"token {self.token}"

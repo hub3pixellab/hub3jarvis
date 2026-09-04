@@ -11,7 +11,7 @@ class DatabaseManager:
 
     async def connect(self):
         mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
-        db_name = os.getenv("MONGO_DB", "hub3_jarvis")
+        db_name = os.getenv("MONGO_DB", "hub3_MestreAgnes")
         self.client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=5000)
         self.db = self.client[db_name]
         self.users = self.db["users"]

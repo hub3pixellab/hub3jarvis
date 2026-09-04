@@ -1,5 +1,5 @@
 """
-CDN Integration Module — JARVIS v4.2
+CDN Integration Module — Mestre Agnes v4.2
 jsDelivr + unpkg para distribuir assets do frontend via CDN global
 100% gratuito para projetos open-source no GitHub
 """
@@ -13,7 +13,7 @@ class CDNIntegration:
 
     def __init__(self):
         self.gh_user = os.getenv("GITHUB_USER", "hub3pixellab")
-        self.gh_repo = os.getenv("GITHUB_REPO", "hub3jarvis")
+        self.gh_repo = os.getenv("GITHUB_REPO", "hub3MestreAgnes")
         self.branch = "main"
 
     # ===== JSDELIVR =====
@@ -45,11 +45,11 @@ class CDNIntegration:
             "config.js": self.jsdelivr_url("frontend/config.js"),
             "toast.js": self.jsdelivr_url("frontend/toast.js"),
             "favicon": self.jsdelivr_url("frontend/favicon.ico") if os.path.exists(
-                "/Users/diogozachioliveira/projetos/hub3jarvis/frontend/favicon.ico"
+                "/Users/diogozachioliveira/projetos/hub3MestreAgnes/frontend/favicon.ico"
             ) else None,
         }
         # Assets de imagem do repositorio
-        img_dir = "/Users/diogozachioliveira/projetos/hub3jarvis/frontend/img"
+        img_dir = "/Users/diogozachioliveira/projetos/hub3MestreAgnes/frontend/img"
         if os.path.exists(img_dir):
             for f in os.listdir(img_dir):
                 if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico")):
@@ -109,13 +109,13 @@ class CDNIntegration:
     def generate_loader_script(self, minify=False):
         """
         Gera codigo HTML/JS para carregar o frontend via CDN.
-        Util se quiser distribuir o JARVIS como pagina estatica.
+        Util se quiser distribuir o Mestre Agnes como pagina estatica.
         """
         index_url = self.jsdelivr_url("frontend/index.html")
-        return f"""<!-- Carregar JARVIS via jsDelivr CDN -->
+        return f"""<!-- Carregar Mestre Agnes via jsDelivr CDN -->
 <link rel="preload" href="{index_url}" as="document">
 <script>
-// Loader JARVIS via CDN
+// Loader Mestre Agnes via CDN
 (function() {{
     var url = "{index_url}";
     fetch(url)
@@ -153,7 +153,7 @@ class CDNIntegration:
         <div class="card" id="section-cdn" style="display:none">
         <div class="card-title">🌐 CDN Global (jsDelivr + unpkg)</div>
         <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-            Assets do JARVIS hospedados gratuitamente via jsDelivr CDN — carregamento instantaneo em qualquer lugar.
+            Assets do Mestre Agnes hospedados gratuitamente via jsDelivr CDN — carregamento instantaneo em qualquer lugar.
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px">{cards}</div>
         <div style="margin-top:16px;font-size:12px;color:var(--text-muted);text-align:center">

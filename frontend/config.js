@@ -1,5 +1,5 @@
 /**
- * JARVIS v4.2 — Configuração Centralizada
+ * Mestre Agnes v4.2 — Configuração Centralizada
  * Hub3 Pixel Lab
  *
  * Detecta automaticamente ambiente local vs produção
@@ -28,4 +28,4 @@ const CONFIG = (() => {
 })();
 
 window.CONFIG = CONFIG;
-console.log(`[JARVIS] Ambiente: ${CONFIG.env} | API: ${CONFIG.API_BASE}`);
+console.log(`[Mestre Agnes] Ambiente: ${CONFIG.env} | API: ${CONFIG.API_BASE}`);

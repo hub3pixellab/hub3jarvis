@@ -11,7 +11,7 @@ class AskRequest(BaseModel):
     question: str
 
 @router.post("/ask")
-async def ask_jarvis(req: AskRequest, user: dict = Depends(get_current_user)):
+async def ask_MestreAgnes(req: AskRequest, user: dict = Depends(get_current_user)):
     context = second_brain.get_context(req.question)
     result = await consensus_engine.query_all(
         req.question, user_plan=user["plan"], context=context

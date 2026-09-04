@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import httpx, os
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.getenv("JWT_SECRET", "hub3-jarvis-secret-2026")
+SECRET_KEY = os.getenv("JWT_SECRET", "hub3-Mestre Agnes-secret-2026")
 ALGORITHM = "HS256"
 EXPIRES_HOURS = 168
 

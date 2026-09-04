@@ -1,5 +1,5 @@
 /**
- * Toast Notification System para JARVIS v4.2
+ * Toast Notification System para Mestre Agnes v4.2
  * Versao robusta — aguarda o body existir antes de criar o container
  */
 (function() {
