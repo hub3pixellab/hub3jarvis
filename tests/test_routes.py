@@ -1,4 +1,4 @@
-"""Testes unitarios das rotas principais do backend JARVIS v4.2"""
+"""Testes unitarios das rotas principais do backend Mestre Agnes v4.2"""
 import pytest
 from httpx import AsyncClient, ASGITransport
 import sys, os
@@ -18,7 +18,7 @@ async def test_root():
     assert r.status_code == 200
     data = r.json()
     assert "sistema" in data
-    assert data["sistema"] == "JARVIS"
+    assert data["sistema"] == "Mestre Agnes"
 
 @pytest.mark.asyncio
 async def test_services_status():

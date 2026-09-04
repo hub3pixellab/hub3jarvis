@@ -1,4 +1,4 @@
-"""Orquestrador Autonomo JARVIS v4.2 — Loop continuo em background"""
+"""Orquestrador Autonomo Mestre Agnes v4.2 — Loop continuo em background"""
 import asyncio, time, os, json
 from datetime import datetime, timezone
 from modules.policy_engine import SENSITIVE_ACTIONS

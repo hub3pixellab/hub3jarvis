@@ -6,11 +6,11 @@ Hub3 é seu segundo cérebro — um assistente pessoal que busca em arquivos loc
 
 | Repositório | Descrição |
 |-------------|-----------|
-| [hub3jarvis](https://github.com/hub3pixellab/hub3jarvis) | Frontend vanilla (HTML/CSS/JS) + backend Node.js |
-| [hub3jarvis-2.0](https://github.com/hub3pixellab/hub3jarvis-2.0) | **NOVO** — Backend FastAPI + Frontend React + LiteLLM |
+| [hub3Mestre Agnes](https://github.com/hub3pixellab/hub3Mestre Agnes) | Frontend vanilla (HTML/CSS/JS) + backend Node.js |
+| [hub3Mestre Agnes-2.0](https://github.com/hub3pixellab/hub3Mestre Agnes-2.0) | **NOVO** — Backend FastAPI + Frontend React + LiteLLM |
 
-> ⚠️ O desenvolvimento ativo está no **hub3jarvis-2.0**.
-> Este repositório (hub3jarvis) mantém o frontend vanilla funcional como fallback.
+> ⚠️ O desenvolvimento ativo está no **hub3Mestre Agnes-2.0**.
+> Este repositório (hub3Mestre Agnes) mantém o frontend vanilla funcional como fallback.
 
 ## 🚀 Tecnologias
 

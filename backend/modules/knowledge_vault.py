@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-VAULT_ROOT = os.getenv("VAULT_PATH", "/Users/diogozachioliveira/projetos/hub3jarvis/knowledge-vault")
+VAULT_ROOT = os.getenv("VAULT_PATH", "/Users/diogozachioliveira/projetos/hub3MestreAgnes/knowledge-vault")
 
 CATEGORIES = {
     ".txt": "textos", ".md": "textos", ".json": "textos", ".csv": "textos",

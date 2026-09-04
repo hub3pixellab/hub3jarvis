@@ -1,5 +1,5 @@
 """
-Second Brain — JARVIS v4.2
+Second Brain — Mestre Agnes v4.2
 Memoria de longo prazo com busca semantica via Hugging Face embeddings
 """
 
@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 SECOND_BRAIN_PATH = os.getenv(
     "SECOND_BRAIN_PATH",
-    "/Users/diogozachioliveira/projetos/hub3jarvis/data/second-brain.json"
+    "/Users/diogozachioliveira/projetos/hub3MestreAgnes/data/second-brain.json"
 )
 
 class SecondBrain:
@@ -98,7 +98,7 @@ class SecondBrain:
         return self.search_sync(query, limit)
 
     def get_context(self, query, limit=3):
-        """Obtem contexto formatado para injetar no prompt do JARVIS"""
+        """Obtem contexto formatado para injetar no prompt do Mestre Agnes"""
         try:
             import asyncio
             loop = asyncio.get_event_loop()

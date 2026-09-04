@@ -1,4 +1,4 @@
-"""Rotas de Autonomia JARVIS v4.2 — Self-test e Status"""
+"""Rotas de Autonomia Mestre Agnes v4.2 — Self-test e Status"""
 import pytest, sys, os, time
 from io import StringIO
 
@@ -13,7 +13,7 @@ def register_routes(app, orchestrator_instance):
         status["health_pct"] = round((svc_online / max(svc_total, 1)) * 100, 1) if svc_total > 0 else 0
         return status
 
-    @app.get("/api/jarvis/self-test")
+    @app.get("/api/Mestre Agnes/self-test")
     async def self_test():
         tests_dir = os.path.join(os.path.dirname(__file__), "..", "tests")
         if not os.path.exists(tests_dir):

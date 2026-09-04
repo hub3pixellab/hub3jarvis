@@ -1,4 +1,4 @@
-"""Rota consolidada de status de todas as integracoes / APIs do JARVIS"""
+"""Rota consolidada de status de todas as integracoes / APIs do Mestre Agnes"""
 import os
 
 def register_integrations_route(app):

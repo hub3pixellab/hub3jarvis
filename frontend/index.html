@@ -268,7 +268,7 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div class="section" id="section-autonomy">
 <div class="card">
 <div class="card-title">🔬 Painel de Autonomia</div>
-<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">JARVIS opera em loop autonomo — monitorando servicos, analizando logs e aplicando politicas de seguranca em tempo real.</div>
+<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Mestre Agnes opera em loop autonomo — monitorando servicos, analizando logs e aplicando politicas de seguranca em tempo real.</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
 <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:14px">
 <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Orquestrador</div>
@@ -297,12 +297,12 @@ body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 <div id="auto-policies"></div>
 </div>
 </div>
-<div class="section" id="section-skills"><div class="card"><div class="card-title">Skills Autonomas</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">JARVIS detecta automaticamente qual skill usar. <span id="skills-total" style="color:var(--cyan)"></span></div><div id="skills-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"><div class="loading"><span class="spinner"></span> Carregando skills...</div></div><div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="card-title">Modo Autonomo</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Digite qualquer coisa e JARVIS decide qual skill usar</div><div class="chat-input-row"><input type="text" class="chat-input" id="auto-input" placeholder="Ex: auditar seguranca..."><button class="btn" onclick="autonomousMode()">Executar</button></div><div id="auto-result" style="margin-top:12px"></div></div></div></div><div class="section" id="section-services"><div class="card"><div class="card-title">Servicos Self-Hosted</div><div class="services-grid" id="services-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
+<div class="section" id="section-skills"><div class="card"><div class="card-title">Skills Autonomas</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Mestre Agnes detecta automaticamente qual skill usar. <span id="skills-total" style="color:var(--cyan)"></span></div><div id="skills-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px"><div class="loading"><span class="spinner"></span> Carregando skills...</div></div><div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="card-title">Modo Autonomo</div><div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Digite qualquer coisa e Mestre Agnes decide qual skill usar</div><div class="chat-input-row"><input type="text" class="chat-input" id="auto-input" placeholder="Ex: auditar seguranca..."><button class="btn" onclick="autonomousMode()">Executar</button></div><div id="auto-result" style="margin-top:12px"></div></div></div></div><div class="section" id="section-services"><div class="card"><div class="card-title">Servicos Self-Hosted</div><div class="services-grid" id="services-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
 <div class="section" id="section-vault"><div class="card"><div class="card-title">Knowledge Vault</div><div id="vault-info" style="margin-bottom:12px;font-size:13px;color:var(--text-muted)"></div><div class="vault-grid" id="vault-grid"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
 <div class="section" id="section-iot"><div class="card"><div class="card-title">Dispositivos IoT</div><div class="iot-grid" id="iot-grid"></div></div></div>
 <div class="section" id="section-github"><div class="card"><div class="card-title">GitHub</div><div id="github-repos"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div><div class="card" style="margin-top:12px"><div class="card-title">Commits</div><div id="github-commits"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
 <div class="section" id="section-repos"><div class="card"><div class="card-title">Repos Locais</div><div id="repos-local"><div class="loading"><span class="spinner"></span> Carregando...</div></div></div></div>
-<div class="section" id="section-issues"><div class="card"><div class="card-title">Criar Issue</div><div class="form-group"><label class="form-label">Repo</label><select class="form-select" id="issue-repo"><option value="hub3jarvis">hub3jarvis</option><option value="Site">Site</option></select></div><div class="form-group"><label class="form-label">Titulo</label><input type="text" class="form-input" id="issue-title" placeholder="Titulo"></div><div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="issue-body" placeholder="Descreva..."></textarea></div><div class="form-group"><label class="form-label">Labels</label><input type="text" class="form-input" id="issue-labels" placeholder="bug,cliente"></div><button class="btn btn-orange" onclick="createIssue()" id="issue-btn">Criar Issue</button><div id="issue-result" style="margin-top:10px"></div></div></div>
+<div class="section" id="section-issues"><div class="card"><div class="card-title">Criar Issue</div><div class="form-group"><label class="form-label">Repo</label><select class="form-select" id="issue-repo"><option value="hub3Mestre Agnes">hub3Mestre Agnes</option><option value="Site">Site</option></select></div><div class="form-group"><label class="form-label">Titulo</label><input type="text" class="form-input" id="issue-title" placeholder="Titulo"></div><div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="issue-body" placeholder="Descreva..."></textarea></div><div class="form-group"><label class="form-label">Labels</label><input type="text" class="form-input" id="issue-labels" placeholder="bug,cliente"></div><button class="btn btn-orange" onclick="createIssue()" id="issue-btn">Criar Issue</button><div id="issue-result" style="margin-top:10px"></div></div></div>
 <div class="section" id="section-scrapers"><div class="card"><div class="card-title">Ferramentas de Scraping</div><div class="scraper-grid" id="scraper-grid"></div></div><div class="card" style="margin-top:12px"><div class="card-title">Executar Scrape</div><div class="form-group"><label class="form-label">Ferramenta</label><select class="form-select" id="scraper-select"><option value="firecrawl">Firecrawl</option><option value="crawl4ai">Crawl4AI</option><option value="browser_use">Browser Use</option><option value="crawlee">Crawlee</option><option value="scrapy">Scrapy</option><option value="markitdown">MarkItDown</option><option value="scrapling">Scrapling</option><option value="autoscaper">AutoScraper</option><option value="curl_impersonate">curl-impersonate</option><option value="scrcpy">scrcpy</option></select></div><div class="form-group"><label class="form-label">URL</label><input type="text" class="form-input" id="scraper-url" placeholder="https://exemplo.com"></div><button class="btn" onclick="runScraper()" id="scraper-run-btn">Executar</button><div id="scraper-result" style="margin-top:10px"></div></div></div>
 <div class="section" id="section-aistudio"><div class="card card-glow"><div class="card-title">AI Studio - Geracao de Imagens e Videos</div>
 <div class="form-group"><label class="form-label">Muapi API Key</label><input type="password" class="form-input" id="muapi-key" placeholder="Cole sua API key da Muapi.ai" onchange="localStorage.setItem('muapi-key', this.value)" onkeyup="localStorage.setItem('muapi-key', this.value)"></div>
@@ -454,9 +454,9 @@ async function sendChat() {
   btn.disabled = true;
   box.scrollTop = box.scrollHeight;
   try {
-    const r = await fetch(API + '/api/jarvis/conversar', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagem:text})});
+    const r = await fetch(API + '/api/Mestre Agnes/conversar', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mensagem:text})});
     const d = await r.json();
-    const resposta = d.resposta_jarvis||'Sem resposta';
+    const resposta = d.resposta_Mestre Agnes||'Sem resposta';
     box.innerHTML += '<div class="chat-msg hub3">' + resposta + '</div>';
     // ===== AUTONOMIA =====
 async function loadAutonomy() {
@@ -508,7 +508,7 @@ async function runSelfTest() {
     btn.innerHTML = '⏳ Executando...';
     resultDiv.innerHTML = '<div class="loading"><span class="spinner"></span> Rodando testes...</div>';
     try {
-        const r = await fetch(API + '/api/jarvis/self-test');
+        const r = await fetch(API + '/api/Mestre Agnes/self-test');
         const d = await r.json();
         const statusColor = d.status === 'passed' ? 'var(--green)' : 'var(--red)';
         const statusIcon = d.status === 'passed' ? '✅' : '❌';
@@ -606,7 +606,7 @@ async function loadGithub() {
     }
     rd.innerHTML = h || '<div class="loading">Nenhum repo</div>';
     if (cd) {
-      const rc = await fetch(API + '/github/repos/hub3jarvis/commits');
+      const rc = await fetch(API + '/github/repos/hub3Mestre Agnes/commits');
       const dc = await rc.json();
       let ch = '';
       for (const c of (dc.commits||dc||[]).slice(0,10)) {
@@ -637,7 +637,7 @@ async function loadIssues() {
   if (!g) return;
   g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
   try {
-    const r = await fetch(API + '/github/repos/hub3jarvis/issues');
+    const r = await fetch(API + '/github/repos/hub3Mestre Agnes/issues');
     const d = await r.json();
     let h = '';
     for (const issue of (d.issues||d||[]).slice(0,10)) {
@@ -681,7 +681,7 @@ async function autonomousMode() {
   if (!input || !result) return;
   const text = input.value.trim();
   if (!text) return;
-  result.innerHTML = '<span class="spinner"></span> JARVIS analisando...';
+  result.innerHTML = '<span class="spinner"></span> Mestre Agnes analisando...';
   try {
     const r = await fetch(API + '/skills/autonomous', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:text})});
     const d = await r.json();
@@ -689,7 +689,7 @@ async function autonomousMode() {
       result.innerHTML = '<div style="background:var(--bg-input);border:1px solid var(--orange);border-radius:8px;padding:12px;font-size:13px">' + d.message + '</div>';
     } else {
       let h = '<div style="background:var(--bg-input);border:1px solid var(--green);border-radius:8px;padding:12px">';
-      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">JARVIS detectou ' + d.detected_skills.length + ' skill(s):</div>';
+      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">Mestre Agnes detectou ' + d.detected_skills.length + ' skill(s):</div>';
       for (const s of d.analysis) {
         h += '<div style="display:flex;justify-content:space-between;padding:8px;margin-bottom:4px;background:var(--bg);border-radius:6px;border-left:3px solid var(--cyan)">';
         h += '<span><strong>' + s.title + '</strong></span>';
@@ -944,7 +944,7 @@ async function loadGithub() {
     }
     rd.innerHTML = h || '<div class="loading">Nenhum repo</div>';
     if (cd) {
-      const rc = await fetch(API + '/github/repos/hub3jarvis/commits');
+      const rc = await fetch(API + '/github/repos/hub3Mestre Agnes/commits');
       const dc = await rc.json();
       let ch = '';
       for (const c of (dc.commits||dc||[]).slice(0,10)) {
@@ -975,7 +975,7 @@ async function loadIssues() {
   if (!g) return;
   g.innerHTML = '<div class="loading"><span class="spinner"></span> Carregando...</div>';
   try {
-    const r = await fetch(API + '/github/repos/hub3jarvis/issues');
+    const r = await fetch(API + '/github/repos/hub3Mestre Agnes/issues');
     const d = await r.json();
     let h = '';
     for (const issue of (d.issues||d||[]).slice(0,10)) {
@@ -1019,7 +1019,7 @@ async function autonomousMode() {
   if (!input || !result) return;
   const text = input.value.trim();
   if (!text) return;
-  result.innerHTML = '<span class="spinner"></span> JARVIS analisando...';
+  result.innerHTML = '<span class="spinner"></span> Mestre Agnes analisando...';
   try {
     const r = await fetch(API + '/skills/autonomous', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:text})});
     const d = await r.json();
@@ -1027,7 +1027,7 @@ async function autonomousMode() {
       result.innerHTML = '<div style="background:var(--bg-input);border:1px solid var(--orange);border-radius:8px;padding:12px;font-size:13px">' + d.message + '</div>';
     } else {
       let h = '<div style="background:var(--bg-input);border:1px solid var(--green);border-radius:8px;padding:12px">';
-      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">JARVIS detectou ' + d.detected_skills.length + ' skill(s):</div>';
+      h += '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">Mestre Agnes detectou ' + d.detected_skills.length + ' skill(s):</div>';
       for (const s of d.analysis) {
         h += '<div style="display:flex;justify-content:space-between;padding:8px;margin-bottom:4px;background:var(--bg);border-radius:6px;border-left:3px solid var(--cyan)">';
         h += '<span><strong>' + s.title + '</strong></span>';
