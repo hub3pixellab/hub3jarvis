@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mestre Agnes — Horóscopo do Dia</title>
+<style>
+  :root{ --roxo:#a78bfa; --roxo-escuro:#7c3aed; --fundo:#0f0a1e; --cartao:#1a1230; --texto:#e9e2ff; --texto-suave:#b3a7e0; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{ font-family:'Segoe UI',Arial,sans-serif; background:var(--fundo); color:var(--texto); display:flex; justify-content:center; padding:20px; }
+  .widget{ width:100%; max-width:380px; background:var(--cartao); border:1px solid #2e2150; border-radius:16px; padding:22px; box-shadow:0 8px 30px rgba(0,0,0,.4); }
+  .estrela{ font-size:28px; text-align:center; }
+  h2{ text-align:center; font-size:19px; margin:8px 0 2px; color:var(--roxo); }
+  .sub{ text-align:center; font-size:12px; color:var(--texto-suave); margin-bottom:16px; }
+  label{ display:block; font-size:12px; color:var(--texto-suave); margin-bottom:6px; }
+  select{ width:100%; padding:10px; border-radius:8px; border:1px solid #3a2d63; background:#241a40; color:var(--texto); font-size:14px; margin-bottom:12px; outline:none; }
+  button{ width:100%; padding:11px; border:none; border-radius:8px; background:linear-gradient(135deg,var(--roxo-escuro),var(--roxo)); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+  button:hover{ opacity:.9; }
+  .resultado{ display:none; margin-top:16px; padding:14px; background:#241a40; border-left:3px solid var(--roxo); border-radius:8px; font-size:13px; line-height:1.6; }
+  .detalhes{ margin-top:8px; font-size:12px; color:var(--texto-suave); }
+  .cta{ display:none; margin-top:14px; text-align:center; padding:12px; background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#1a1230; border-radius:10px; font-weight:700; font-size:14px; text-decoration:none; }
+  .cta:hover{ opacity:.9; }
+  .rodape{ margin-top:14px; text-align:center; font-size:10px; color:#6b5f9e; }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="estrela">✦</div>
+  <h2>Mestre Agnes</h2>
+  <div class="sub">Horóscopo do dia — Astrologia &amp; Numerologia</div>
+  <label for="signo">Escolha seu signo:</label>
+  <select id="signo">
+    <option value="">Selecione...</option>
+    <option value="aries">Áries</option><option value="touro">Touro</option>
+    <option value="gemeos">Gêmeos</option><option value="cancer">Câncer</option>
+    <option value="leao">Leão</option><option value="virgem">Virgem</option>
+    <option value="libra">Libra</option><option value="escorpiao">Escorpião</option>
+    <option value="sagitario">Sagitário</option><option value="capricornio">Capricórnio</option>
+    <option value="aquario">Aquário</option><option value="peixes">Peixes</option>
+  </select>
+  <button onclick="verHoroscopo()">Ver meu horóscopo</button>
+  <div id="resultado" class="resultado"></div>
+  <a id="cta" class="cta" href="LINK_DA_LANDING_AGNES" target="_blank">✨ Quero minha análise completa ✨</a>
+  <div class="rodape">Análise completa com Mestre Agnes • Numerologia &amp; Astrologia</div>
+</div>
+<script>
+async function verHoroscopo(){
+  var signo=document.getElementById("signo").value;
+  var r=document.getElementById("resultado");
+  var cta=document.getElementById("cta");
+  if(!signo){ alert("Escolha seu signo"); return; }
+  r.style.display="block"; r.textContent="Consultando as estrelas...";
+  try{
+    var resp=await fetch("/api/agnes/horoscopo?signo="+signo);
+    var d=await resp.json();
+    if(d.mensagem){
+      r.innerHTML="<strong>"+d.signo+" — "+d.data+"</strong><br>"+d.mensagem+"<div class='detalhes'>Número do dia: <strong>"+d.numero_do_dia+"</strong> • Cor: <strong>"+d.cor_do_dia+"</strong></div>";
+      cta.style.display="block";
+    } else { r.textContent="Erro: "+JSON.stringify(d); }
+  }catch(e){ r.textContent="Falha ao consultar: "+e; }
+}
+</script>
+</body>
+</html>
