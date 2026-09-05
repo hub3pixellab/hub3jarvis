@@ -44,16 +44,22 @@ def _extrair_dados(texto: str) -> dict:
     """Extrai nome e data de nascimento do texto do PDF."""
     dados = {"nome": "", "data_nascimento": "", "signo": ""}
 
-    m = re.search(r"(?:nome|nascid[oa])[:\s]+([A-ZÀ-ÚÇ][A-ZÀ-ÚÇ\s]{4,})", texto, re.IGNORECASE)
-    if m:
-        dados["nome"] = m.group(1).strip().title()
-    else:
-        for linha in texto.split("\n"):
-            linha = linha.strip()
-            if len(linha.split()) >= 3 and linha.isupper() and not re.search(r"\d", linha):
-                dados["nome"] = linha.title()
-                break
+    # --- Nome: maior sequencia em MAIUSCULAS com 2+ palavras, ignorando cabecalho ---
+    ignorar = {"CERTIDAO", "NASCIMENTO", "REGISTRO", "CIVIL", "REPUBLICA",
+               "FEDERATIVA", "BRASIL", "ESTADO", "CARTORIO", "LIVRO", "FOLHA",
+               "TERMO", "MATRICULA", "OFICIO", "NOME", "DATA", "SEXO", "FILHO",
+               "FILHA", "NASCIDO", "NASCIDA", "NATURAL", "MUNICIPIO", "UF"}
+    melhor = ""
+    for m in re.finditer(r"([A-ZÀ-ÚÇ][A-ZÀ-ÚÇ\s]{5,})", texto):
+        palavras = [p for p in m.group(1).split() if p.upper() not in ignorar]
+        if len(palavras) >= 2:
+            nome = " ".join(palavras)
+            if len(nome) > len(melhor):
+                melhor = nome
+    if melhor:
+        dados["nome"] = melhor.title()
 
+    # --- Data de nascimento ---
     m = re.search(r"(\d{1,2})[/](\d{1,2})[/](\d{4})", texto)
     if m:
         dados["data_nascimento"] = f"{int(m.group(1)):02d}/{int(m.group(2)):02d}/{m.group(3)}"
