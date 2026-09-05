@@ -563,3 +563,6 @@ app.include_router(widget_router)
 
 from routes.horoscopo_routes import router as horoscopo_router
 app.include_router(horoscopo_router)
+
+from routes.admin_upload_routes import router as admin_upload_router
+app.include_router(admin_upload_router)
