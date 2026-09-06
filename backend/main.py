@@ -85,11 +85,11 @@ async def status_servicos():
 @app.post("/api/Mestre Agnes/conversar")
 async def conversar_com_MestreAgnes(req: RequisicaoMestreAgnes):
     # Roteador: tema da Agnes -> Agnes (groq) com fallback Gemini; conversa aleatoria -> Gemini
-    from modules.roteador_agnes import responder
+    from modules.roteador_agnes import responder\n    from humanizador import humanizar_texto
     try:
         resultado = await responder(req.mensagem, temperature=0.8)
         return {
-            "resposta_MestreAgnes": resultado.get("resposta", ""),
+            "resposta_MestreAgnes": humanizar_texto(resultado.get("resposta", "")),
             "provider": resultado.get("provider", "unknown"),
             "model": resultado.get("model", "unknown"),
         }

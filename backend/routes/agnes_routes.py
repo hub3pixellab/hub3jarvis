@@ -130,7 +130,7 @@ async def gerar_relatorio(
             "- Essencia: " + num_info["positivo"] + "\n"
             "- A desenvolver: " + num_info["negativo"] + "\n"
         )
-    from humanizador import REGRAS_HUMANIZADOR
+    from humanizador import REGRAS_HUMANIZADOR, humanizar_texto
     vault_texto = _ler_vault(req.foco) + "\n\n=== REGRAS DE ESCRITA HUMANA (OBRIGATORIAS - humanizer) ===\n" + REGRAS_HUMANIZADOR
 
     # Monta o bloco de conhecimento ANTES do f-string (evita backslash dentro de {})
@@ -379,7 +379,7 @@ Responda como o Oraculo do Eneagrama: empatico, didatico, profundo e focado no c
     resultado = await groq_chat.chat(prompt_usuario, temperature=0.8, max_tokens=3000)
 
     return {
-        "resposta": resultado.get("resposta", ""),
+        "resposta": humanizar_texto(resultado.get("resposta", "")),
         "provider": resultado.get("provider", "unknown"),
         "model": resultado.get("model", "unknown"),
     }
@@ -413,7 +413,7 @@ async def compatibilidade(
         raise HTTPException(status_code=400, detail="Informe pelo menos 2 pessoas para a analise")
 
     from conhecimento_agnes import obter_conhecimento, NUMEROS as NUMEROS_AGNES
-    from humanizador import REGRAS_HUMANIZADOR
+    from humanizador import REGRAS_HUMANIZADOR, humanizar_texto
     vault_texto = _ler_vault(req.foco_analise)
 
     # Monta o bloco de cada pessoa
@@ -481,7 +481,7 @@ async def conselho(
     _check_rate_limit(client_ip)
 
     from conhecimento_agnes import obter_conhecimento, NUMEROS as NUMEROS_AGNES
-    from humanizador import REGRAS_HUMANIZADOR
+    from humanizador import REGRAS_HUMANIZADOR, humanizar_texto
 
     numero = _numero_caminho_vida(req.data_nascimento)
     conhecimento = obter_conhecimento(req.signo, req.foco)
@@ -567,7 +567,7 @@ Escreva de forma natural, empatica e com rigor tecnico. Assine no final com: —
     r_final = await groq_chat.chat(prompt_final, temperature=0.8, max_tokens=3500)
 
     return {
-        "analise_final": r_final.get("resposta", ""),
+        "analise_final": humanizar_texto(r_final.get("resposta", "")),
         "analises_mestres": analises_mestres,
         "analise_opositor": analise_opositor,
         "caminho_vida": numero,
