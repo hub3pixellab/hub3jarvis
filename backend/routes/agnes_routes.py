@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
+from personas.eneagrama import ORACULO_ENEAGRAMA
 
 router = APIRouter(prefix="/api/agnes", tags=["Agnes"])
 
@@ -294,3 +295,51 @@ async def relatorio_pdf(req: RequisicaoRelatorioPDF, x_api_key: str = Header(Non
     buf.seek(0)
     nome_arquivo = "relatorio_agnes_" + req.nome.replace(' ', '_') + ".pdf"
     return StreamingResponse(buf, media_type="application/pdf", headers={"Content-Disposition": 'attachment; filename="' + nome_arquivo + '"'})
+
+# ===== Oráculo do Eneagrama =====
+class RequisicaoEneagrama(BaseModel):
+    mensagem: str
+    historico: list = []
+
+@router.post("/eneagrama")
+async def oraculo_eneagrama(
+    req: RequisicaoEneagrama,
+    x_api_key: str = Header(None),
+    x_forwarded_for: str = Header(None),
+):
+    if x_api_key != AGNES_KEY:
+        raise HTTPException(status_code=401, detail="Chave de API invalida")
+    client_ip = (x_forwarded_for or "local").split(",")[0].strip()
+    _check_rate_limit(client_ip)
+
+    from personas.eneagrama import ORACULO_ENEAGRAMA
+
+    # Monta o prompt com a persona + conhecimento do vault + historico
+    vault_texto = _ler_vault()
+    historico_txt = ""
+    if req.historico:
+        historico_txt = "\n".join(
+            f"{m.get('papel','usuario')}: {m.get('conteudo','')}" for m in req.historico[-6:]
+        )
+
+    prompt_usuario = f"""{ORACULO_ENEAGRAMA}
+
+=== CONHECIMENTO DO VAULT (use para enriquecer) ===
+{vault_texto}
+
+=== HISTORICO DA CONVERSA ===
+{historico_txt or "(nova conversa)"}
+
+=== PERGUNTA DO USUARIO ===
+{req.mensagem}
+
+Responda como o Oraculo do Eneagrama: empatico, didatico, profundo e focado no crescimento. Faca perguntas abertas quando precisar de mais contexto, mas ja ofereca uma analise inicial util com base no que foi dito."""
+
+    from modules.groq_chat import groq_chat
+    resultado = await groq_chat.chat(prompt_usuario, temperature=0.8, max_tokens=3000)
+
+    return {
+        "resposta": resultado.get("resposta", ""),
+        "provider": resultado.get("provider", "unknown"),
+        "model": resultado.get("model", "unknown"),
+    }
