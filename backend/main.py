@@ -84,15 +84,17 @@ async def status_servicos():
 
 @app.post("/api/Mestre Agnes/conversar")
 async def conversar_com_MestreAgnes(req: RequisicaoMestreAgnes):
-    url_ollama = "http://localhost:11434/api/generate"
-    payload = {"model": "llama3.2:1b", "prompt": req.mensagem, "stream": False}
+    # Roteador: tema da Agnes -> Agnes (groq) com fallback Gemini; conversa aleatoria -> Gemini
+    from modules.roteador_agnes import responder
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resposta = await client.post(url_ollama, json=payload)
-            resposta.raise_for_status()
-            return {"resposta_MestreAgnes": resposta.json().get("response")}
+        resultado = await responder(req.mensagem, temperature=0.8)
+        return {
+            "resposta_MestreAgnes": resultado.get("resposta", ""),
+            "provider": resultado.get("provider", "unknown"),
+            "model": resultado.get("model", "unknown"),
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro Ollama: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro no roteador: {str(e)}")
 
 @app.post("/consensus/ollama")
 async def consensus_ollama(req: RequisicaoConsensus, authorization: str = Header(None)):
