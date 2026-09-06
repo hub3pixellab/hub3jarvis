@@ -63,3 +63,4 @@ pandas
 openpyxl
 pytesseract
 pillow
+google-generativeai
