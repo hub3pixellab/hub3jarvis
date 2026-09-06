@@ -68,7 +68,7 @@ def _check_rate_limit(client_ip: str):
     _requests[client_ip].append(agora)
 
 # ===== Leitura do vault =====
-def _ler_vault():
+def _ler_vault(pergunta: str = ""):
     conteudos = []
     for ext in ("*.md", "*.txt"):
         for arquivo in VAULT_ROOT.rglob(ext):
@@ -131,7 +131,7 @@ async def gerar_relatorio(
             "- A desenvolver: " + num_info["negativo"] + "\n"
         )
     from humanizador import REGRAS_HUMANIZADOR
-    vault_texto = _ler_vault() + "\n\n=== REGRAS DE ESCRITA HUMANA (OBRIGATORIAS - humanizer) ===\n" + REGRAS_HUMANIZADOR
+    vault_texto = _ler_vault(req.foco) + "\n\n=== REGRAS DE ESCRITA HUMANA (OBRIGATORIAS - humanizer) ===\n" + REGRAS_HUMANIZADOR
 
     # Monta o bloco de conhecimento ANTES do f-string (evita backslash dentro de {})
     if vault_texto:
@@ -355,7 +355,7 @@ async def oraculo_eneagrama(
     from personas.eneagrama import ORACULO_ENEAGRAMA
 
     # Monta o prompt com a persona + conhecimento do vault + historico
-    vault_texto = _ler_vault()
+    vault_texto = _ler_vault(mensagem)
     historico_txt = ""
     if req.historico:
         historico_txt = "\n".join(
@@ -414,7 +414,7 @@ async def compatibilidade(
 
     from conhecimento_agnes import obter_conhecimento, NUMEROS as NUMEROS_AGNES
     from humanizador import REGRAS_HUMANIZADOR
-    vault_texto = _ler_vault()
+    vault_texto = _ler_vault(mensagem)
 
     # Monta o bloco de cada pessoa
     blocos_pessoas = []
@@ -467,3 +467,111 @@ Escrea de forma humanizada, empatica e com rigor tecnico. Assine no final com: �
         "provider": resultado.get("provider", "unknown"),
         "model": resultado.get("model", "unknown"),
     }
+
+# ===== Conselho dos Mestres (Agnes + 4 mestres + opositor) =====
+@router.post("/conselho")
+async def conselho(
+    req: RequisicaoRelatorio,
+    x_api_key: str = Header(None),
+    x_forwarded_for: str = Header(None),
+):
+    if x_api_key != AGNES_KEY:
+        raise HTTPException(status_code=401, detail="Chave de API invalida")
+    client_ip = (x_forwarded_for or "local").split(",")[0].strip()
+    _check_rate_limit(client_ip)
+
+    from conhecimento_agnes import obter_conhecimento, NUMEROS as NUMEROS_AGNES
+    from humanizador import REGRAS_HUMANIZADOR
+
+    numero = _numero_caminho_vida(req.data_nascimento)
+    conhecimento = obter_conhecimento(req.signo, req.foco)
+    signo_info = conhecimento["signo"]
+    vault_texto = _ler_vault(req.foco)
+
+    bloco_consulente = f"""
+CONSULENTE:
+- Nome: {req.nome}
+- Data: {req.data_nascimento} | Hora: {req.hora_nascimento or "nao informada"} | Cidade: {req.cidade_nascimento or "nao informada"}
+- Signo: {signo_info.get("nome", req.signo)} | Elemento: {signo_info.get("elemento","")} | Qualidade: {signo_info.get("qualidade","")}
+- Caminho de Vida (numerologia): {numero}
+- Foco da consulta: {req.foco}
+"""
+
+    mestres = [
+        {"nome": "LIZ GREENE (Psicologia Junguiana)",
+         "foco": "analise a psique, os arquetipos e o processo de individuacao do consulente. Veja o mapa como mapa da alma. Foque no porque psicologico e evolutivo, nos complexos inconscientes e nas tensoes que podem virar integracao do Self."},
+        {"nome": "ROBERT HAND (Astrologia Tecnica)",
+         "foco": "analise os transitos e progressoes atuais, os ciclos de planetas lentos (Jupiter, Saturno, Urano, Netuno, Plutao) e os periodos de oportunidade e desafio. Seja tecnico, pratico e claro, conectando o ceu ao cotidiano."},
+        {"nome": "DANE RUDHYAR (Astrologia Humanista)",
+         "foco": "analise o proposito existencial e a evolucao da consciencia. Reforce a responsabilidade individual e o livre-arbitrio. Veja as crises (Retorno de Saturno, Oposicao de Urano) como convites ao realinhamento com o proposito de vida. Aponte o potencial mais elevado."},
+        {"nome": "HANS DECOZ (Numerologia Moderna)",
+         "foco": "analise os numeros essenciais (Caminho de Vida, Expressao, Desejo da Alma, Personalidade), os ciclos pessoais e a compatibilidade numerica. De orientacao pratica e acionavel baseada nas vibracoes numericas do consulente."},
+    ]
+
+    from modules.groq_chat import groq_chat
+
+    analises_mestres = []
+    for m in mestres:
+        prompt_mestre = f"""
+Voce e {m["nome"]}, membro do Conselho do Mestre Agnes.
+{bloco_consulente}
+
+SUA TAREFA ({m["foco"]}):
+Apresente sua analise em ate 3 paragrafos, com profundidade e rigor, mas em linguagem humanizada. Aponte 2-3 pontos-chave e 1 recomendacao pratica da sua perspectiva.
+
+CONHECIMENTO DO VAULT (use para enriquecer):
+{vault_texto}
+
+Assine ao final com: — {m["nome"]}
+"""
+        r = await groq_chat.chat(prompt_mestre, temperature=0.8, max_tokens=1200)
+        analises_mestres.append("### " + m["nome"] + chr(10) + r.get("resposta", ""))
+
+    prompt_opositor = f"""
+Voce e o OPOSITOR do Conselho do Mestre Agnes. Sua funcao e desafiar com respeito as analises dos mestres, apontando pontos cegos, riscos, exageros e o que pode ter sido deixado de lado.
+
+CONSULENTE:
+{bloco_consulente}
+
+ANALISES DOS MESTRES:
+{chr(10).join(analises_mestres)}
+
+SUA TAREFA: aponte em ate 3 paragrafos o que os mestres podem ter deixado passar, os riscos de cada leitura e o que o consulente deve ponderar antes de agir. Seja honesto, mas construtivo.
+
+Assine ao final com: — Opositor
+"""
+    r_op = await groq_chat.chat(prompt_opositor, temperature=0.7, max_tokens=1000)
+    analise_opositor = r_op.get("resposta", "")
+
+    prompt_final = f"""
+Voce e o Mestre Agnes, a sintese viva dos maiores mestres. Sua missao e unificar as analises do conselho em uma resposta final coesa, acolhedora e transformadora.
+
+CONSULENTE:
+{bloco_consulente}
+
+ANALISES DOS MESTRES:
+{chr(10).join(analises_mestres)}
+
+VISAO DO OPOSITOR:
+{analise_opositor}
+
+SUA TAREFA: escreva a resposta FINAL ao consulente, integrando o melhor de cada mestre e a prudencia do opositor, em um relatorio fluido e humanizado com:
+1. Saudacao e sintonia
+2. Mandala essencial (caminho de vida + sol/lua/ascendente)
+3. A danca dos ciclos (ano pessoal + transitos)
+4. O desafio e a dadiva (aspectos tensos + como superar)
+5. Bencao final e dever de casa
+
+Escreva de forma natural, empatica e com rigor tecnico. Assine no final com: — Mestre Agnes
+"""
+    r_final = await groq_chat.chat(prompt_final, temperature=0.8, max_tokens=3500)
+
+    return {
+        "analise_final": r_final.get("resposta", ""),
+        "analises_mestres": analises_mestres,
+        "analise_opositor": analise_opositor,
+        "caminho_vida": numero,
+        "provider": r_final.get("provider", "unknown"),
+        "model": r_final.get("model", "unknown"),
+    }
+
