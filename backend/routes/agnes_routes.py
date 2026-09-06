@@ -355,7 +355,7 @@ async def oraculo_eneagrama(
     from personas.eneagrama import ORACULO_ENEAGRAMA
 
     # Monta o prompt com a persona + conhecimento do vault + historico
-    vault_texto = _ler_vault(mensagem)
+    vault_texto = _ler_vault(req.foco_analise)
     historico_txt = ""
     if req.historico:
         historico_txt = "\n".join(
@@ -414,7 +414,7 @@ async def compatibilidade(
 
     from conhecimento_agnes import obter_conhecimento, NUMEROS as NUMEROS_AGNES
     from humanizador import REGRAS_HUMANIZADOR
-    vault_texto = _ler_vault(mensagem)
+    vault_texto = _ler_vault(req.foco_analise)
 
     # Monta o bloco de cada pessoa
     blocos_pessoas = []
