@@ -88,3 +88,12 @@ async def upload_conhecimento(
         "caracteres": len(texto),
         "mensagem": "Conhecimento salvo com sucesso",
     }
+
+@router.delete("/conhecimentos/{doc_id}")
+async def deletar_conhecimento(doc_id: str, x_admin_key: str = Header(None)):
+    _checar_admin(x_admin_key)
+    from bson.objectid import ObjectId
+    res = await _get_collection().delete_one({"_id": ObjectId(doc_id)})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Documento nao encontrado")
+    return {"mensagem": "Documento removido com sucesso", "id": doc_id}
