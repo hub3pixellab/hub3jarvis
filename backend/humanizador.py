@@ -34,3 +34,42 @@ PROCESSO OBRIGATORIO:
 3. Pergunte-se: "O que ainda soa como IA?" e "Adicionei ou removi algum fato?".
 4. Corrija e entregue a versao final. Nunca invente nome, numero, data ou detalhe que nao esteja no conhecimento fornecido.
 """
+
+
+def humanizar_texto(texto: str) -> str:
+    """Remove toda marcacao de IA e deixa o texto em prosa natural e humana."""
+    if not texto:
+        return texto
+
+    import re
+
+    t = texto
+
+    # Remove marcadores de titulo (###, ##, #)
+    t = re.sub(r"^#{1,6}\s*", "", t, flags=re.MULTILINE)
+
+    # Remove negrito e italico (**texto**, *texto*, __texto__, _texto_)
+    t = re.sub(r"\*\*(.+?)\*\*", r"", t)
+    t = re.sub(r"__(.+?)__", r"", t)
+    t = re.sub(r"(?<![\w*])\*(?!\*)(.+?)(?<!\*)\*(?![\w*])", r"", t)
+    t = re.sub(r"(?<![\w_])_(?!_)(.+?)(?<!_)_(?![\w_])", r"", t)
+
+    # Remove marcadores de lista (-, *, +) no inicio de linha
+    t = re.sub(r"^\s*[-*+]\s+", "", t, flags=re.MULTILINE)
+
+    # Remove numeracao de lista (1. 2. 3. etc) no inicio de linha
+    t = re.sub(r"^\s*\d+\.\s+", "", t, flags=re.MULTILINE)
+
+    # Remove links markdown [texto](url) -> texto
+    t = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"", t)
+
+    # Remove codigo inline (`texto`)
+    t = re.sub(r"`([^`]*)`", r"", t)
+
+    # Remove linhas em branco duplicadas
+    t = re.sub(r"\n{3,}", "\n\n", t)
+
+    # Remove espacos no fim das linhas
+    t = re.sub(r"[ 	]+$", "", t, flags=re.MULTILINE)
+
+    return t.strip()
