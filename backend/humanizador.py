@@ -73,3 +73,32 @@ def humanizar_texto(texto: str) -> str:
     t = re.sub(r"[ 	]+$", "", t, flags=re.MULTILINE)
 
     return t.strip()
+
+
+# === FIX FINAL AGNES ===
+import re
+
+def humanizar_texto(texto):
+    if not texto:
+        return texto
+    t = texto
+    t = re.sub(r"^#{1,6}\s*", "", t, flags=re.MULTILINE)
+    t = re.sub(r"\*\*(.+?)\*\*", r"", t)
+    t = re.sub(r"__(.+?)__", r"", t)
+    t = re.sub(r"^\s*[-*+]\s+", "", t, flags=re.MULTILINE)
+    t = re.sub(r"^\s*\d+\.\s+", "", t, flags=re.MULTILINE)
+    t = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"", t)
+    t = re.sub(r"`([^`]*)`", r"", t)
+    t = re.sub(r"\n{3,}", "\n\n", t)
+    t = t.replace("mapa astral", "mapa natal")
+    t = t.replace("astral", "natal")
+    for a, b in [
+        ("Sou a Agnes", "Sou o Agnes"), ("sou a Agnes", "sou o Agnes"),
+        ("astróloga", "astrólogo"), ("astrologa", "astrologo"),
+        ("numeróloga", "numerólogo"), ("numerologa", "numerologo"),
+        ("consultora", "consultor"), ("mestra", "mestre"),
+        ("estou pronta", "estou pronto"), ("obrigada", "obrigado"),
+        ("minha guia", "meu guia"), ("sua guia", "seu guia"),
+    ]:
+        t = t.replace(a, b)
+    return t.strip()
