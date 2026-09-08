@@ -4,34 +4,34 @@
 
 @layer base {
   :root {
-    /* Digital Museum dark cinematic palette */
-    --background: 0 0% 4%;
-    --foreground: 40 12% 88%;
+    /* Mestre Agnes — dark mystical palette */
+    --background: 221 69% 14%;
+    --foreground: 37 43% 81%;
 
-    --card: 0 0% 6%;
-    --card-foreground: 40 12% 90%;
+    --card: 221 55% 16%;
+    --card-foreground: 37 43% 85%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 40 12% 90%;
+    --popover: 221 55% 16%;
+    --popover-foreground: 37 43% 85%;
 
-    --primary: 60 35% 78%;
-    --primary-foreground: 0 0% 6%;
+    --primary: 46 65% 52%;
+    --primary-foreground: 0 0% 4%;
 
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 40 12% 88%;
+    --secondary: 221 45% 20%;
+    --secondary-foreground: 37 43% 81%;
 
-    --muted: 0 0% 10%;
-    --muted-foreground: 40 6% 55%;
+    --muted: 221 40% 20%;
+    --muted-foreground: 37 20% 68%;
 
-    --accent: 56 65% 60%;
-    --accent-foreground: 0 0% 6%;
+    --accent: 46 65% 52%;
+    --accent-foreground: 0 0% 4%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 0 0% 14%;
-    --input: 0 0% 14%;
-    --ring: 56 65% 60%;
+    --border: 221 40% 28%;
+    --input: 221 40% 28%;
+    --ring: 46 65% 52%;
 
     --radius: 0.5rem;
 
@@ -89,6 +89,7 @@
 
   html {
     color-scheme: dark;
+    scroll-padding-top: 5.5rem;
   }
 
   body {
@@ -192,6 +193,19 @@
 
   .animate-pulse-glow {
     animation: pulse-glow 4s ease-in-out infinite;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 38s linear infinite;
   }
 
   /* ─────────────────────────────────────────────────────────────

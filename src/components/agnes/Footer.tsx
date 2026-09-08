@@ -25,7 +25,10 @@ const SOCIALS = [
 
 const Footer = () => {
   return (
-    <footer className="relative overflow-hidden bg-gradient-to-b from-navy to-navy-deep text-cream">
+    <footer
+      id="contato"
+      className="relative overflow-hidden bg-gradient-to-b from-navy to-navy-deep text-cream"
+    >
       {/* Fine gold top hairline */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent" />
 
