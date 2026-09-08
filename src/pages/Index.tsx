@@ -5,7 +5,7 @@ import ExhibitionHalls from "@/components/museum/ExhibitionHalls";
 import Experience from "@/components/museum/Experience";
 import Curator from "@/components/museum/Curator";
 import LabArchive from "@/components/museum/LabArchive";
-import Footer from "@/components/museum/Footer";
+import Footer from "@/components/agnes/Footer";
 import StackedPanel from "@/components/museum/StackedPanel";
 import SectionReveal from "@/components/museum/SectionReveal";
 

@@ -22,13 +22,27 @@ export default {
 			fontFamily: {
 				display: ['"Cormorant Garamond"', 'Times New Roman', 'serif'],
 				sans: ['Inter', '"Helvetica Neue"', 'system-ui', 'sans-serif'],
-				mono: ['"JetBrains Mono"', '"Courier New"', 'monospace']
+				mono: ['"JetBrains Mono"', '"Courier New"', 'monospace'],
+				cinzel: ['Cinzel', '"Times New Roman"', 'serif'],
+				jost: ['Jost', '"Helvetica Neue"', 'system-ui', 'sans-serif']
 			},
 			colors: {
 				ink: 'hsl(var(--ink))',
 				bone: 'hsl(var(--bone))',
-				gold: 'hsl(var(--gold))',
+				gold: {
+					DEFAULT: 'hsl(var(--gold))',
+					light: 'hsl(var(--gold-light))'
+				},
 				moss: 'hsl(var(--moss))',
+				navy: {
+					DEFAULT: 'hsl(var(--navy))',
+					deep: 'hsl(var(--navy-deep))'
+				},
+				royal: {
+					DEFAULT: 'hsl(var(--royal))',
+					light: 'hsl(var(--royal-light))'
+				},
+				cream: 'hsl(var(--cream))',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
