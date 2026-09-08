@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, Crown, Sparkle } from "lucide-react";
+import { Check, Crown, Loader2, Sparkle } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const PLANS = [
   {
@@ -10,6 +12,7 @@ const PLANS = [
     descKey: "pricing.p1Desc",
     features: ["pricing.p1f1", "pricing.p1f2", "pricing.p1f3"],
     featured: false,
+    productId: "prod_VDubKDp1jKVsL8",
   },
   {
     nameKey: "pricing.p2Name",
@@ -18,6 +21,7 @@ const PLANS = [
     descKey: "pricing.p2Desc",
     features: ["pricing.p2f1", "pricing.p2f2", "pricing.p2f3", "pricing.p2f4"],
     featured: true,
+    productId: "prod_VDubmi1896ALiM",
   },
   {
     nameKey: "pricing.p3Name",
@@ -26,16 +30,40 @@ const PLANS = [
     descKey: "pricing.p3Desc",
     features: ["pricing.p3f1", "pricing.p3f2", "pricing.p3f3"],
     featured: false,
+    productId: "prod_VDub44DMiyL80u",
   },
 ];
 
 const Pricing = () => {
   const { t } = useTranslation();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const reserve = (planName: string) => {
-    toast(t("pricing.toastTitle"), {
-      description: t("pricing.toastDesc", { plan: planName }),
-    });
+  const checkout = async (plan: (typeof PLANS)[number]) => {
+    setLoadingId(plan.nameKey);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "create-checkout-session",
+        {
+          body: {
+            productId: plan.productId,
+            successUrl: `${window.location.origin}/#pagamento?status=success`,
+            cancelUrl: `${window.location.origin}/#pagamento`,
+          },
+        },
+      );
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data?.error ?? "No checkout URL");
+      }
+    } catch {
+      toast.error(t("pricing.errorTitle"), {
+        description: t("pricing.errorDesc"),
+      });
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   return (
@@ -117,15 +145,22 @@ const Pricing = () => {
               </ul>
 
               <button
-                onClick={() => reserve(t(plan.nameKey))}
-                className={`mt-8 inline-flex items-center justify-center gap-3 rounded-full px-6 py-3.5 font-jost text-[11px] uppercase tracking-[0.3em] transition ${
+                onClick={() => checkout(plan)}
+                disabled={loadingId !== null}
+                className={`mt-8 inline-flex items-center justify-center gap-3 rounded-full px-6 py-3.5 font-jost text-[11px] uppercase tracking-[0.3em] transition disabled:cursor-not-allowed disabled:opacity-60 ${
                   plan.featured
                     ? "bg-gold text-navy-deep shadow-[0_0_24px_hsl(var(--gold)/0.35)] hover:bg-gold-light"
                     : "border border-gold/50 text-gold hover:bg-gold/10"
                 }`}
               >
-                <Sparkle className="h-3.5 w-3.5" strokeWidth={1.5} />
-                {t("pricing.reserveCta")}
+                {loadingId === plan.nameKey ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5} />
+                ) : (
+                  <Sparkle className="h-3.5 w-3.5" strokeWidth={1.5} />
+                )}
+                {loadingId === plan.nameKey
+                  ? t("pricing.loadingCta")
+                  : t("pricing.reserveCta")}
               </button>
             </article>
           ))}
