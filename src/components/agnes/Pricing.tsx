@@ -1,50 +1,40 @@
+import { useTranslation } from "react-i18next";
 import { Check, Crown, Sparkle } from "lucide-react";
 import { toast } from "sonner";
 
 const PLANS = [
   {
-    name: "Leitura Relâmpago",
+    nameKey: "pricing.p1Name",
     price: "R$ 47",
-    period: "por consulta",
-    desc: "Resposta direta do Mestre para uma pergunta urgente.",
-    features: [
-      "1 pergunta no terminal",
-      "Resposta em até 24h",
-      "Leitura da energia do dia",
-    ],
+    periodKey: "pricing.p1Period",
+    descKey: "pricing.p1Desc",
+    features: ["pricing.p1f1", "pricing.p1f2", "pricing.p1f3"],
     featured: false,
   },
   {
-    name: "Mapa Natal Completo",
+    nameKey: "pricing.p2Name",
     price: "R$ 147",
-    period: "pagamento único",
-    desc: "A leitura mais profunda da sua carta astral e numerologia.",
-    features: [
-      "Carta astral completa",
-      "Numerologia do nome",
-      "Interpretação em áudio",
-      "1 sessão ao vivo com o Mestre",
-    ],
+    periodKey: "pricing.p2Period",
+    descKey: "pricing.p2Desc",
+    features: ["pricing.p2f1", "pricing.p2f2", "pricing.p2f3", "pricing.p2f4"],
     featured: true,
   },
   {
-    name: "Guia Mensal",
+    nameKey: "pricing.p3Name",
     price: "R$ 97",
-    period: "por mês",
-    desc: "Acompanhamento por ciclo lunar com orientações contínuas.",
-    features: [
-      "2 consultas por mês",
-      "Previsões por ciclo",
-      "Prioridade no terminal",
-    ],
+    periodKey: "pricing.p3Period",
+    descKey: "pricing.p3Desc",
+    features: ["pricing.p3f1", "pricing.p3f2", "pricing.p3f3"],
     featured: false,
   },
 ];
 
 const Pricing = () => {
-  const reserve = (plan: string) => {
-    toast("Reserva em breve", {
-      description: `O plano "${plan}" estará disponível assim que o pagamento for integrado.`,
+  const { t } = useTranslation();
+
+  const reserve = (planName: string) => {
+    toast(t("pricing.toastTitle"), {
+      description: t("pricing.toastDesc", { plan: planName }),
     });
   };
 
@@ -64,23 +54,22 @@ const Pricing = () => {
           <div className="flex items-center justify-center gap-3">
             <span className="h-px w-8 bg-gold" />
             <span className="font-jost text-[11px] uppercase tracking-[0.35em] text-gold">
-              Investimento
+              {t("pricing.eyebrow")}
             </span>
             <span className="h-px w-8 bg-gold" />
           </div>
           <h2 className="mt-6 font-cinzel text-4xl leading-tight text-cream md:text-5xl">
-            Escolha o <span className="italic text-gold-gradient">caminho</span>
+            {t("pricing.title1")} <span className="italic text-gold-gradient">{t("pricing.title2")}</span>
           </h2>
           <p className="mt-4 font-jost text-sm font-light leading-relaxed tracking-wide text-cream/60">
-            Pagamento seguro e atendimento 100% em português, com a orientação
-            pessoal do Mestre.
+            {t("pricing.subtitle")}
           </p>
         </div>
 
         <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
           {PLANS.map((plan) => (
             <article
-              key={plan.name}
+              key={plan.nameKey}
               className={`relative flex flex-col rounded-sm border p-8 transition-all duration-500 hover:-translate-y-1 ${
                 plan.featured
                   ? "border-gold/70 bg-gradient-to-b from-royal/40 to-card shadow-[0_0_50px_hsl(var(--gold)/0.15)]"
@@ -90,13 +79,13 @@ const Pricing = () => {
               {plan.featured && (
                 <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full border border-gold/60 bg-gold px-4 py-1 font-jost text-[9px] uppercase tracking-[0.3em] text-navy-deep">
                   <Crown className="h-3 w-3" strokeWidth={1.5} />
-                  Mais procurado
+                  {t("pricing.featuredBadge")}
                 </span>
               )}
 
-              <h3 className="font-cinzel text-2xl text-cream">{plan.name}</h3>
+              <h3 className="font-cinzel text-2xl text-cream">{t(plan.nameKey)}</h3>
               <p className="mt-2 font-jost text-sm font-light leading-relaxed tracking-wide text-cream/60">
-                {plan.desc}
+                {t(plan.descKey)}
               </p>
 
               <div className="mt-6 flex items-baseline gap-2">
@@ -108,7 +97,7 @@ const Pricing = () => {
                   {plan.price}
                 </span>
                 <span className="font-jost text-[10px] uppercase tracking-[0.3em] text-cream/45">
-                  {plan.period}
+                  {t(plan.periodKey)}
                 </span>
               </div>
 
@@ -122,13 +111,13 @@ const Pricing = () => {
                       className="mt-0.5 h-4 w-4 shrink-0 text-gold"
                       strokeWidth={1.5}
                     />
-                    {f}
+                    {t(f)}
                   </li>
                 ))}
               </ul>
 
               <button
-                onClick={() => reserve(plan.name)}
+                onClick={() => reserve(t(plan.nameKey))}
                 className={`mt-8 inline-flex items-center justify-center gap-3 rounded-full px-6 py-3.5 font-jost text-[11px] uppercase tracking-[0.3em] transition ${
                   plan.featured
                     ? "bg-gold text-navy-deep shadow-[0_0_24px_hsl(var(--gold)/0.35)] hover:bg-gold-light"
@@ -136,7 +125,7 @@ const Pricing = () => {
                 }`}
               >
                 <Sparkle className="h-3.5 w-3.5" strokeWidth={1.5} />
-                Reservar análise
+                {t("pricing.reserveCta")}
               </button>
             </article>
           ))}

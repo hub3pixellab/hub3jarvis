@@ -1,20 +1,21 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Instagram, Mail, MessageCircle, Sparkle, Youtube } from "lucide-react";
 
 const SERVICES = [
-  "Mapa Natal",
-  "Numerologia",
-  "Eneagrama",
-  "Compatibilidade",
-  "Conselho dos Mestres",
+  "services.s1Name",
+  "services.s2Name",
+  "services.s3Name",
+  "services.s4Name",
+  "services.s5Name",
 ];
 
 const NAVIGATION = [
-  { label: "Início", href: "#inicio" },
-  { label: "Fazer Análise", href: "#analise" },
-  { label: "Terminal de Chat", href: "#terminal" },
-  { label: "Pagamento", href: "#pagamento" },
-  { label: "Contato", href: "#contato" },
+  { key: "nav.home", href: "#inicio" },
+  { key: "nav.cta", href: "#analise" },
+  { key: "footer.navTerminal", href: "#terminal" },
+  { key: "footer.navPayment", href: "#pagamento" },
+  { key: "nav.contact", href: "#contato" },
 ];
 
 const SOCIALS = [
@@ -24,6 +25,8 @@ const SOCIALS = [
 ];
 
 const Footer = () => {
+  const { t } = useTranslation();
+
   return (
     <footer
       id="contato"
@@ -54,16 +57,16 @@ const Footer = () => {
               </span>
             </a>
             <p className="mt-4 font-jost text-[10px] font-light uppercase tracking-[0.5em] text-cream/60">
-              Seu Guia <span className="text-gold">•</span> Seu Destino
+              {t("footer.guide")} <span className="text-gold">•</span> {t("footer.destiny")}
             </p>
             <p className="mt-5 max-w-xs font-jost text-sm font-light leading-relaxed tracking-wide text-cream/70">
-              Astrologia e numerologia cabalística para guiar sua jornada.
+              {t("footer.description")}
             </p>
           </div>
 
           {/* Col 2 — Services */}
           <div>
-            <ColumnTitle>Serviços</ColumnTitle>
+            <ColumnTitle>{t("footer.servicesTitle")}</ColumnTitle>
             <ul className="mt-6 space-y-3">
               {SERVICES.map((s) => (
                 <li key={s}>
@@ -71,7 +74,7 @@ const Footer = () => {
                     href="#servicos"
                     className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
                   >
-                    {s}
+                    {t(s)}
                   </a>
                 </li>
               ))}
@@ -80,15 +83,15 @@ const Footer = () => {
 
           {/* Col 3 — Navigation */}
           <div>
-            <ColumnTitle>Navegação</ColumnTitle>
+            <ColumnTitle>{t("footer.navTitle")}</ColumnTitle>
             <ul className="mt-6 space-y-3">
               {NAVIGATION.map((item) => (
-                <li key={item.label}>
+                <li key={item.key}>
                   <a
                     href={item.href}
                     className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
                   >
-                    {item.label}
+                    {t(item.key)}
                   </a>
                 </li>
               ))}
@@ -97,7 +100,7 @@ const Footer = () => {
 
           {/* Col 4 — Contact / Social */}
           <div>
-            <ColumnTitle>Contato</ColumnTitle>
+            <ColumnTitle>{t("footer.contactTitle")}</ColumnTitle>
             <a
               href="mailto:contato@mestreagnes.com"
               className="link-glow mt-6 inline-flex items-center gap-3 font-jost text-sm font-light tracking-wide text-cream/70"
@@ -132,7 +135,7 @@ const Footer = () => {
           <div className="h-px bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
           <p className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center">
             <span className="font-jost text-[11px] font-light uppercase tracking-[0.4em] text-cream/60">
-              Produzido por
+              {t("footer.producedBy")}
             </span>
             <Sparkle className="h-3 w-3 text-gold" strokeWidth={1.5} />
             <span className="font-cinzel text-sm uppercase tracking-[0.4em] text-gold-gradient">

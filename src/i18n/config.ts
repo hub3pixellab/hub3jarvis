@@ -16,6 +16,26 @@ const baseUrl = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 
+// Bundle every public/locales file at build time and pass them as synchronous
+// `resources`. This makes t() return real strings on the very first paint instead
+// of returning the key and re-rendering the whole tree once HttpBackend finishes
+// loading. That async swap is what remounts elements keyed off translated values
+// (key={t(...)}) and breaks mount-time effects (scroll/stack animations, layout
+// measurement) after a reload. The preview re-imports these JSON files on every
+// rebuild, so the bundled copy never goes stale; HttpBackend stays as a fallback
+// for any language not covered by the bundle.
+const bundledResources = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<Record<string, string>>("../../public/locales/*.json", {
+      eager: true,
+      import: "default",
+    }),
+  ).map(([filePath, translation]) => {
+    const code = filePath.match(/([^/]+)\.json$/)?.[1] ?? "";
+    return [code, { translation }];
+  }),
+);
+
 void i18n
   .use(HttpBackend)
   .use(LanguageDetector)
@@ -23,17 +43,22 @@ void i18n
   .init({
     fallbackLng,
     supportedLngs,
+    resources: bundledResources,
+    // Bundled languages resolve synchronously (no backend refetch, no re-render);
+    // only a language with no bundled file falls back to HttpBackend.
+    partialBundledLanguages: true,
     backend: { loadPath: `${baseUrl}locales/{{lng}}.json` },
     detection: {
       order: ["cookie", "navigator", "htmlTag"],
       lookupCookie: "i18next",
       caches: ["cookie"],
-      // 不支持的语言归一到 fallbackLng，避免 cookie 持久化无效语言串
-      // （detector 缓存的是 i18n.language，而非 resolvedLanguage）。
+      // Normalize unsupported languages to fallbackLng to avoid persisting
+      // an invalid language string (the detector caches i18n.language, not resolvedLanguage).
       convertDetectedLanguage: (l) => normalizeLanguage(l) ?? fallbackLng,
     },
-    // 当前模板用 flat dotted key + 单 namespace。两个 separator 都关掉，
-    // 让整个字符串作字面 key，不被切成 ns/key/subkey。
+    // The current template uses flat dotted keys + a single namespace.
+    // Both separators are disabled so the entire string is a literal key,
+    // not split into ns/key/subkey.
     keySeparator: false,
     nsSeparator: false,
     interpolation: { escapeValue: false },

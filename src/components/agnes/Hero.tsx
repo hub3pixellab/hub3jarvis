@@ -1,11 +1,19 @@
+import { useTranslation } from "react-i18next";
 import { ArrowRight, Sparkle } from "lucide-react";
 
 const HERO_IMG =
   "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/c21a7765.png";
 
-const PRACTICES = ["Astrologia", "Numerologia", "Eneagrama", "Cabala"];
+const PRACTICES = [
+  "hero.practice1",
+  "hero.practice2",
+  "hero.practice3",
+  "hero.practice4",
+];
 
 const Hero = () => {
+  const { t } = useTranslation();
+
   return (
     <section
       id="inicio"
@@ -14,7 +22,7 @@ const Hero = () => {
       {/* Background — hero do Mestre */}
       <img
         src={HERO_IMG}
-        alt="Mestre Agnes sob a roda do zodíaco"
+        alt={t("hero.imgAlt")}
         crossOrigin="anonymous"
         className="absolute inset-0 h-full w-full object-cover"
       />
@@ -31,7 +39,7 @@ const Hero = () => {
       {/* Right vertical label */}
       <div className="absolute right-10 top-1/2 hidden -translate-y-1/2 rotate-90 origin-right md:block">
         <span className="font-jost text-[10px] tracking-[0.5em] text-gold/60">
-          MMXXVI — O SEU GUIA • O SEU DESTINO
+          {t("hero.verticalLabel")}
         </span>
       </div>
 
@@ -41,7 +49,7 @@ const Hero = () => {
           <div className="flex items-center gap-4">
             <span className="h-px w-10 bg-gold" />
             <span className="font-jost text-[11px] uppercase tracking-[0.45em] text-gold/90">
-              Seu Guia • Seu Destino
+              {t("footer.guide")} • {t("footer.destiny")}
             </span>
           </div>
 
@@ -54,8 +62,7 @@ const Hero = () => {
           </h1>
 
           <p className="mt-6 max-w-lg font-jost text-base font-light leading-relaxed tracking-wide text-cream/75 md:text-lg">
-            Astrologia e numerologia cabalística para guiar sua jornada com
-            clareza, propósito e sabedoria ancestral.
+            {t("hero.subtitle")}
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-5">
@@ -63,7 +70,7 @@ const Hero = () => {
               href="#analise"
               className="group inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-navy-deep shadow-[0_0_30px_hsl(var(--gold)/0.35)] transition hover:bg-gold-light hover:shadow-[0_0_44px_hsl(var(--gold)/0.55)]"
             >
-              Fazer minha análise
+              {t("hero.ctaPrimary")}
               <ArrowRight
                 className="h-4 w-4 transition-transform group-hover:translate-x-1"
                 strokeWidth={1.5}
@@ -73,7 +80,7 @@ const Hero = () => {
               href="#sobre"
               className="inline-flex items-center gap-3 rounded-full border border-gold/50 px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-cream transition hover:border-gold hover:text-gold hover:shadow-[0_0_24px_hsl(var(--gold)/0.25)]"
             >
-              Conhecer o Mestre
+              {t("hero.ctaSecondary")}
             </a>
           </div>
         </div>
@@ -84,7 +91,7 @@ const Hero = () => {
             {PRACTICES.map((p, i) => (
               <span key={p} className="flex items-center gap-5">
                 <span className="font-jost text-[10px] uppercase tracking-[0.4em] text-cream/60">
-                  {p}
+                  {t(p)}
                 </span>
                 {i < PRACTICES.length - 1 && (
                   <Sparkle className="h-2.5 w-2.5 text-gold/70" strokeWidth={1.5} />
@@ -93,7 +100,7 @@ const Hero = () => {
             ))}
           </div>
           <span className="font-jost text-[10px] uppercase tracking-[0.4em] text-cream/50">
-            Consultas em português
+            {t("hero.consultsNote")}
           </span>
         </div>
       </div>

@@ -1,25 +1,22 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Send, Sparkle } from "lucide-react";
 
 const TERMINAL_BG =
   "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/1c2a5250.png";
 
 const QUICK_QUESTIONS = [
-  "Qual é a minha missão de vida?",
-  "Como está minha energia hoje?",
-  "Somos compatíveis?",
-  "O que os números dizem sobre mim?",
+  "terminal.q1",
+  "terminal.q2",
+  "terminal.q3",
+  "terminal.q4",
 ];
 
 const REPLIES: Record<string, string> = {
-  "Qual é a minha missão de vida?":
-    "Seu caminho aponta para a união entre sensibilidade e propósito. Os números e as estrelas falam de um chamado para liderar com o coração.",
-  "Como está minha energia hoje?":
-    "Hoje a Lua favorece a introspecção. Guarde sua energia para o que realmente importa — o silêncio de hoje prepara a colheita de amanhã.",
-  "Somos compatíveis?":
-    "Há sintonia entre vocês, mas ela pede paciência: elementos que se completam precisam de tempo para aprender a dançar.",
-  "O que os números dizem sobre mim?":
-    "Seu número de caminho revela força criativa e uma missão ligada ao autoconhecimento. O ano presente pede coragem para recomeçar.",
+  "terminal.q1": "terminal.r1",
+  "terminal.q2": "terminal.r2",
+  "terminal.q3": "terminal.r3",
+  "terminal.q4": "terminal.r4",
 };
 
 interface Message {
@@ -28,10 +25,11 @@ interface Message {
 }
 
 const Terminal = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
     {
       from: "master",
-      text: "Bem-vindo ao terminal do Mestre Agnes. O que sua alma deseja saber hoje?",
+      text: t("terminal.greeting"),
     },
   ]);
   const [input, setInput] = useState("");
@@ -50,13 +48,12 @@ const Terminal = () => {
     setInput("");
     setTyping(true);
     window.setTimeout(() => {
+      const replyKey = REPLIES[q] ?? "terminal.rFallback";
       setMessages((m) => [
         ...m,
         {
           from: "master",
-          text:
-            REPLIES[q] ??
-            "Os astros ouviram sua pergunta. Para uma resposta precisa, consulte seu mapa completo.",
+          text: t(replyKey),
         },
       ]);
       setTyping(false);
@@ -88,18 +85,19 @@ const Terminal = () => {
             <div className="flex items-center gap-3">
               <span className="h-px w-8 bg-gold" />
               <span className="font-jost text-[11px] uppercase tracking-[0.35em] text-gold">
-                Terminal de Chat
+                {t("terminal.eyebrow")}
               </span>
             </div>
             <h2 className="mt-6 font-cinzel text-4xl leading-tight text-cream md:text-5xl">
-              Pergunte.
+              {t("terminal.title1")}
               <br />
-              <span className="italic text-gold-gradient">Os astros respondem.</span>
+              <span className="italic text-gold-gradient">
+                {t("terminal.title2")}
+              </span>
             </h2>
           </div>
           <p className="max-w-sm font-jost text-sm font-light leading-relaxed tracking-wide text-cream/60">
-            Toque em uma pergunta predefinida ou escreva a sua. Esta é uma
-            sessão de demonstração do terminal.
+            {t("terminal.subtitle")}
           </p>
         </div>
 
@@ -121,7 +119,7 @@ const Terminal = () => {
                 ))}
               </div>
               <span className="font-jost text-[10px] uppercase tracking-[0.4em] text-cream/60">
-                Terminal Mestre Agnes
+                {t("terminal.windowTitle")}
               </span>
               <Sparkle className="h-3.5 w-3.5 text-gold/70" strokeWidth={1.5} />
             </div>
@@ -182,7 +180,7 @@ const Terminal = () => {
                   disabled={typing}
                   className="rounded-full border border-gold/40 px-4 py-1.5 font-jost text-xs tracking-wide text-gold transition hover:bg-gold/15 hover:shadow-[0_0_14px_hsl(var(--gold)/0.25)] disabled:opacity-50"
                 >
-                  {q}
+                  {t(q)}
                 </button>
               ))}
             </div>
@@ -195,13 +193,13 @@ const Terminal = () => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") ask(input);
                 }}
-                placeholder="Escreva sua pergunta aos astros…"
+                placeholder={t("terminal.placeholder")}
                 className="min-w-0 flex-1 rounded-full border border-gold/25 bg-navy/60 px-5 py-3 font-jost text-sm tracking-wide text-cream placeholder:text-cream/35 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40"
               />
               <button
                 onClick={() => ask(input)}
                 disabled={typing || !input.trim()}
-                aria-label="Enviar pergunta"
+                aria-label={t("terminal.sendAria")}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold text-navy-deep shadow-[0_0_18px_hsl(var(--gold)/0.35)] transition hover:bg-gold-light disabled:opacity-50"
               >
                 <Send className="h-4 w-4" strokeWidth={1.5} />
@@ -210,7 +208,7 @@ const Terminal = () => {
           </div>
 
           <p className="mt-6 text-center font-jost text-[10px] uppercase tracking-[0.35em] text-cream/40">
-            Sessão demonstração — consulta ao vivo em breve
+            {t("terminal.demoNote")}
           </p>
         </div>
       </div>

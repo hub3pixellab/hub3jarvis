@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { ArrowRight, MessagesSquare } from "lucide-react";
 
 const MASCOT_IMG =
@@ -6,27 +7,29 @@ const MASCOT_IMG =
 const STEPS = [
   {
     n: "01",
-    title: "Compartilhe seus dados",
-    desc: "Envie nome completo, data, hora e local de nascimento pelo formulário seguro.",
+    titleKey: "analysis.step1Title",
+    descKey: "analysis.step1Desc",
   },
   {
     n: "02",
-    title: "Receba seu mapa",
-    desc: "Carta astral e numerologia calculadas com precisão e interpretadas por mim.",
+    titleKey: "analysis.step2Title",
+    descKey: "analysis.step2Desc",
   },
   {
     n: "03",
-    title: "Consulte o Mestre",
-    desc: "Tire suas dúvidas no terminal de chat, no momento em que precisar.",
+    titleKey: "analysis.step3Title",
+    descKey: "analysis.step3Desc",
   },
   {
     n: "04",
-    title: "Siga orientado",
-    desc: "Orientações práticas para cada fase, ciclo e decisão importante da sua vida.",
+    titleKey: "analysis.step4Title",
+    descKey: "analysis.step4Desc",
   },
 ];
 
 const Analysis = () => {
+  const { t } = useTranslation();
+
   return (
     <section
       id="analise"
@@ -42,13 +45,13 @@ const Analysis = () => {
         <div className="flex items-center gap-3">
           <span className="h-px w-8 bg-gold" />
           <span className="font-jost text-[11px] uppercase tracking-[0.35em] text-gold">
-            Fazer Análise
+            {t("analysis.eyebrow")}
           </span>
         </div>
         <h2 className="mt-6 max-w-2xl font-cinzel text-4xl leading-tight text-cream md:text-5xl">
-          Sua análise em
+          {t("analysis.title1")}
           <br />
-          <span className="italic text-gold-gradient">quatro passos.</span>
+          <span className="italic text-gold-gradient">{t("analysis.title2")}</span>
         </h2>
 
         <div className="mt-16 grid grid-cols-1 gap-10 md:grid-cols-12">
@@ -58,7 +61,7 @@ const Analysis = () => {
               <div className="relative overflow-hidden rounded-sm border border-gold/25">
                 <img
                   src={MASCOT_IMG}
-                  alt="Mascote Mestre Agnes"
+                  alt={t("analysis.mascotAlt")}
                   crossOrigin="anonymous"
                   className="aspect-square w-full object-cover"
                 />
@@ -66,10 +69,10 @@ const Analysis = () => {
                 <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-jost text-[10px] uppercase tracking-[0.35em] text-gold/80">
-                      O Guardião do Terminal
+                      {t("analysis.mascotLabel")}
                     </div>
                     <div className="mt-1 font-cinzel text-xl text-cream">
-                      Pronto para te atender
+                      {t("analysis.mascotTitle")}
                     </div>
                   </div>
                   <span className="relative flex h-2.5 w-2.5 shrink-0">
@@ -96,10 +99,10 @@ const Analysis = () => {
                     </span>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-cinzel text-2xl text-cream md:text-3xl">
-                        {s.title}
+                        {t(s.titleKey)}
                       </h3>
                       <p className="mt-3 max-w-md font-jost text-sm font-light leading-relaxed tracking-wide text-cream/60">
-                        {s.desc}
+                        {t(s.descKey)}
                       </p>
                     </div>
                   </div>
@@ -112,7 +115,7 @@ const Analysis = () => {
                 href="#pagamento"
                 className="group inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-navy-deep shadow-[0_0_30px_hsl(var(--gold)/0.35)] transition hover:bg-gold-light hover:shadow-[0_0_44px_hsl(var(--gold)/0.55)]"
               >
-                Fazer minha análise
+                {t("analysis.ctaPrimary")}
                 <ArrowRight
                   className="h-4 w-4 transition-transform group-hover:translate-x-1"
                   strokeWidth={1.5}
@@ -123,7 +126,7 @@ const Analysis = () => {
                 className="inline-flex items-center gap-3 rounded-full border border-gold/50 px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-cream transition hover:border-gold hover:text-gold"
               >
                 <MessagesSquare className="h-4 w-4" strokeWidth={1.5} />
-                Abrir o Terminal
+                {t("analysis.ctaTerminal")}
               </a>
             </div>
           </div>

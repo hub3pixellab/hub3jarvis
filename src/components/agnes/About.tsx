@@ -1,18 +1,22 @@
+import { useTranslation } from "react-i18next";
+
 const PORTRAIT_IMG =
   "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/72cab091.png";
 
 const SEAL_IMG =
   "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/b2238850.jpeg";
 
-const TAGS = ["Astrólogo", "Numerólogo", "Conselheiro"];
+const TAGS = ["about.tag1", "about.tag2", "about.tag3"];
 
 const STATS = [
-  { value: "15+", label: "Anos de estudo" },
-  { value: "4.200+", label: "Consultas realizadas" },
-  { value: "3", label: "Tradições sagradas" },
+  { value: "15+", key: "about.stat1Label" },
+  { value: "4.200+", key: "about.stat2Label" },
+  { value: "3", key: "about.stat3Label" },
 ];
 
 const About = () => {
+  const { t } = useTranslation();
+
   return (
     <section
       id="sobre"
@@ -32,7 +36,7 @@ const About = () => {
             <div className="relative overflow-hidden rounded-sm border border-gold/30 bg-card">
               <img
                 src={PORTRAIT_IMG}
-                alt="Retrato do Mestre Agnes"
+                alt={t("about.imgAlt")}
                 crossOrigin="anonymous"
                 className="aspect-[4/5] w-full object-cover"
               />
@@ -41,7 +45,7 @@ const About = () => {
                   Mestre Agnes
                 </div>
                 <div className="mt-1 font-jost text-[9px] uppercase tracking-[0.32em] text-gold/70">
-                  Astrólogo &amp; Numerólogo
+                  {t("about.captionRole")}
                 </div>
               </div>
             </div>
@@ -50,7 +54,7 @@ const About = () => {
             <div className="absolute -bottom-8 -right-4 hidden h-28 w-28 items-center justify-center rounded-full border border-gold/40 bg-navy/90 p-1.5 shadow-[0_0_30px_hsl(var(--gold)/0.25)] backdrop-blur md:flex">
               <img
                 src={SEAL_IMG}
-                alt="Selo Mestre Agnes"
+                alt={t("about.sealAlt")}
                 crossOrigin="anonymous"
                 className="h-full w-full rounded-full object-cover"
               />
@@ -63,7 +67,7 @@ const About = () => {
           <div className="flex items-center gap-3">
             <span className="h-px w-8 bg-gold" />
             <span className="font-jost text-[11px] uppercase tracking-[0.35em] text-gold">
-              O Mestre
+              {t("about.eyebrow")}
             </span>
           </div>
 
@@ -72,15 +76,10 @@ const About = () => {
           </h2>
 
           <p className="mt-8 max-w-xl font-jost text-base leading-relaxed tracking-wide text-cream/85">
-            Sou o Agnes, seu consultor em astrologia e numerologia cabalística.
-            Há mais de quinze anos estudo os céus, os números e a alma humana
-            para ajudar você a ler a própria jornada com clareza.
+            {t("about.p1")}
           </p>
           <p className="mt-4 max-w-xl font-jost text-sm font-light leading-relaxed tracking-wide text-cream/65">
-            Cada consulta é uma conversa íntima: nada de horóscopos genéricos.
-            Eu mergulho no seu mapa, ouço as suas perguntas e devolvo uma
-            orientação prática, feita para a sua vida — e para o momento que
-            você vive agora.
+            {t("about.p2")}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -89,7 +88,7 @@ const About = () => {
                 key={tag}
                 className="inline-flex items-center rounded-full border border-gold/30 bg-royal/30 px-4 py-1.5 font-jost text-[10px] uppercase tracking-[0.3em] text-gold"
               >
-                {tag}
+                {t(tag)}
               </span>
             ))}
           </div>
@@ -97,12 +96,12 @@ const About = () => {
           {/* Stats */}
           <div className="mt-14 grid grid-cols-3 gap-6 border-t border-gold/15 pt-8">
             {STATS.map((s) => (
-              <div key={s.label} className="min-w-0">
+              <div key={s.key} className="min-w-0">
                 <div className="font-cinzel text-2xl text-gold-gradient md:text-5xl">
                   {s.value}
                 </div>
                 <div className="mt-2 font-jost text-[10px] uppercase tracking-[0.3em] text-cream/55">
-                  {s.label}
+                  {t(s.key)}
                 </div>
               </div>
             ))}

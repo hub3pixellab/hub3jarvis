@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   ArrowUpRight,
   BookOpen,
@@ -10,42 +11,44 @@ import {
 const SERVICES = [
   {
     n: "I",
-    name: "Mapa Natal",
-    tag: "Carta astral completa",
-    desc: "Seu céu no momento exato do nascimento — talentos, desafios e o caminho que as estrelas reservaram.",
+    nameKey: "services.s1Name",
+    tagKey: "services.s1Tag",
+    descKey: "services.s1Desc",
     icon: Compass,
   },
   {
     n: "II",
-    name: "Numerologia",
-    tag: "Os números do destino",
-    desc: "Nome e data de nascimento revelam seus ciclos, propósito e os anos mais favoráveis.",
+    nameKey: "services.s2Name",
+    tagKey: "services.s2Tag",
+    descKey: "services.s2Desc",
     icon: Hash,
   },
   {
     n: "III",
-    name: "Eneagrama",
-    tag: "A arquitetura do ser",
-    desc: "Descubra seu tipo de personalidade e os padrões que se repetem na sua história.",
+    nameKey: "services.s3Name",
+    tagKey: "services.s3Tag",
+    descKey: "services.s3Desc",
     icon: Triangle,
   },
   {
     n: "IV",
-    name: "Compatibilidade",
-    tag: "A sintonia de dois mapas",
-    desc: "Amor, amizade e parcerias — leia a harmonia entre dois céus antes de decidir.",
+    nameKey: "services.s4Name",
+    tagKey: "services.s4Tag",
+    descKey: "services.s4Desc",
     icon: Heart,
   },
   {
     n: "V",
-    name: "Conselho dos Mestres",
-    tag: "Orientação direta",
-    desc: "Uma consulta íntima para dúvidas urgentes e decisões que pedem sabedoria.",
+    nameKey: "services.s5Name",
+    tagKey: "services.s5Tag",
+    descKey: "services.s5Desc",
     icon: BookOpen,
   },
 ];
 
 const Services = () => {
+  const { t } = useTranslation();
+
   return (
     <section
       id="servicos"
@@ -63,7 +66,7 @@ const Services = () => {
           <div className="animate-marquee flex whitespace-nowrap font-cinzel text-2xl italic text-gold/25 md:text-4xl">
             {Array.from({ length: 6 }).map((_, i) => (
               <span key={i} className="px-8">
-                — Mestre Agnes ✦ Seu Guia ✦ Seu Destino ✦
+                — Mestre Agnes ✦ {t("footer.guide")} ✦ {t("footer.destiny")} ✦
               </span>
             ))}
           </div>
@@ -75,18 +78,17 @@ const Services = () => {
             <div className="flex items-center gap-3">
               <span className="h-px w-8 bg-gold" />
               <span className="font-jost text-[11px] uppercase tracking-[0.35em] text-gold">
-                Nossos Ofícios
+                {t("services.eyebrow")}
               </span>
             </div>
             <h2 className="mt-6 max-w-2xl font-cinzel text-4xl leading-tight text-cream md:text-5xl">
-              Cinco saberes,
+              {t("services.title1")}
               <br />
-              <span className="italic text-gold-gradient">um só guia.</span>
+              <span className="italic text-gold-gradient">{t("services.title2")}</span>
             </h2>
           </div>
           <p className="max-w-sm font-jost text-sm font-light leading-relaxed tracking-wide text-cream/60">
-            Cada prática é um portal. Escolha a que ressoa com a sua pergunta —
-            ou entregue-se a todas.
+            {t("services.subtitle")}
           </p>
         </div>
 
@@ -105,14 +107,14 @@ const Services = () => {
               </span>
               <div className="min-w-0">
                 <h3 className="font-cinzel text-2xl text-cream transition-colors group-hover:text-gold-gradient md:text-3xl">
-                  {s.name}
+                  {t(s.nameKey)}
                 </h3>
                 <p className="mt-1 font-jost text-[10px] uppercase tracking-[0.35em] text-gold/70">
-                  {s.tag}
+                  {t(s.tagKey)}
                 </p>
               </div>
               <p className="hidden max-w-md font-jost text-sm font-light leading-relaxed tracking-wide text-cream/60 md:block">
-                {s.desc}
+                {t(s.descKey)}
               </p>
               <span className="hidden h-10 w-10 items-center justify-center justify-self-end rounded-full border border-gold/25 text-gold transition-all duration-500 group-hover:border-gold group-hover:bg-gold group-hover:text-navy-deep group-hover:shadow-[0_0_20px_hsl(var(--gold)/0.4)] md:flex">
                 <ArrowUpRight className="h-4 w-4" strokeWidth={1.25} />
