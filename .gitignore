@@ -6,3 +6,9 @@ relatorio_*.pdf
 fix_*.py
 test_*.py
 renomear_*.py
+frontend/node_modules/
+frontend/.env
+
+node_modules/
+.env
+.DS_Store
