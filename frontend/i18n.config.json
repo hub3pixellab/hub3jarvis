@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "fallbackLng": "pt-BR",
+  "languages": [
+    {
+      "code": "pt-BR",
+      "label": "Português (Brasil)",
+      "detect": ["pt", "pt-BR"],
+      "dir": "ltr"
+    },
+    {
+      "code": "pt",
+      "label": "Português (Portugal)",
+      "detect": ["pt-PT"],
+      "dir": "ltr"
+    },
+    {
+      "code": "en",
+      "label": "English",
+      "detect": ["en"],
+      "dir": "ltr"
+    },
+    {
+      "code": "es",
+      "label": "Español",
+      "detect": ["es"],
+      "dir": "ltr"
+    },
+    {
+      "code": "fr",
+      "label": "Français",
+      "detect": ["fr"],
+      "dir": "ltr"
+    },
+    {
+      "code": "it",
+      "label": "Italiano",
+      "detect": ["it"],
+      "dir": "ltr"
+    }
+  ]
+}
