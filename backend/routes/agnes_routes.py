@@ -230,6 +230,9 @@ STRIPE_SECRET = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_PRICE = os.getenv("STRIPE_PRICE_ID", "")
 
+# URL do frontend para onde o Stripe redireciona apos o pagamento
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+
 if STRIPE_SECRET:
     stripe.api_key = STRIPE_SECRET
 
@@ -238,8 +241,8 @@ class RequisicaoCheckout(BaseModel):
     data_nascimento: str
     signo: str = ""
     foco: str = "geral"
-    success_url: str = "http://localhost:3000/sucesso"
-    cancel_url: str = "http://localhost:3000"
+    success_url: str = FRONTEND_URL + "/sucesso"
+    cancel_url: str = FRONTEND_URL
 
 @router.post("/checkout")
 async def criar_checkout(req: RequisicaoCheckout, x_api_key: str = Header(None)):
