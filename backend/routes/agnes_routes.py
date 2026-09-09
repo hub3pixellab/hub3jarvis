@@ -351,6 +351,7 @@ async def relatorio_pdf(req: RequisicaoRelatorioPDF, x_api_key: str = Header(Non
 class RequisicaoEneagrama(BaseModel):
     mensagem: str
     historico: list = []
+    foco_analise: str = "eneagrama"
 
 @router.post("/eneagrama")
 async def oraculo_eneagrama(
