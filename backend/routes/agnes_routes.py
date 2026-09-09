@@ -252,11 +252,12 @@ async def criar_checkout(req: RequisicaoCheckout, x_api_key: str = Header(None))
         raise HTTPException(status_code=500, detail="Stripe nao configurado")
 
     try:
+        sep = "&" if "?" in req.success_url else "?"
         sessao = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=[{"price": STRIPE_PRICE, "quantity": 1}],
             mode="payment",
-            success_url=req.success_url + "?session_id={CHECKOUT_SESSION_ID}",
+            success_url=req.success_url + sep + "session_id={CHECKOUT_SESSION_ID}",
             cancel_url=req.cancel_url,
             metadata={
                 "nome": req.nome,
