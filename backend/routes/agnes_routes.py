@@ -241,6 +241,8 @@ class RequisicaoCheckout(BaseModel):
     data_nascimento: str
     signo: str = ""
     foco: str = "geral"
+    price_id: str = ""
+    email: str = ""
     success_url: str = FRONTEND_URL + "/sucesso"
     cancel_url: str = FRONTEND_URL
 
@@ -255,7 +257,7 @@ async def criar_checkout(req: RequisicaoCheckout, x_api_key: str = Header(None))
         sep = "&" if "?" in req.success_url else "?"
         sessao = stripe.checkout.Session.create(
             payment_method_types=["card"],
-            line_items=[{"price": STRIPE_PRICE, "quantity": 1}],
+            line_items=[{"price": req.price_id or STRIPE_PRICE, "quantity": 1}],
             mode="payment",
             success_url=req.success_url + sep + "session_id={CHECKOUT_SESSION_ID}",
             cancel_url=req.cancel_url,
@@ -264,6 +266,7 @@ async def criar_checkout(req: RequisicaoCheckout, x_api_key: str = Header(None))
                 "data_nascimento": req.data_nascimento,
                 "signo": req.signo,
                 "foco": req.foco,
+                "email": req.email,
             },
         )
         return {"checkout_url": sessao.url, "session_id": sessao.id}
@@ -646,3 +649,28 @@ Escreva de forma natural, empatica e com rigor tecnico. Assine no final com: —
         "model": r_final.get("model", "unknown"),
     }
 
+
+
+# ===== NOVO: GET /api/agnes/checkout/{session_id} - validacao de pagamento real =====
+import os as _os
+from fastapi import Header as _Header, HTTPException as _HTTPException
+
+@router.get("/checkout/{session_id}")
+async def status_checkout(session_id: str, x_api_key: str = _Header(default="")):
+    chave_esperada = _os.getenv("AGNES_API_KEY") or _os.getenv("AGNES_KEY", "")
+    if not chave_esperada or x_api_key != chave_esperada:
+        raise _HTTPException(status_code=401, detail="Chave de API invalida")
+    sk = _os.getenv("STRIPE_SECRET_KEY")
+    if not sk:
+        raise _HTTPException(status_code=500, detail="STRIPE_SECRET_KEY nao configurada")
+    try:
+        s = stripe.checkout.Session.retrieve(session_id, api_key=sk)
+    except stripe.error.StripeError:
+        raise _HTTPException(status_code=404, detail="Sessao de pagamento nao encontrada")
+    return {
+        "session_id": s.id,
+        "pago": s.payment_status == "paid",
+        "status": s.status,
+        "email": s.customer_details.email if s.customer_details else None,
+        "metadados": s.metadata or {},
+    }
