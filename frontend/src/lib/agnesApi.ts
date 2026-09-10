@@ -55,6 +55,25 @@ export async function baixarPdf(dados: { nome: string; data_nascimento: string; 
   URL.revokeObjectURL(url);
 }
 
+// Abre a apresentacao estilo Gamma (HTML navegavel) do relatorio em nova aba.
+export async function abrirApresentacao(dados: { nome: string; data_nascimento: string; signo?: string; foco?: string }) {
+  const res = await fetch(`${API_URL}/api/agnes/relatorio/apresentacao`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+    },
+    body: JSON.stringify(dados),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `Erro ${res.status} ao gerar a apresentacao`);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
 // Cria a sessao de checkout no Stripe e retorna { checkout_url, session_id }.
 export async function checkout(dados: {
   nome: string;
