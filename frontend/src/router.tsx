@@ -1,11 +1,17 @@
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Sucesso from "./pages/Sucesso";
 
 export const routers = [
   {
     path: "/",
     name: "home",
     element: <Index />,
+  },
+  {
+    path: "/sucesso",
+    name: "sucesso",
+    element: <Sucesso />,
   },
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */
   {
