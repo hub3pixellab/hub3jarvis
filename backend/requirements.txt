@@ -64,3 +64,9 @@ openpyxl
 pytesseract
 pillow
 google-generativeai
+
+# Pins para quebrar o backtracking do pip (build mais rapido no Render)
+google-api-core==2.36.0
+grpcio-status==1.83.1
+proto-plus==1.28.4
+googleapis-common-protos==1.75.3
