@@ -559,6 +559,7 @@ async def embeddings_status():
 	}
 
 app.include_router(agnes_router)
+app.include_router(agnes_presentation_router)
 app.mount("/frontend", StaticFiles(directory="../frontend"), name="frontend")
 
 from routes.widget_routes import router as widget_router
