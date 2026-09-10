@@ -307,17 +307,15 @@ import re
 def _limpar_markdown(texto):
     t = texto
     t = re.sub(r'!\[.*?\]\(.*?\)', '', t)
-    t = re.sub(r'\[(.*?)\]\(.*?\)', r'', t)
-    t = re.sub(r'\*\*(.*?)\*\*', r'', t)
-    t = re.sub(r'\*(.*?)\*', r'', t)
+    t = re.sub(r'\[(.*?)\]\(.*?\)', r'\1', t)
+    t = re.sub(r'\*\*(.*?)\*\*', r'\1', t)
+    t = re.sub(r'\*(.*?)\*', r'\1', t)
     t = re.sub(r'^#{1,6}\s*', '', t, flags=re.M)
     t = re.sub(r'^\s*[-*]\s+', '• ', t, flags=re.M)
     t = re.sub(r'^\s*\|.*\|$', '', t, flags=re.M)
     t = re.sub(r'[|]', ' ', t)
     t = re.sub(r'\n{3,}', '\n\n', t)
-    # remove emoji e caracteres fora do latin-1 (fonte Helvetica do reportlab)
     t = t.encode('latin-1', errors='ignore').decode('latin-1')
-    # escapa caracteres especiais XML do reportlab
     t = t.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
     return t.strip()
 
