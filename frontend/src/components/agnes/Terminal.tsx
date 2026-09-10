@@ -120,7 +120,12 @@ const Terminal = () => {
       const escolha = textoFinal.toLowerCase();
       const { signo } = pendencia;
       setPendencia(null);
-      if (escolha.includes("básico") || escolha.includes("basico") || escolha.includes("horóscopo") || escolha.includes("horoscopo") || escolha.includes("dia")) {
+      const querBasico =
+        escolha === "1" ||
+        escolha.includes("básico") || escolha.includes("basico") ||
+        escolha.includes("horóscopo") || escolha.includes("horoscopo") ||
+        escolha.includes("dia") || escolha.includes("rápido") || escolha.includes("rapido");
+      if (querBasico) {
         setMensagens((m) => [...m, { autor: "agnes", texto: horoscopoDoDia(signo!) }]);
         return;
       }
