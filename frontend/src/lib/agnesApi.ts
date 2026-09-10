@@ -93,7 +93,20 @@ export async function statusCheckout(sessionId: string) {
 
 // Chat do terminal (Mestre Agnes responde).
 export async function conversar(mensagem: string) {
-  return request("/api/agnes/conselho", { mensagem });
+  const r = await request("/api/agnes/conselho", { mensagem });
+  // Normaliza a resposta para texto puro, seja string, objeto ou array.
+  if (typeof r === "string") return r;
+  if (Array.isArray(r)) {
+    return r
+      .map((item) =>
+        typeof item === "string"
+          ? item
+          : item?.resposta || item?.texto || item?.mensagem || item?.conteudo || JSON.stringify(item)
+      )
+      .filter(Boolean)
+      .join("\n\n");
+  }
+  return r?.resposta || r?.texto || r?.mensagem || r?.conteudo || JSON.stringify(r);
 }
 
 // Analise de eneagrama.
