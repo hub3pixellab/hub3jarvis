@@ -4,6 +4,7 @@ import { Send, Sparkles } from "lucide-react";
 import { conversar } from "@/lib/agnesApi";
 
 type Mensagem = { autor: "agnes" | "voce"; texto: string };
+type Pendencia = { signo?: string } | null;
 
 const SUGESTOES = [
   "O que os astros revelam sobre mim hoje?",
@@ -13,24 +14,156 @@ const SUGESTOES = [
 ];
 
 const SAUDACAO =
-  "Bem-vindo(a), buscador(a). Eu sou o Mestre Agnes. Os astros e os números já estão alinhados — pergunte o que seu coração deseja saber.";
+  "Bem-vindo(a), buscador(a). Eu sou o Mestre Agnes. Os astros e os números já estão alinhados — pergunte o que seu coração deseja saber. Digite seu signo ou sua data de nascimento para ver o horóscopo do dia, ou faça qualquer pergunta para uma análise completa.";
+
+const SIGNOS: { nome: string; chaves: string[] }[] = [
+  { nome: "Áries", chaves: ["áries", "aries"] },
+  { nome: "Touro", chaves: ["touro"] },
+  { nome: "Gêmeos", chaves: ["gêmeos", "gemeos"] },
+  { nome: "Câncer", chaves: ["câncer", "cancer"] },
+  { nome: "Leão", chaves: ["leão", "leao"] },
+  { nome: "Virgem", chaves: ["virgem"] },
+  { nome: "Libra", chaves: ["libra"] },
+  { nome: "Escorpião", chaves: ["escorpião", "escorpiao"] },
+  { nome: "Sagitário", chaves: ["sagitário", "sagitario"] },
+  { nome: "Capricórnio", chaves: ["capricórnio", "capricornio"] },
+  { nome: "Aquário", chaves: ["aquário", "aquario"] },
+  { nome: "Peixes", chaves: ["peixes"] },
+];
+
+const FAQS = [
+  {
+    chaves: ["quanto custa", "preço", "preco", "valor", "plano", "custa"],
+    resposta:
+      "O valor do seu mapa pessoal completo está disponível na seção de planos, logo abaixo. Você escolhe o plano ideal para sua jornada e paga com segurança via Stripe.",
+  },
+  {
+    chaves: ["como funciona", "como recebo", "como faço", "como faco", "como funciona"],
+    resposta:
+      "É simples: você escolhe um plano, preenche seu nome e data de nascimento, faz o pagamento seguro e, na página de sucesso, clica em \"Gerar e baixar\" para receber seu mapa pessoal na hora.",
+  },
+  {
+    chaves: ["seguro", "stripe", "pagamento seguro", "confiável", "confiavel"],
+    resposta:
+      "Sim, totalmente seguro. Usamos o Stripe Checkout, com segurança de nível bancário e compliance PCI DSS. Nenhum dado sensível passa pelos nossos servidores.",
+  },
+  {
+    chaves: ["o que é", "o que e", "quem é", "quem e", "sobre o mestre"],
+    resposta:
+      "Eu sou o Mestre Agnes, um mestre virtual que une astrologia, numerologia e eneagrama com Inteligência Artificial para gerar um mapa pessoal único, baseado no seu nome e data de nascimento.",
+  },
+  {
+    chaves: ["eneagrama"],
+    resposta:
+      "O eneagrama é um sistema de nove tipos de personalidade que revela seus padrões de comportamento, motivações profundas e caminhos de crescimento. Eu o uso para enriquecer sua análise com uma visão mais completa de quem você é.",
+  },
+];
+
+const HOROSCOPO: Record<string, string> = {
+  "Áries": "Sua energia está em alta hoje, Áries. Marte te impulsiona a agir, mas cuidado com a impulsividade. É um bom dia para iniciar projetos e liderar, desde que você respire antes de responder.",
+  "Touro": "Hoje pede estabilidade, Touro. Vênus favorece suas relações e seu conforto. Aproveite para cuidar do que é seu, mas evite rigidez diante de mudanças que chegam como convites.",
+  "Gêmeos": "Sua mente está ágil, Gêmeos. Comunicação favorecida, ideias novas e conexões. Cuidado apenas para não dispersar sua energia em muitas frentes ao mesmo tempo.",
+  "Câncer": "As emoções estão à flor da pele, Câncer. A Lua pede acolhimento: cuide de si e dos seus. Um momento propício para fortalecer laços e ouvir sua intuição.",
+  "Leão": "O brilho é seu hoje, Leão. O Sol te dá carisma e presença. Um ótimo dia para se destacar e inspirar, sem esquecer de dar espaço para os outros brilharem também.",
+  "Virgem": "Dia de organização, Virgem. Mercúrio favorece o detalhe, o planejamento e a ordem. Aproveite para colocar a vida em dia, mas sem se cobrar perfeição.",
+  "Libra": "Harmonia é a palavra, Libra. Vênus favorece parcerias e equilíbrio. Um bom dia para resolver conflitos com diplomacia e buscar o que traz paz.",
+  "Escorpião": "Sua intensidade está em foco, Escorpião. Plutão convida à transformação profunda. Dia para mergulhar no que importa e soltar o que já não te serve.",
+  "Sagitário": "Expansão no ar, Sagitário. Júpiter abre horizontes: novos aprendizados, viagens ou ideias. Aventure-se, mas mantenha os pés no chão nas decisões práticas.",
+  "Capricórnio": "Foco e disciplina, Capricórnio. Saturno premia o esforço consistente. Um bom dia para avançar em metas de longo prazo com paciência e estrutura.",
+  "Aquário": "Sua mente inovadora brilha, Aquário. Urano traz insights originais e vontade de mudança. Dia para pensar fora da caixa e se conectar com causas que importam.",
+  "Peixes": "Sensibilidade em alta, Peixes. Netuno amplia sua intuição e criatividade. Dia para sonhar, criar e se conectar com o espiritual, sem se perder em ilusões.",
+};
+
+function horoscopoDoDia(signo: string): string {
+  const hoje = new Date().toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+  });
+  const base = HOROSCOPO[signo] ?? "Os astros hoje te convidam a olhar para dentro e seguir com confiança.";
+  return `☀️ Horóscopo de ${signo} — ${hoje}:\n\n${base}\n\nSe quiser ir mais fundo, me diga e eu posso fazer uma análise completa do seu mapa.`;
+}
 
 const Terminal = () => {
   const { t } = useTranslation();
   const [mensagens, setMensagens] = useState<Mensagem[]>([{ autor: "agnes", texto: SAUDACAO }]);
   const [texto, setTexto] = useState("");
   const [digitando, setDigitando] = useState(false);
+  const [pendencia, setPendencia] = useState<Pendencia>(null);
   const fimRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fimRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [mensagens, digitando]);
 
+  function detectarSigno(txt: string): string | null {
+    const lower = txt.toLowerCase();
+    for (const s of SIGNOS) {
+      if (s.chaves.some((c) => lower.includes(c))) return s.nome;
+    }
+    return null;
+  }
+
+  function detectarFaq(txt: string): string | null {
+    const lower = txt.toLowerCase();
+    const faq = FAQS.find((f) => f.chaves.some((c) => lower.includes(c)));
+    return faq ? faq.resposta : null;
+  }
+
   async function enviar(pergunta?: string) {
     const textoFinal = (pergunta ?? texto).trim();
     if (!textoFinal || digitando) return;
     setTexto("");
     setMensagens((m) => [...m, { autor: "voce", texto: textoFinal }]);
+
+    // Se há uma pendência (escolha após signo/data), interpreta a resposta
+    if (pendencia) {
+      const escolha = textoFinal.toLowerCase();
+      const { signo } = pendencia;
+      setPendencia(null);
+      if (escolha.includes("básico") || escolha.includes("basico") || escolha.includes("horóscopo") || escolha.includes("horoscopo") || escolha.includes("dia")) {
+        setMensagens((m) => [...m, { autor: "agnes", texto: horoscopoDoDia(signo!) }]);
+        return;
+      }
+      // Análise completa
+      setDigitando(true);
+      try {
+        const resposta = await conversar(textoFinal);
+        setMensagens((m) => [...m, { autor: "agnes", texto: resposta }]);
+      } catch (e) {
+        setMensagens((m) => [
+          ...m,
+          { autor: "agnes", texto: e instanceof Error ? e.message : "Os astros estão confusos neste momento... tente novamente." },
+        ]);
+      } finally {
+        setDigitando(false);
+      }
+      return;
+    }
+
+    // 1) FAQ
+    const faqResposta = detectarFaq(textoFinal);
+    if (faqResposta) {
+      setMensagens((m) => [...m, { autor: "agnes", texto: faqResposta }]);
+      return;
+    }
+
+    // 2) Signo ou data → pergunta o que o usuário quer
+    const signo = detectarSigno(textoFinal);
+    const temData = /\d{1,2}\/\d{1,2}/.test(textoFinal);
+    if (signo || temData) {
+      const alvo = signo ?? "seu signo";
+      setPendencia({ signo: signo ?? undefined });
+      setMensagens((m) => [
+        ...m,
+        {
+          autor: "agnes",
+          texto: `Detectei ${alvo}. O que você deseja?\n\n1️⃣ Ver o horóscopo do dia (resposta rápida)\n2️⃣ Fazer uma análise completa do seu mapa`,
+        },
+      ]);
+      return;
+    }
+
+    // 3) Análise completa
     setDigitando(true);
     try {
       const resposta = await conversar(textoFinal);
@@ -38,13 +171,7 @@ const Terminal = () => {
     } catch (e) {
       setMensagens((m) => [
         ...m,
-        {
-          autor: "agnes",
-          texto:
-            e instanceof Error
-              ? e.message
-              : "Os astros estão confusos neste momento... tente novamente.",
-        },
+        { autor: "agnes", texto: e instanceof Error ? e.message : "Os astros estão confusos neste momento... tente novamente." },
       ]);
     } finally {
       setDigitando(false);
@@ -76,7 +203,6 @@ const Terminal = () => {
         </div>
 
         <div className="mt-12 overflow-hidden rounded-md border border-gold/25 bg-[#0B0E14]/90 shadow-[0_30px_80px_-30px_hsl(0_0%_0%/0.9)]">
-          {/* Barra do terminal */}
           <div className="flex items-center justify-between border-b border-gold/15 bg-navy/60 px-5 py-3">
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-[#E5989B]" />
@@ -91,15 +217,11 @@ const Terminal = () => {
             />
           </div>
 
-          {/* Mensagens */}
           <div className="h-80 space-y-4 overflow-y-auto px-5 py-6">
             {mensagens.map((m, i) => (
-              <div
-                key={i}
-                className={`flex ${m.autor === "voce" ? "justify-end" : "justify-start"}`}
-              >
+              <div key={i} className={`flex ${m.autor === "voce" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[80%] rounded-lg border px-4 py-3 font-jost text-sm font-light leading-relaxed tracking-wide ${
+                  className={`max-w-[80%] whitespace-pre-line rounded-lg border px-4 py-3 font-jost text-sm font-light leading-relaxed tracking-wide ${
                     m.autor === "voce"
                       ? "border-gold/40 bg-gold/10 text-cream"
                       : "border-cream/10 bg-cream/5 text-cream/85"
@@ -124,7 +246,6 @@ const Terminal = () => {
             <div ref={fimRef} />
           </div>
 
-          {/* Sugestões */}
           {mensagens.length <= 1 && !digitando && (
             <div className="flex flex-wrap gap-2 border-t border-gold/10 px-5 py-4">
               {SUGESTOES.map((s) => (
@@ -139,7 +260,6 @@ const Terminal = () => {
             </div>
           )}
 
-          {/* Input */}
           <div className="flex items-center gap-3 border-t border-gold/15 bg-navy/60 px-5 py-4">
             <input
               value={texto}
