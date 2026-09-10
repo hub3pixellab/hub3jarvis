@@ -24,6 +24,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Mestre Agnes Backend v4.2", version="4.2", lifespan=lifespan)
 from routes.chat_routes import router as chat_router
+from routes.agnes_presentation import router as agnes_presentation_router
 from routes.upload_routes import router as upload_router
 app.include_router(chat_router)
 app.include_router(upload_router)
