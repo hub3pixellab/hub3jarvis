@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { gerarPDF, statusCheckout, STORAGE_DADOS } from "@/lib/agnesApi";
+import { abrirApresentacao, statusCheckout, STORAGE_DADOS } from "@/lib/agnesApi";
 
 const AZUL = "#0B1B3D";
 const DOURADO = "#D4AF37";
@@ -37,17 +37,9 @@ export default function Sucesso() {
     setBaixando(true);
     setMensagemErro("");
     try {
-      const blob = await gerarPDF(dados);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `relatorio_agnes_${dados.nome.replace(/ /g, "_")}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      await abrirApresentacao(dados);
     } catch (e) {
-      setMensagemErro(e instanceof Error ? e.message : "Erro ao gerar o PDF");
+      setMensagemErro(e instanceof Error ? e.message : "Erro ao gerar a apresentacao");
     } finally {
       setBaixando(false);
     }
