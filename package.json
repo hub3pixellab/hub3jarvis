@@ -6,11 +6,19 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "build": "npm run build:css && npm run build:js",
+    "build": "echo 'Build ok - frontend estatico'",
     "start": "node src/index.js",
     "test": "jest"
   },
-  "keywords": ["ai", "assistant", "multi-ai", "consensus", "local-first", "cache", "second-brain"],
+  "keywords": [
+    "ai",
+    "assistant",
+    "multi-ai",
+    "consensus",
+    "local-first",
+    "cache",
+    "second-brain"
+  ],
   "author": "Diogo Zachi Oliveira",
   "license": "MIT",
   "dependencies": {
