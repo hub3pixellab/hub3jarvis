@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { AnalysisCounter } from "@/components/agnes/AnalysisCounter";
 
 const PORTRAIT_IMG =
   "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/72cab091.png";
@@ -97,8 +98,8 @@ const About = () => {
           <div className="mt-14 grid grid-cols-3 gap-6 border-t border-gold/15 pt-8">
             {STATS.map((s) => (
               <div key={s.key} className="min-w-0">
-                <div className="font-cinzel text-2xl text-gold-gradient md:text-5xl">
-                  {s.value}
+                <div className="flex items-baseline font-cinzel text-2xl text-gold-gradient md:text-5xl">
+                  {s.key === "about.stat2Label" ? <AnalysisCounter /> : s.value}
                 </div>
                 <div className="mt-2 font-jost text-[10px] uppercase tracking-[0.3em] text-cream/55">
                   {t(s.key)}

@@ -3360,6 +3360,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      global_stats: {
+        Row: {
+          analysis_count: number
+          created_at: string
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          analysis_count?: number
+          created_at?: string
+          id: number
+          updated_at?: string
+        }
+        Update: {
+          analysis_count?: number
+          created_at?: string
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -3432,6 +3453,30 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_events: {
+        Row: {
+          event_type: string
+          id: string
+          processed_at: string
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          event_type: string
+          id: string
+          processed_at?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          processed_at?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           canceled_at: string | null
@@ -3470,7 +3515,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_analysis_counter: {
+        Args: { p_count?: number }
+        Returns: number
+      }
+      record_checkout_completion: {
+        Args: {
+          p_event_id: string
+          p_price_centavos: number
+          p_product_id?: string
+          p_product_name: string
+          p_session_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
