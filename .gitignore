@@ -1,14 +1,21 @@
-.env
+# Dependências
+node_modules/
+.venv/
+venv/
 __pycache__/
 *.pyc
-venv/
-relatorio_*.pdf
-fix_*.py
-test_*.py
-renomear_*.py
-frontend/node_modules/
-frontend/.env
 
-node_modules/
+# Ambiente e segredos
 .env
+.env.local
+*.pem
+
+# Builds e artefatos
+dist/
+build/
+*.log
+
+# OS/editor
 .DS_Store
+.vscode/
+.idea/
