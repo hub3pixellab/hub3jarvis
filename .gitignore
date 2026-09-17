@@ -1,21 +1,48 @@
 # Dependências
 node_modules/
+frontend/node_modules/
 .venv/
 venv/
+venv.bak/
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.so
+.Python
+pip-wheel-metadata/
 
 # Ambiente e segredos
 .env
-.env.local
+.env.*
+!.env.example
+backend/.env
+frontend/.env
 *.pem
+*.key
 
-# Builds e artefatos
+# Arquivos gerados pelos scripts do projeto
+relatorio_*.pdf
+fix_*.py
+test_*.py
+renomear_*.py
+
+# Logs e artefatos
+*.log
+*.sqlite3
 dist/
 build/
-*.log
+coverage/
+htmlcov/
+.pytest_cache/
 
-# OS/editor
+# IDE e sistema
 .DS_Store
-.vscode/
 .idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Banco de dados local
+data/*.db
+data/*.json
