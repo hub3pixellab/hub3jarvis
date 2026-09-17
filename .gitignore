@@ -46,3 +46,12 @@ htmlcov/
 # Banco de dados local
 data/*.db
 data/*.json
+
+# Arquivos gerados pelo projeto
+relatorio_*.pdf
+fix_*.py
+test_*.py
+renomear_*.py
+.pytest_cache/
+coverage/
+htmlcov/
