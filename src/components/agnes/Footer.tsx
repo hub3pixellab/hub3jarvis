@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Instagram, Mail, MessageCircle, Sparkle, Youtube } from "lucide-react";
 
@@ -15,6 +16,7 @@ const NAVIGATION = [
   { key: "nav.cta", href: "#analise" },
   { key: "footer.navTerminal", href: "#terminal" },
   { key: "footer.navPayment", href: "#pagamento" },
+  { key: "nav.dashboard", href: "/dashboard", route: true },
   { key: "nav.contact", href: "#contato" },
 ];
 
@@ -87,12 +89,21 @@ const Footer = () => {
             <ul className="mt-6 space-y-3">
               {NAVIGATION.map((item) => (
                 <li key={item.key}>
-                  <a
-                    href={item.href}
-                    className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
-                  >
-                    {t(item.key)}
-                  </a>
+                  {item.route ? (
+                    <Link
+                      to={item.href}
+                      className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
+                    >
+                      {t(item.key)}
+                    </Link>
+                  ) : (
+                    <a
+                      href={item.href}
+                      className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
+                    >
+                      {t(item.key)}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

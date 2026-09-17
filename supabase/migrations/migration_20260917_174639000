@@ -1,0 +1,35 @@
+create or replace function public.sync_zodiac_sign()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  z text;
+  idx integer;
+begin
+  if new.birth_date is null then
+    new.zodiac_sign = null;
+    return new;
+  end if;
+  idx := (extract(month from new.birth_date))::int * 100 + (extract(day from new.birth_date))::int;
+  if idx >= 321 and idx <= 419 then z := 'aries';
+  elsif idx >= 420 and idx <= 520 then z := 'taurus';
+  elsif idx >= 521 and idx <= 620 then z := 'gemini';
+  elsif idx >= 621 and idx <= 722 then z := 'cancer';
+  elsif idx >= 723 and idx <= 822 then z := 'leo';
+  elsif idx >= 823 and idx <= 922 then z := 'virgo';
+  elsif idx >= 923 and idx <= 1022 then z := 'libra';
+  elsif idx >= 1023 and idx <= 1121 then z := 'scorpio';
+  elsif idx >= 1122 and idx <= 1221 then z := 'sagittarius';
+  elsif idx >= 1222 or idx <= 119 then z := 'capricorn';
+  elsif idx >= 120 and idx <= 218 then z := 'aquarius';
+  elsif idx >= 219 and idx <= 320 then z := 'pisces';
+  end if;
+  new.zodiac_sign = z;
+  return new;
+end;
+$$;
+
+create trigger profiles_sync_zodiac
+  before insert or update of birth_date on public.profiles
+  for each row execute function public.sync_zodiac_sign();

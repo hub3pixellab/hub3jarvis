@@ -3360,7 +3360,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          birth_date: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          locale: string
+          updated_at: string
+          zodiac_sign: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          birth_date?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          locale?: string
+          updated_at?: string
+          zodiac_sign?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          birth_date?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          locale?: string
+          updated_at?: string
+          zodiac_sign?: string | null
+        }
+        Relationships: []
+      }
+      purchased_analyses: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          price_centavos: number
+          product_name: string
+          purchased_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          price_centavos?: number
+          product_name: string
+          purchased_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          price_centavos?: number
+          product_name?: string
+          purchased_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          canceled_at: string | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_name: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_name: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_name?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -3410,7 +3514,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_07: {
+      messages_2026_09_14: {
         Row: {
           event: string | null
           extension: string
@@ -3443,7 +3547,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_08: {
+      messages_2026_09_15: {
         Row: {
           event: string | null
           extension: string
@@ -3476,7 +3580,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_09: {
+      messages_2026_09_16: {
         Row: {
           event: string | null
           extension: string
@@ -3509,7 +3613,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_10: {
+      messages_2026_09_17: {
         Row: {
           event: string | null
           extension: string
@@ -3542,7 +3646,73 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_11: {
+      messages_2026_09_18: {
+        Row: {
+          event: string | null
+          extension: string
+          id: string
+          inserted_at: string
+          payload: Json | null
+          private: boolean | null
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          event?: string | null
+          extension: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          event?: string | null
+          extension?: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages_2026_09_19: {
+        Row: {
+          event: string | null
+          extension: string
+          id: string
+          inserted_at: string
+          payload: Json | null
+          private: boolean | null
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          event?: string | null
+          extension: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          event?: string | null
+          extension?: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages_2026_09_20: {
         Row: {
           event: string | null
           extension: string
