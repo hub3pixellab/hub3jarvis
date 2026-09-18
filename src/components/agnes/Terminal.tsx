@@ -63,15 +63,6 @@ const Terminal = () => {
 
   return (
     <div role="region" aria-label={t("terminal.windowTitle")} className="min-w-0">
-      {/* Eyebrow acima do painel de vidro */}
-      <div className="mb-4 flex items-center gap-3">
-        <span className="h-px w-6 bg-gold" />
-        <span className="font-jost text-[10px] uppercase tracking-[0.4em] text-gold/90">
-          {t("terminal.eyebrow")}
-        </span>
-        <Sparkle className="h-3 w-3 text-gold/70" strokeWidth={1.5} />
-      </div>
-
       {/* Glass panel — fallback opaco sem backdrop-filter, translúcido com blur */}
       <div className="overflow-hidden rounded-lg border border-gold/25 bg-navy/85 shadow-[0_30px_80px_-30px_hsl(0_0%_0%/0.85)] backdrop-blur-xl supports-[backdrop-filter]:bg-navy/55">
         {/* Title bar */}

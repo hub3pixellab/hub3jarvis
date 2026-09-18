@@ -3,6 +3,7 @@ import AuthPage from "./pages/AuthPage";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
+import HoroscopoSolo from "./pages/HoroscopoSolo";
 import NotFound from "./pages/NotFound";
 
 export const routers = [
@@ -10,6 +11,11 @@ export const routers = [
     path: "/",
     name: "home",
     element: <Index />,
+  },
+  {
+    path: "/horoscopo",
+    name: "horoscopo",
+    element: <HoroscopoSolo />,
   },
   {
     path: "/auth",

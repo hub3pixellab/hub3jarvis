@@ -1,5 +1,6 @@
 import Navbar from "@/components/agnes/Navbar";
 import Hero from "@/components/agnes/Hero";
+import ZodiacWidget from "@/components/agnes/ZodiacWidget";
 import TerminalSection from "@/components/agnes/TerminalSection";
 import Services from "@/components/agnes/Services";
 import Pricing from "@/components/agnes/Pricing";
@@ -12,6 +13,9 @@ const Index = () => {
     <main className="relative min-h-screen w-full bg-background text-foreground">
       <Navbar />
       <Hero />
+
+      {/* Widget de tráfego: 12 signos + horóscopo do dia em pop-up */}
+      <ZodiacWidget />
 
       <SectionReveal>
         <TerminalSection />
