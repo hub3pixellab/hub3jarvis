@@ -1,86 +1,80 @@
-# Minha Área do Mestre Agnes — Horóscopo do dia + Terminal de análises
+# Reorganização da landing — Terminal após o Hero, FAQ e novo menu
 
 ## Contexto
 
-A direção original mudou. As pendências apontavam para um backend Python no Render que **não existe neste repositório**. Ao investigar, descobri que boa parte da infraestrutura **já foi construída aqui** — o plano anterior partiu de uma premissa errada. Estado real:
+O usuário quer reordenar a landing do Mestre Agnes. Direção atual (mensagens mais recentes):
 
-- **Auth** já existe: e-mail/senha (login + cadastro) em `src/pages/AuthPage.tsx`, com `useAuth.tsx` seguindo as convenções (listener antes do `getSession`, callback não-async, sessão guardada).
-- **Dashboard "Minha Área"** já existe em `/dashboard`: Visão Geral (`DashboardPage.tsx`), Perfil (`/dashboard/perfil`, com `ProfileForm` incluindo **`birth_date`** e signo derivado via `lib/zodiac.ts`), Compras (`PurchasesCard`) e Assinatura (`SubscriptionCard`).
-- **Pagamentos** já conectados: `create-checkout-session` + `stripe-webhook` publicados. O webhook já valida assinatura com **`constructEventAsync` + `STRIPE_WEBHOOK_SECRET`**, rejeita corpo inválido com 400 e grava a compra via RPC `record_checkout_completion`. `config.toml` já tem `verify_jwt = false` no webhook.
-- **Banco**: tabelas `profiles`, `purchased_analyses`, `subscriptions`, `global_stats` já existem com RLS.
-- Tabelas de aplicação **não existem mais** para criar? Não — falta apenas `horoscopes`.
+1. Trocar a seção "Sua análise em quatro passos" (`Analysis.tsx`) por uma seção **FAQ**.
+2. Colocar o **terminal** em uma seção própria logo **depois da Hero** (hoje ele vive dentro da coluna direita da Hero).
+3. **Menu** na ordem: Início, Terminal, Serviços, Planos, FAQ, Contato — e a página na mesma ordem.
+4. **Remover** a seção "Sobre" (`About.tsx`, retrato do Mestre) — confirmado pelo usuário.
 
-**A tarefa agora (mensagem mais recente):** na Visão Geral, dentro da identidade, mostrar o **horóscopo do dia** calculado pela data de aniversário do perfil, e inserir um **terminal** nessa parte com um campo para cada análise: **mapa natal, numerologia, eneagrama, compatibilidade e conselhos do mestre**. Decisões do usuário: horóscopo **livre**; análises **gated por pagamento**; terminal com **uma aba por tipo de análise**; usar **IA real** (ativar geração de texto).
+A ordem final da página: **Navbar → Hero → Terminal → Serviços → Planos → FAQ → Footer(Contato)**.
 
-Itens antigos resolvidos/irrelevantes (registro para não voltarem):
-- `STORAGE_DADOS`/`agnesApi.ts`/`pagar()` não existem e não farão sentido: os dados agora ficam no banco via Enter Cloud, não em `localStorage`. Não criar.
-- Item 2b (onrender no bundle) é inverso: nada referencia `onrender.com` e nada deve passar a referenciar. A verificação final é que o bundle não contenha `onrender` nem segredo.
-- Item 3a: o webhook já retorna erro claro `"STRIPE_WEBHOOK_SECRET nao configurada"`. Falta erro claro para `STRIPE_SECRET_KEY` no checkout.
-- Item 3b (commit/push): a plataforma commita automaticamente; não executo `git commit/push`.
+Não faz parte deste escopo (ficam para depois): a integração de IA do terminal, a "Minha Área" com horóscopo e o backend — o usuário redirecionou para a organização da landing.
 
-## Correções de bug já identificadas
+## Estado atual (verificado)
 
-- **`create-checkout-session` tem `mode: 'payment'` fixo**, mas o Guia Mensal é preço recorrente → o Stripe rejeita (botão quebrado). Corrigir derivando `mode` de `price.recurring`.
-- Falta erro claro quando `STRIPE_SECRET_KEY` não está configurada no checkout (retorna genérico `error.message`).
+- `src/pages/Index.tsx` monta: `Navbar, Hero, Services, About, Analysis, Pricing, Footer`.
+- `Hero.tsx` tem grid de 2 colunas com `<Terminal />` na direita; CTAs apontam para `#analise` e `#sobre` (âncoras que deixarão de existir).
+- `Terminal.tsx` é só o painel de vidro e já carrega `id="terminal"` no raiz.
+- `Analysis.tsx` (`id="analise"`) tem os 4 passos + CTAs para `#pagamento` e `#terminal`.
+- `Pricing.tsx` já é `id="pagamento"` (Planos).
+- `Footer.tsx` tem `NAVIGATION` com links para `#analise`, `#terminal`, `#pagamento`, `/dashboard`, `#inicio`, `#contato`.
+- `Navbar.tsx` (`NAV_ITEMS`): home, about, services, terminal, contact — precisa virar a ordem nova.
+- i18n: não existem chaves `faq.*` nem `nav.plans`/`nav.faq`. Existem `nav.about`, `analysis.*`, `about.*` (ficam órfãs e serão removidas).
+- Acordeão shadcn disponível em `src/components/ui/accordion.tsx` (Radix).
 
-## Fase 1 — Banco (migração única)
+## Mudanças
 
-`supabase_migration` criando **`horoscopes`** com RLS na mesma migração:
-- `id`, `user_id` (not null, FK), `data` (date), `texto` (text), `created_at`.
-- Política: `select` só das próprias linhas. **Nenhuma policy de insert/update para o cliente** — só a função de backend grava (isso mantém o gate de pagamento e o cache diário sob controle do servidor).
-- Confirmar com `supabase_get_table_schema` que a RLS está ativa e as policies listadas.
+### 1. `src/components/agnes/TerminalSection.tsx` (novo)
+- Envolve o `<Terminal />` em uma `<section id="terminal">` com eyebrow e título (reutiliza a estética das outras seções: linha dourada, `font-cinzel`/`font-jost`, fundo navy).
+- O `id="terminal"` sai do raiz de `Terminal.tsx` (evita âncora duplicada) — o painel passa a não ter `id` próprio.
 
-## Fase 2 — Função de backend `agnes-conversar` (nova)
+### 2. `src/components/agnes/Faq.tsx` (novo)
+- Substitui `Analysis.tsx`. `<section id="faq">` com eyebrow + título e um `Accordion` (shadcn) com 5–6 perguntas/respostas reais do negócio (como funciona a consulta, quais dados enviar, formas de pagamento, prazo de entrega, reembolso, como acessar a análise).
+- Sem reusar a mascote/imagem de `Analysis.tsx`; visual consistente com as demais seções (starfield, blur de ambiência).
 
-Uma função, vários tipos — o terminal e o horóscopo passam por ela:
-- Requer JWT. Sem erro claro para envs ausentes.
-- Corpo: `{ tipo, mensagem?, dadosNascimento?, parceiroNascimento? }` com `tipo` ∈ `horoscopo | mapa_natal | numerologia | eneagrama | compatibilidade | conselhos`.
-- **Gate (só no servidor, nunca no cliente):** para tipos ≠ `horoscopo`, consultar `purchased_analyses` (status `pago`) **ou** `subscriptions` (`active`/`trialing`) do `user_id`; se não houver, retornar 402 `{ error: "compra_necessaria" }`.
-- **Horóscopo livre:** aceita para qualquer usuário logado. Usa `profiles.birth_date` para derivar o signo (mesma lógica de `lib/zodiac.ts`) e o **cache diário** em `horoscopes` (uma chamada de IA por usuário/dia; leituras seguintes vêm do banco). Fazer upsert via client do service role.
-- Chama o LLM com system prompt do Mestre Agnes (persona), no idioma do usuário (`Accept-Language`), com o prompt específico por tipo. Seguir o fluxo de seleção de modelo da skill `enter_llm_integration`.
-- CORS conforme `references/edge-functions.md`; `Deno.serve`; import via esm.sh; sem SQL cru.
+### 3. `src/components/agnes/Hero.tsx`
+- Remove `<Terminal />` da coluna direita e a grade de 2 colunas → copy centralizada/à esquerda em tela cheia.
+- CTAs atualizados: primário → `#terminal`, secundário → `#pagamento` (nada aponta mais para `#analise`/`#sobre`).
 
-Requer **`enable_ai_capability`** antes (chamado no início da implementação) e carregar a skill `enter_llm_integration`.
+### 4. `src/components/agnes/Navbar.tsx`
+- `NAV_ITEMS` vira: home(`#inicio`), terminal(`#terminal`), services(`#servicos`), plans(`#pagamento`), faq(`#faq`), contact(`#contato`).
+- CTA do navbar (`nav.cta`) aponta para `#pagamento` (compra) — mantém visual atual.
+- Mesmo ajuste no menu mobile.
 
-## Fase 3 — Frontend
+### 5. `src/components/agnes/Footer.tsx`
+- `NAVIGATION` reordenado/alinhado à nova estrutura (Início, Terminal, Serviços, Planos, FAQ, Minha Área, Contato); remove link para `#analise`.
 
-- **`src/lib/agnes.ts`** (novo, pequeno): `invocarAnalise(tipo, inputs)` → `supabase.functions.invoke('agnes-conversar')`, tipa retorno/erros (incl. 402).
-- **`src/lib/horoscopo.ts`** (novo): derivar signo de `birth_date` (reusa `getZodiacSign` de `lib/zodiac.ts`), definir o tipo de data de hoje e mapear o resultado para exibição. Sem chaves de storage.
-- **`src/components/dashboard/HoroscopeCard.tsx`** (novo): na Visão Geral, logo após o `IdentityCard`; carrega o horóscopo do dia (gratuito) usando `useProfile` + `lib/agnes.ts`; estados carregando/erro; visual consistente com o tema (cartão dourado/navy).
-- **`src/components/dashboard/AnalysisTerminal.tsx`** (novo): terminal estilo vidro (reusa estética de `Terminal.tsx`, com `Tabs` do shadcn) com 5 abas — mapa natal, numerologia, eneagrama, compatibilidade, conselhos. Cada aba tem campo(s) específico(s) (compatibilidade pede a data do parceiro) e botão "Consultar o Mestre". Bloqueado com aviso + link para `/` quando não há compra paga (o gate real é no servidor; o bloqueio é só UX). Respostas renderizadas como mensagens do Mestre. Abas desabilitadas durante carregamento.
-- **`src/pages/DashboardPage.tsx`**: adicionar `<HoroscopeCard />` e `<AnalysisTerminal />` abaixo do `IdentityCard`, mantendo Compras/Assinatura. A Visão Geral já é a "Minha Área" — o terminal fica dentro dela, como pedido.
-- **i18n** — chaves novas nos 6 locales: seção `horoscopo.*` e `terminal.*` (títulos das 5 abas, placeholders, 402, loading, erros). Seguir o padrão de chaves achatadas de `src/i18n/config.ts`.
-- **`supabase/functions/create-checkout-session/index.ts`**: derivar `mode` de `price.recurring`; validar `STRIPE_SECRET_KEY` com erro claro. Redeploy.
+### 6. `src/pages/Index.tsx`
+- Nova ordem: `Hero, TerminalSection, Services, Pricing, Faq, Footer`. Remove `About` e `Analysis`.
 
-Sem novas rotas: a Visão Geral já vive em `/dashboard`. O `?pago=1` não existe e não será criado.
+### 7. Arquivos removidos
+- `src/components/agnes/About.tsx` e `src/components/agnes/Analysis.tsx` (deletados).
+
+### 8. i18n — nos 6 locales (`en`, `es`, `fr`, `it`, `pt`, `pt-BR`)
+- Adicionar: `nav.plans`, `nav.faq`, e seção `faq.*` (eyebrow, título, 5–6 perguntas/respostas traduzidas).
+- Remover: `nav.about`, `about.*`, `analysis.*` (órfãs após deletar os componentes).
+- Verificar `reports/i18n/` não acusar `missing` novo.
 
 ## Implementation checklist
 
-- [ ] Migração cria `horoscopes` com RLS habilitada na mesma migração, sem policy de insert/update para o cliente
-- [ ] `supabase_get_table_schema("horoscopes")` confirma RLS ativa e policies listadas
-- [ ] `enable_ai_capability` aprovado e skill `enter_llm_integration` carregada
-- [ ] `agnes-conversar` exige JWT e deriva `user_id` do token
-- [ ] `agnes-conversar` retorna 402 `compra_necessaria` para tipos ≠ `horoscopo` sem compra paga/subscription ativa (checagem no servidor)
-- [ ] `agnes-conversar` usa cache diário em `horoscopes` (upsert service role; 1 chamada IA/dia/usuário)
-- [ ] `agnes-conversar` tem CORS completo e `Deno.serve`
-- [ ] `agnes-conversar` publicada com `supabase_deploy_edge_function`
-- [ ] `lib/agnes.ts` tipa retorno e erros (incl. 402)
-- [ ] `HoroscopeCard` na Visão Geral, estados de loading/erro/sem-aniversário
-- [ ] `AnalysisTerminal` com 5 abas, gate visual (link para pagamento) e estados de loading
-- [ ] Chaves i18n nos 6 locales (horoscopo + 5 análises + erros)
-- [ ] `create-checkout-session`: `mode` derivado de `price.recurring` + erro claro de `STRIPE_SECRET_KEY`, redeployed
-- [ ] `pnpm run build` e `pnpm run check` sem erros
+- [ ] `TerminalSection.tsx` criado com `id="terminal"`, eyebrow e título; `id` removido do raiz de `Terminal.tsx`
+- [ ] `Faq.tsx` criado com `id="faq"` e `Accordion` do shadcn (5–6 perguntas)
+- [ ] `Hero.tsx` sem terminal na coluna direita; CTAs → `#terminal` e `#pagamento`
+- [ ] `Navbar.tsx` com ordem Início, Terminal, Serviços, Planos, FAQ, Contato (desktop e mobile); CTA → `#pagamento`
+- [ ] `Footer.tsx` com navegação alinhada e sem `#analise`
+- [ ] `Index.tsx` na ordem Hero, Terminal, Serviços, Planos, FAQ, Footer
+- [ ] `About.tsx` e `Analysis.tsx` deletados
+- [ ] Chaves `nav.plans`, `nav.faq`, `faq.*` adicionadas nos 6 locales; `nav.about`, `about.*`, `analysis.*` removidas
+- [ ] Nenhuma referência restante a `#analise`, `#sobre`, `About`, `Analysis` no código
 
 ## Verification checklist
 
 - [ ] `pnpm run build` e `pnpm run check` passam
-- [ ] **Positivo:** usuário com `birth_date` no perfil vê o horóscopo do dia na Visão Geral sem pagar
-- [ ] **Fronteira:** usuário sem `birth_date` vê estado "adicione seu aniversário" com link para o perfil, sem crash
-- [ ] **Negativo:** usuário logado sem compra paga recebe 402 ao tentar análise e vê o bloqueio com link de compra
-- [ ] **Positivo:** após compra paga (status `pago`), as 5 abas consultam o Mestre e renderizam resposta
-- [ ] **Cache:** segunda visita no mesmo dia ao horóscopo não gera nova chamada de IA (registro lido do banco)
-- [ ] **Negativo:** chamar `agnes-conversar` sem JWT → 401/403, sem resposta
-- [ ] **Auth:** perfil (com aniversário) salva e reaparece após refresh
-- [ ] **Bug corrigido:** compra do Guia Mensal abre checkout em modo assinatura (sem erro de `mode`)
-- [ ] **Bundle (item 2b):** `grep -r "onrender\|agnes-secreta" dist/` não retorna nada
-- [ ] Verificar `/dashboard` em `mobile_390` e `desktop_1280`
+- [ ] Âncoras do menu levam às seções na ordem correta (terminal logo após hero)
+- [ ] Nenhum link aponta para âncora inexistente (`#analise`, `#sobre`)
+- [ ] FAQ abre/fecha as perguntas no accordion e traduz nos 6 idiomas
+- [ ] `grep -rn "#analise\|#sobre\|About" src/` não retorna referências quebradas
+- [ ] Verificar visual em `mobile_390` e `desktop_1280` na rota `/`
