@@ -29,10 +29,10 @@ from routes.upload_routes import router as upload_router
 app.include_router(chat_router)
 app.include_router(upload_router)
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=[os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")], allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
 
 VAULT_DIR = "../knowledge-vault"
-REPOS_DIR = "/Users/diogozachioliveira/projetos/hub3MestreAgnes/repos"
+REPOS_DIR = os.getenv("REPOS_DIR", "./repos")
 GITHUB_USER = "hub3pixellab"
 
 SERVICES = {
@@ -83,7 +83,7 @@ async def status_servicos():
             resultados[nome] = {"status": "offline"}
     return {"servicos": resultados}
 
-@app.post("/api/Mestre Agnes/conversar")
+@app.post("/api/agnes/conversar")
 async def conversar_com_MestreAgnes(req: RequisicaoMestreAgnes):
     # Roteador: tema da Agnes -> Agnes (groq) com fallback Gemini; conversa aleatoria -> Gemini
     from modules.roteador_agnes import responder
