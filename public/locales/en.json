@@ -250,5 +250,9 @@
   "horoscope.advice.4": "Take care of your body: it warns you before the mind notices.",
   "horoscope.advice.5": "Say what you feel; today silence costs more than the truth.",
   "horoscope.advice.6": "Avoid impulsive decisions; wait for the dust to settle.",
-  "horoscope.advice.7": "Give thanks for what already exists: gratitude opens the next cycle."
+  "horoscope.advice.7": "Give thanks for what already exists: gratitude opens the next cycle.",
+  "horoscopeCard.title": "Today's horoscope",
+  "horoscopeCard.noBirthDate": "Add your birth date in your profile and reveal your sign's horoscope every day.",
+  "horoscopeCard.addBirthDate": "Add birth date",
+  "horoscopeCard.dailyLabel": "Today's horoscope"
 }

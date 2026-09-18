@@ -250,5 +250,9 @@
   "horoscope.advice.4": "Prenez soin de votre corps : il prévient avant que l'esprit ne le remarque.",
   "horoscope.advice.5": "Dites ce que vous ressentez ; aujourd'hui le silence coûte plus cher que la vérité.",
   "horoscope.advice.6": "Évitez les décisions impulsives ; attendez que la poussière retombe.",
-  "horoscope.advice.7": "Remerciez pour ce qui existe déjà : la gratitude ouvre le cycle suivant."
+  "horoscope.advice.7": "Remerciez pour ce qui existe déjà : la gratitude ouvre le cycle suivant.",
+  "horoscopeCard.title": "Votre horoscope du jour",
+  "horoscopeCard.noBirthDate": "Ajoutez votre date de naissance dans votre profil et découvrez l'horoscope de votre signe chaque jour.",
+  "horoscopeCard.addBirthDate": "Ajouter la date de naissance",
+  "horoscopeCard.dailyLabel": "Horoscope du jour"
 }
