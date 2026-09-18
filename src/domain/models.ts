@@ -64,3 +64,21 @@ export const ZODIAC_SIGNS = [
 ] as const;
 
 export type ZodiacSignKey = (typeof ZODIAC_SIGNS)[number];
+
+/** Chinese zodiac animal keys — values match the `chineseZodiac.*` i18n keys. */
+export const CHINESE_ZODIAC_SIGNS = [
+  "rato",
+  "boi",
+  "tigre",
+  "coelho",
+  "dragao",
+  "serpente",
+  "cavalo",
+  "cabra",
+  "macaco",
+  "galo",
+  "cao",
+  "porco",
+] as const;
+
+export type ChineseZodiacSignKey = (typeof CHINESE_ZODIAC_SIGNS)[number];

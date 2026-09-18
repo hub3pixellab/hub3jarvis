@@ -18,6 +18,7 @@ import {
 import { useUpdateProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/auth-context";
 import { getZodiacSign } from "@/lib/zodiac";
+import { getChineseZodiacSign } from "@/lib/chineseZodiac";
 import { languageOptions } from "@/i18n/config";
 import type { Profile } from "@/domain/models";
 
@@ -52,6 +53,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
   const birthDate = watch("birth_date");
   const derivedZodiac = getZodiacSign(birthDate || null);
+  const derivedChineseZodiac = getChineseZodiacSign(birthDate || null);
 
   const onSubmit = async (values: ProfileValues) => {
     if (!user) return;
@@ -130,6 +132,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             {derivedZodiac ? t(`zodiac.${derivedZodiac}`) : t("profile.zodiacUnknown")}
           </div>
           <p className="text-[11px] text-cream/45">{t("profile.zodiacHint")}</p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label>{t("profile.chineseZodiacLabel")}</Label>
+          <div className="flex min-h-10 items-center rounded-md border border-gold/15 bg-navy/40 px-3 font-cinzel text-lg text-gold-gradient">
+            {derivedChineseZodiac
+              ? t(`chineseZodiac.${derivedChineseZodiac}`)
+              : t("profile.zodiacUnknown")}
+          </div>
+          <p className="text-[11px] text-cream/45">{t("profile.chineseZodiacHint")}</p>
         </div>
       </div>
 

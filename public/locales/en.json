@@ -195,5 +195,19 @@
   "faq.q5": "What if I'm not satisfied?",
   "faq.a5": "Write to contato@mestreagnes.com within 7 days of purchase. Every case is reviewed with care and attention.",
   "nav.plans": "Plans",
-  "nav.faq": "FAQ"
+  "nav.faq": "FAQ",
+  "profile.chineseZodiacLabel": "Chinese zodiac",
+  "profile.chineseZodiacHint": "Calculated by the lunar calendar, from your birth date.",
+  "chineseZodiac.rato": "Rat",
+  "chineseZodiac.boi": "Ox",
+  "chineseZodiac.tigre": "Tiger",
+  "chineseZodiac.coelho": "Rabbit",
+  "chineseZodiac.dragao": "Dragon",
+  "chineseZodiac.serpente": "Snake",
+  "chineseZodiac.cavalo": "Horse",
+  "chineseZodiac.cabra": "Goat",
+  "chineseZodiac.macaco": "Monkey",
+  "chineseZodiac.galo": "Rooster",
+  "chineseZodiac.cao": "Dog",
+  "chineseZodiac.porco": "Pig"
 }
