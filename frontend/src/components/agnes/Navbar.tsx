@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, Sparkle, X } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { useAuth } from "@/hooks/auth-context";
 
 const NAV_ITEMS = [
   { key: "nav.home", href: "#inicio" },
@@ -13,6 +15,7 @@ const NAV_ITEMS = [
 
 const Navbar = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
@@ -40,6 +43,12 @@ const Navbar = () => {
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
+          <Link
+            to={user ? "/dashboard" : "/auth"}
+            className="font-jost text-[11px] uppercase tracking-[0.3em] text-cream/70 transition hover:text-gold hover:drop-shadow-[0_0_8px_hsl(var(--gold)/0.6)]"
+          >
+            {user ? t("nav.dashboard") : t("nav.signIn")}
+          </Link>
           <LanguageSwitcher />
           <a
             href="#analise"
@@ -70,6 +79,13 @@ const Navbar = () => {
               {t(item.key)}
             </a>
           ))}
+          <Link
+            to={user ? "/dashboard" : "/auth"}
+            onClick={() => setOpen(false)}
+            className="block border-b border-gold/5 py-3 font-jost text-xs uppercase tracking-[0.3em] text-cream/80 transition hover:text-gold"
+          >
+            {user ? t("nav.dashboard") : t("nav.signIn")}
+          </Link>
           <div className="mt-4 flex items-center justify-between gap-4">
             <LanguageSwitcher />
             <a

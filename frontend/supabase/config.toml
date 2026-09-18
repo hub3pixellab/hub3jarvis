@@ -1,1 +1,11 @@
 project_id = "spb-t4ng9l0640q82en1"
+
+# create-checkout-session is called by the browser through the client SDK,
+# which always sends a valid JWT (the user's session or the anon key).
+[functions.create-checkout-session]
+verify_jwt = true
+
+# stripe-webhook receives unsigned requests from Stripe. The signature is
+# verified inside the function with constructEventAsync + STRIPE_WEBHOOK_SECRET.
+[functions.stripe-webhook]
+verify_jwt = false

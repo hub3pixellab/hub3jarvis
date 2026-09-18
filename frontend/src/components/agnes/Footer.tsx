@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Instagram, Mail, MessageCircle, Sparkle, Youtube } from "lucide-react";
+import { AnalysisCounter } from "@/components/agnes/AnalysisCounter";
 
 const SERVICES = [
   "services.s1Name",
@@ -15,6 +17,7 @@ const NAVIGATION = [
   { key: "nav.cta", href: "#analise" },
   { key: "footer.navTerminal", href: "#terminal" },
   { key: "footer.navPayment", href: "#pagamento" },
+  { key: "nav.dashboard", href: "/dashboard", route: true },
   { key: "nav.contact", href: "#contato" },
 ];
 
@@ -87,12 +90,21 @@ const Footer = () => {
             <ul className="mt-6 space-y-3">
               {NAVIGATION.map((item) => (
                 <li key={item.key}>
-                  <a
-                    href={item.href}
-                    className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
-                  >
-                    {t(item.key)}
-                  </a>
+                  {item.route ? (
+                    <Link
+                      to={item.href}
+                      className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
+                    >
+                      {t(item.key)}
+                    </Link>
+                  ) : (
+                    <a
+                      href={item.href}
+                      className="link-glow font-jost text-sm font-light tracking-wide text-cream/70"
+                    >
+                      {t(item.key)}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -127,6 +139,19 @@ const Footer = () => {
                 </a>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Live counter strip */}
+        <div className="mt-14 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-sm border border-gold/20 bg-royal/30 px-5 py-4 md:justify-between md:gap-8 md:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <Sparkle className="h-4 w-4 shrink-0 text-gold/80" strokeWidth={1.5} />
+            <span className="font-jost text-[10px] font-light uppercase tracking-[0.4em] text-cream/65">
+              {t("about.stat2Label")}
+            </span>
+          </div>
+          <div className="min-w-0 text-2xl md:text-3xl">
+            <AnalysisCounter />
           </div>
         </div>
 

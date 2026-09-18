@@ -1,6 +1,9 @@
 import Index from "./pages/Index";
+import AuthPage from "./pages/AuthPage";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardPage from "./pages/DashboardPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
-import Sucesso from "./pages/Sucesso";
 
 export const routers = [
   {
@@ -9,9 +12,18 @@ export const routers = [
     element: <Index />,
   },
   {
-    path: "/sucesso",
-    name: "sucesso",
-    element: <Sucesso />,
+    path: "/auth",
+    name: "auth",
+    element: <AuthPage />,
+  },
+  {
+    path: "/dashboard",
+    name: "dashboard",
+    element: <DashboardLayout />,
+    children: [
+      { index: true, element: <DashboardPage /> },
+      { path: "perfil", element: <ProfilePage /> },
+    ],
   },
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */
   {

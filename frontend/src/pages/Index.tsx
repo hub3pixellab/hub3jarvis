@@ -3,9 +3,7 @@ import Hero from "@/components/agnes/Hero";
 import Services from "@/components/agnes/Services";
 import About from "@/components/agnes/About";
 import Analysis from "@/components/agnes/Analysis";
-import Terminal from "@/components/agnes/Terminal";
 import Pricing from "@/components/agnes/Pricing";
-import Faq from "@/components/agnes/Faq";
 import Footer from "@/components/agnes/Footer";
 import SectionReveal from "@/components/museum/SectionReveal";
 
@@ -25,14 +23,6 @@ const Index = () => {
 
       <SectionReveal>
         <Analysis />
-      </SectionReveal>
-
-      <SectionReveal>
-        <Terminal />
-      </SectionReveal>
-
-      <SectionReveal>
-        <Faq />
       </SectionReveal>
 
       <SectionReveal>
