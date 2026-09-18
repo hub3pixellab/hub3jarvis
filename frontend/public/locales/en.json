@@ -209,5 +209,10 @@
   "chineseZodiac.macaco": "Monkey",
   "chineseZodiac.galo": "Rooster",
   "chineseZodiac.cao": "Dog",
-  "chineseZodiac.porco": "Pig"
+  "chineseZodiac.porco": "Pig",
+  "player.ariaLabel": "Music player",
+  "player.muteAria": "Mute",
+  "player.unmuteAria": "Unmute",
+  "player.volumeLabel": "Volume",
+  "dashboard.terminalTitle": "Master's Terminal"
 }

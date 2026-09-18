@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
+import { MessagesSquare } from "lucide-react";
 import { IdentityCard } from "@/components/dashboard/IdentityCard";
 import { PurchasesCard } from "@/components/dashboard/PurchasesCard";
 import { SubscriptionCard } from "@/components/dashboard/SubscriptionCard";
+import Terminal from "@/components/agnes/Terminal";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -18,6 +21,18 @@ export default function DashboardPage() {
       </div>
 
       <IdentityCard />
+
+      <Card className="border-gold/20 bg-card">
+        <CardHeader className="border-b border-gold/10 pb-3">
+          <CardTitle className="flex items-center gap-2 font-cinzel text-xl text-cream">
+            <MessagesSquare className="h-4 w-4 text-gold" strokeWidth={1.5} />
+            {t("dashboard.terminalTitle")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 md:p-6">
+          <Terminal />
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <PurchasesCard />

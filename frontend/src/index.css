@@ -394,3 +394,41 @@ body {
   box-shadow: 0 0 18px hsl(var(--gold) / 0.35);
   transform: translateY(-2px);
 }
+
+/* ─────────────────────────────────────────────
+   Player de música — slider de volume (top bar)
+   ───────────────────────────────────────────── */
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    hsl(var(--gold)) 0%,
+    hsl(var(--gold)) var(--volume, 80%),
+    hsl(var(--gold) / 0.25) var(--volume, 80%),
+    hsl(var(--gold) / 0.25) 100%
+  );
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 9999px;
+  background: hsl(var(--gold));
+  border: 2px solid hsl(var(--navy-deep));
+  box-shadow: 0 0 8px hsl(var(--gold) / 0.5);
+}
+
+.volume-slider::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+  border-radius: 9999px;
+  background: hsl(var(--gold));
+  border: 2px solid hsl(var(--navy-deep));
+  box-shadow: 0 0 8px hsl(var(--gold) / 0.5);
+}

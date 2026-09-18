@@ -209,5 +209,10 @@
   "chineseZodiac.macaco": "Mono",
   "chineseZodiac.galo": "Gallo",
   "chineseZodiac.cao": "Perro",
-  "chineseZodiac.porco": "Cerdo"
+  "chineseZodiac.porco": "Cerdo",
+  "player.ariaLabel": "Reproductor de música",
+  "player.muteAria": "Silenciar",
+  "player.unmuteAria": "Activar sonido",
+  "player.volumeLabel": "Volumen",
+  "dashboard.terminalTitle": "Terminal del Maestro"
 }
