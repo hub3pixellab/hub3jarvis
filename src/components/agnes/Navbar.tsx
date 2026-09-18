@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Menu, Sparkle, X } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import SoundCloudPlayer from "@/components/agnes/SoundCloudPlayer";
 import { useAuth } from "@/hooks/auth-context";
 
 const NAV_ITEMS = [
@@ -21,17 +22,17 @@ const Navbar = () => {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-gold/10 bg-navy-deep/60 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
-        <a href="#inicio" className="flex items-center gap-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 md:px-10">
+        <a href="#inicio" className="flex shrink-0 items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/50 bg-royal/40">
             <Sparkle className="h-4 w-4 text-gold" strokeWidth={1.5} />
           </span>
-          <span className="font-cinzel text-lg uppercase tracking-[0.28em] text-gold-gradient">
+          <span className="hidden font-cinzel text-lg uppercase tracking-[0.28em] text-gold-gradient sm:inline">
             Mestre Agnes
           </span>
         </a>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-7 xl:flex">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.key}
@@ -43,25 +44,20 @@ const Navbar = () => {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="flex items-center gap-4">
+          <SoundCloudPlayer />
+          <LanguageSwitcher />
           <Link
             to={user ? "/dashboard" : "/auth"}
-            className="font-jost text-[11px] uppercase tracking-[0.3em] text-cream/70 transition hover:text-gold hover:drop-shadow-[0_0_8px_hsl(var(--gold)/0.6)]"
+            className="hidden font-jost text-[11px] uppercase tracking-[0.3em] text-cream/70 transition hover:text-gold hover:drop-shadow-[0_0_8px_hsl(var(--gold)/0.6)] sm:inline"
           >
             {user ? t("nav.dashboard") : t("nav.signIn")}
           </Link>
-          <LanguageSwitcher />
-          <a
-            href="#pagamento"
-            className="inline-flex items-center gap-2 rounded-full border border-gold/60 bg-gold/10 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-gold transition hover:bg-gold hover:text-navy-deep hover:shadow-[0_0_20px_hsl(var(--gold)/0.4)]"
-          >
-            {t("nav.cta")}
-          </a>
         </div>
 
         <button
           onClick={() => setOpen((o) => !o)}
-          className="text-cream md:hidden"
+          className="text-cream xl:hidden"
           aria-label={open ? t("nav.menuClose") : t("nav.menuOpen")}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -69,7 +65,7 @@ const Navbar = () => {
       </div>
 
       {open && (
-        <div className="border-t border-gold/10 bg-navy-deep/95 px-6 py-4 backdrop-blur-md md:hidden">
+        <div className="border-t border-gold/10 bg-navy-deep/95 px-6 py-4 backdrop-blur-md xl:hidden">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.key}
@@ -87,16 +83,6 @@ const Navbar = () => {
           >
             {user ? t("nav.dashboard") : t("nav.signIn")}
           </Link>
-          <div className="mt-4 flex items-center justify-between gap-4">
-            <LanguageSwitcher />
-            <a
-              href="#pagamento"
-              onClick={() => setOpen(false)}
-              className="inline-flex rounded-full border border-gold/60 bg-gold/10 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-gold"
-            >
-              {t("nav.cta")}
-            </a>
-          </div>
         </div>
       )}
     </header>

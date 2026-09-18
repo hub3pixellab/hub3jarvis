@@ -209,5 +209,10 @@
   "chineseZodiac.macaco": "Singe",
   "chineseZodiac.galo": "Coq",
   "chineseZodiac.cao": "Chien",
-  "chineseZodiac.porco": "Cochon"
+  "chineseZodiac.porco": "Cochon",
+  "player.ariaLabel": "Lecteur de musique",
+  "player.muteAria": "Couper le son",
+  "player.unmuteAria": "Réactiver le son",
+  "player.volumeLabel": "Volume",
+  "dashboard.terminalTitle": "Terminal du Maître"
 }
