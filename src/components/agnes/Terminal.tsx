@@ -62,7 +62,7 @@ const Terminal = () => {
   };
 
   return (
-    <div id="terminal" role="region" aria-label={t("terminal.windowTitle")} className="min-w-0">
+    <div role="region" aria-label={t("terminal.windowTitle")} className="min-w-0">
       {/* Eyebrow acima do painel de vidro */}
       <div className="mb-4 flex items-center gap-3">
         <span className="h-px w-6 bg-gold" />

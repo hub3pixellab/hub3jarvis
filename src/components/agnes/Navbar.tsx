@@ -7,9 +7,10 @@ import { useAuth } from "@/hooks/auth-context";
 
 const NAV_ITEMS = [
   { key: "nav.home", href: "#inicio" },
-  { key: "nav.about", href: "#sobre" },
-  { key: "nav.services", href: "#servicos" },
   { key: "nav.terminal", href: "#terminal" },
+  { key: "nav.services", href: "#servicos" },
+  { key: "nav.plans", href: "#pagamento" },
+  { key: "nav.faq", href: "#faq" },
   { key: "nav.contact", href: "#contato" },
 ];
 
@@ -51,7 +52,7 @@ const Navbar = () => {
           </Link>
           <LanguageSwitcher />
           <a
-            href="#analise"
+            href="#pagamento"
             className="inline-flex items-center gap-2 rounded-full border border-gold/60 bg-gold/10 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-gold transition hover:bg-gold hover:text-navy-deep hover:shadow-[0_0_20px_hsl(var(--gold)/0.4)]"
           >
             {t("nav.cta")}
@@ -89,7 +90,7 @@ const Navbar = () => {
           <div className="mt-4 flex items-center justify-between gap-4">
             <LanguageSwitcher />
             <a
-              href="#analise"
+              href="#pagamento"
               onClick={() => setOpen(false)}
               className="inline-flex rounded-full border border-gold/60 bg-gold/10 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-gold"
             >
