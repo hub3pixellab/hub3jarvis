@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Sparkle } from "lucide-react";
-import Terminal from "@/components/agnes/Terminal";
 
 const HERO_IMG =
   "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/c21a7765.png";
@@ -39,51 +38,44 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-14 pt-32 md:px-10 md:pb-16 md:pt-40">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-14">
-          {/* Copy + CTAs */}
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-4">
-              <span className="h-px w-10 bg-gold" />
-              <span className="font-jost text-[11px] uppercase tracking-[0.45em] text-gold/90">
-                {t("footer.guide")} • {t("footer.destiny")}
-              </span>
-            </div>
-
-            <h1 className="mt-8 font-cinzel text-[15vw] leading-[0.92] text-cream md:text-[9rem]">
-              Mestre
-              <br />
-              <span className="text-gold-gradient drop-shadow-[0_0_30px_hsl(var(--gold)/0.35)]">
-                Agnes
-              </span>
-            </h1>
-
-            <p className="mt-6 max-w-lg font-jost text-base font-light leading-relaxed tracking-wide text-cream/75 md:text-lg">
-              {t("hero.subtitle")}
-            </p>
-
-            <div className="mt-10 flex flex-wrap items-center gap-5">
-              <a
-                href="#analise"
-                className="group inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-navy-deep shadow-[0_0_30px_hsl(var(--gold)/0.35)] transition hover:bg-gold-light hover:shadow-[0_0_44px_hsl(var(--gold)/0.55)]"
-              >
-                {t("hero.ctaPrimary")}
-                <ArrowRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  strokeWidth={1.5}
-                />
-              </a>
-              <a
-                href="#sobre"
-                className="inline-flex items-center gap-3 rounded-full border border-gold/50 px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-cream transition hover:border-gold hover:text-gold hover:shadow-[0_0_24px_hsl(var(--gold)/0.25)]"
-              >
-                {t("hero.ctaSecondary")}
-              </a>
-            </div>
+        {/* Copy + CTAs */}
+        <div className="max-w-3xl">
+          <div className="flex items-center gap-4">
+            <span className="h-px w-10 bg-gold" />
+            <span className="font-jost text-[11px] uppercase tracking-[0.45em] text-gold/90">
+              {t("footer.guide")} • {t("footer.destiny")}
+            </span>
           </div>
 
-          {/* Terminal — overlay de vidro ao lado da imagem do Mestre */}
-          <div className="min-w-0">
-            <Terminal />
+          <h1 className="mt-8 font-cinzel text-[15vw] leading-[0.92] text-cream md:text-[9rem]">
+            Mestre
+            <br />
+            <span className="text-gold-gradient drop-shadow-[0_0_30px_hsl(var(--gold)/0.35)]">
+              Agnes
+            </span>
+          </h1>
+
+          <p className="mt-6 max-w-lg font-jost text-base font-light leading-relaxed tracking-wide text-cream/75 md:text-lg">
+            {t("hero.subtitle")}
+          </p>
+
+          <div className="mt-10 flex flex-wrap items-center gap-5">
+            <a
+              href="#terminal"
+              className="group inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-navy-deep shadow-[0_0_30px_hsl(var(--gold)/0.35)] transition hover:bg-gold-light hover:shadow-[0_0_44px_hsl(var(--gold)/0.55)]"
+            >
+              {t("hero.ctaPrimary")}
+              <ArrowRight
+                className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                strokeWidth={1.5}
+              />
+            </a>
+            <a
+              href="#pagamento"
+              className="inline-flex items-center gap-3 rounded-full border border-gold/50 px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-cream transition hover:border-gold hover:text-gold hover:shadow-[0_0_24px_hsl(var(--gold)/0.25)]"
+            >
+              {t("hero.ctaSecondary")}
+            </a>
           </div>
         </div>
 

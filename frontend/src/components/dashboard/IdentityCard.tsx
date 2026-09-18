@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { getInitials, getZodiacSign } from "@/lib/zodiac";
+import { getChineseZodiacSign } from "@/lib/chineseZodiac";
 import { formatDate } from "@/lib/format";
 import { useAuth } from "@/hooks/auth-context";
 import { useProfile } from "@/hooks/useProfile";
@@ -37,7 +38,12 @@ export function IdentityCard() {
   const zodiacDerived = profile?.birth_date
     ? getZodiacSign(profile.birth_date)
     : null;
-  const zodiac = zodiacStored ?? zodiacDerived;
+  // O valor derivado tem precedência: é recalculado com a lógica corrigida,
+  // enquanto `zodiac_sign` gravado no banco pode conter o cálculo antigo.
+  const zodiac = zodiacDerived ?? zodiacStored;
+  const chineseZodiac = profile?.birth_date
+    ? getChineseZodiacSign(profile.birth_date)
+    : null;
 
   return (
     <Card className="border-gold/20 bg-card">
@@ -81,6 +87,12 @@ export function IdentityCard() {
             <span className="font-jost text-xs text-cream/45">
               {t("dashboard.zodiacUnknown")}
             </span>
+          )}
+          {chineseZodiac && (
+            <Badge className="border-gold/40 bg-royal/40 text-gold">
+              <Sparkle className="mr-1 h-3 w-3" strokeWidth={1.5} />
+              {t(`chineseZodiac.${chineseZodiac}`)}
+            </Badge>
           )}
           <span className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/45">
             {t("dashboard.memberSince")}{" "}

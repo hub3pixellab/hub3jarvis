@@ -1,9 +1,9 @@
 import Navbar from "@/components/agnes/Navbar";
 import Hero from "@/components/agnes/Hero";
+import TerminalSection from "@/components/agnes/TerminalSection";
 import Services from "@/components/agnes/Services";
-import About from "@/components/agnes/About";
-import Analysis from "@/components/agnes/Analysis";
 import Pricing from "@/components/agnes/Pricing";
+import Faq from "@/components/agnes/Faq";
 import Footer from "@/components/agnes/Footer";
 import SectionReveal from "@/components/museum/SectionReveal";
 
@@ -14,20 +14,20 @@ const Index = () => {
       <Hero />
 
       <SectionReveal>
+        <TerminalSection />
+      </SectionReveal>
+
+      <SectionReveal>
         <Services />
-      </SectionReveal>
-
-      <SectionReveal>
-        <About />
-      </SectionReveal>
-
-      <SectionReveal>
-        <Analysis />
       </SectionReveal>
 
       <SectionReveal>
         <Pricing />
       </SectionReveal>
+
+      {/* FAQ fora do SectionReveal: o acordeão tem botões interativos e o
+          reveal esconderia os triggers até o observer disparar. */}
+      <Faq />
 
       <Footer />
     </main>

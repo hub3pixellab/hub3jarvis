@@ -14,9 +14,10 @@ const SERVICES = [
 
 const NAVIGATION = [
   { key: "nav.home", href: "#inicio" },
-  { key: "nav.cta", href: "#analise" },
-  { key: "footer.navTerminal", href: "#terminal" },
-  { key: "footer.navPayment", href: "#pagamento" },
+  { key: "nav.terminal", href: "#terminal" },
+  { key: "nav.services", href: "#servicos" },
+  { key: "nav.plans", href: "#pagamento" },
+  { key: "nav.faq", href: "#faq" },
   { key: "nav.dashboard", href: "/dashboard", route: true },
   { key: "nav.contact", href: "#contato" },
 ];
