@@ -1,112 +1,86 @@
-# Migração do backend Agnes para o Enter Cloud
+# Minha Área do Mestre Agnes — Horóscopo do dia + Terminal de análises
 
 ## Contexto
 
-As pendências originais apontavam para um backend Python hospedado no Render, que **não existe neste repositório** (nenhum `.py`, nenhum `agnesApi.ts`, nenhuma rota `/sucesso`, zero chamadas HTTP em `src/` — verificado inclusive em todo o histórico do git). A decisão foi migrar esse backend para o Enter Cloud e abandonar o Render.
+A direção original mudou. As pendências apontavam para um backend Python no Render que **não existe neste repositório**. Ao investigar, descobri que boa parte da infraestrutura **já foi construída aqui** — o plano anterior partiu de uma premissa errada. Estado real:
 
-Isso resolve a causa raiz do item 1a. O desenho antigo tinha um segredo compartilhado (`VITE_API_KEY=agnes-secreta-2026`, hoje commitado em texto puro no `.env.example`) que o navegador precisava apresentar. Trocar por "token de sessão curta" não resolveria: o cliente continuaria precisando da chave para pedir o token. Com login real, quem autentica é o usuário, e o servidor valida esse login — **não existe mais segredo compartilhado no bundle**.
+- **Auth** já existe: e-mail/senha (login + cadastro) em `src/pages/AuthPage.tsx`, com `useAuth.tsx` seguindo as convenções (listener antes do `getSession`, callback não-async, sessão guardada).
+- **Dashboard "Minha Área"** já existe em `/dashboard`: Visão Geral (`DashboardPage.tsx`), Perfil (`/dashboard/perfil`, com `ProfileForm` incluindo **`birth_date`** e signo derivado via `lib/zodiac.ts`), Compras (`PurchasesCard`) e Assinatura (`SubscriptionCard`).
+- **Pagamentos** já conectados: `create-checkout-session` + `stripe-webhook` publicados. O webhook já valida assinatura com **`constructEventAsync` + `STRIPE_WEBHOOK_SECRET`**, rejeita corpo inválido com 400 e grava a compra via RPC `record_checkout_completion`. `config.toml` já tem `verify_jwt = false` no webhook.
+- **Banco**: tabelas `profiles`, `purchased_analyses`, `subscriptions`, `global_stats` já existem com RLS.
+- Tabelas de aplicação **não existem mais** para criar? Não — falta apenas `horoscopes`.
 
-Três pontos do pedido original mudam de forma, e vale registrar:
+**A tarefa agora (mensagem mais recente):** na Visão Geral, dentro da identidade, mostrar o **horóscopo do dia** calculado pela data de aniversário do perfil, e inserir um **terminal** nessa parte com um campo para cada análise: **mapa natal, numerologia, eneagrama, compatibilidade e conselhos do mestre**. Decisões do usuário: horóscopo **livre**; análises **gated por pagamento**; terminal com **uma aba por tipo de análise**; usar **IA real** (ativar geração de texto).
 
-- **`STRIPE_PRICE_ID` não será usado.** O preço é derivado do produto no Stripe, então o ID fica num lugar só (o painel do Stripe). Validar uma variável que o código não lê seria teatro. Valido as duas que o código realmente usa.
-- **O item 2b se inverte.** Não há mais `onrender.com` para confirmar no bundle — a verificação passa a ser o oposto: garantir que **nem** `onrender.com` **nem** qualquer chave apareçam no build.
-- **O item 3b eu não executo.** `git commit`/`push` são bloqueados para mim; a plataforma commita automaticamente ao fim do turno.
+Itens antigos resolvidos/irrelevantes (registro para não voltarem):
+- `STORAGE_DADOS`/`agnesApi.ts`/`pagar()` não existem e não farão sentido: os dados agora ficam no banco via Enter Cloud, não em `localStorage`. Não criar.
+- Item 2b (onrender no bundle) é inverso: nada referencia `onrender.com` e nada deve passar a referenciar. A verificação final é que o bundle não contenha `onrender` nem segredo.
+- Item 3a: o webhook já retorna erro claro `"STRIPE_WEBHOOK_SECRET nao configurada"`. Falta erro claro para `STRIPE_SECRET_KEY` no checkout.
+- Item 3b (commit/push): a plataforma commita automaticamente; não executo `git commit/push`.
 
-**Ação fora do código, sua:** a `agnes-secreta-2026` está no histórico do git. Mesmo desligando o Render, revogue-a — histórico não se apaga.
+## Correções de bug já identificadas
 
-## Fase 1 — Banco de dados
+- **`create-checkout-session` tem `mode: 'payment'` fixo**, mas o Guia Mensal é preço recorrente → o Stripe rejeita (botão quebrado). Corrigir derivando `mode` de `price.recurring`.
+- Falta erro claro quando `STRIPE_SECRET_KEY` não está configurada no checkout (retorna genérico `error.message`).
 
-Migração única (`supabase_migration`), com RLS habilitada na mesma migração:
+## Fase 1 — Banco (migração única)
 
-- **`profiles`** — `id` (PK → `auth.users`), `email`, `nome`, `created_at`. Trigger `on_auth_user_created` popula no signup. RLS: cada um lê/edita só a própria linha.
-- **`pedidos`** — `id`, `user_id` (not null), `produto_id`, `plano_nome`, `stripe_session_id` (unique), `status` (`pendente`/`pago`/`cancelado`), `valor_centavos`, `moeda`, `metadados` (jsonb), `created_at`, `pago_em`.
-  RLS: `select` **apenas das próprias linhas**; **nenhuma policy de insert/update para o cliente**. Só as funções de backend escrevem. É isso que impede alguém de marcar o próprio pedido como pago pelo navegador — o gate do item 1c não teria valor se o status fosse gravável do cliente.
+`supabase_migration` criando **`horoscopes`** com RLS na mesma migração:
+- `id`, `user_id` (not null, FK), `data` (date), `texto` (text), `created_at`.
+- Política: `select` só das próprias linhas. **Nenhuma policy de insert/update para o cliente** — só a função de backend grava (isso mantém o gate de pagamento e o cache diário sob controle do servidor).
+- Confirmar com `supabase_get_table_schema` que a RLS está ativa e as policies listadas.
 
-Depois da migração, confirmar com `supabase_get_table_schema` que a RLS está de fato ativa nas duas tabelas.
+## Fase 2 — Função de backend `agnes-conversar` (nova)
 
-## Fase 2 — Funções de backend
+Uma função, vários tipos — o terminal e o horóscopo passam por ela:
+- Requer JWT. Sem erro claro para envs ausentes.
+- Corpo: `{ tipo, mensagem?, dadosNascimento?, parceiroNascimento? }` com `tipo` ∈ `horoscopo | mapa_natal | numerologia | eneagrama | compatibilidade | conselhos`.
+- **Gate (só no servidor, nunca no cliente):** para tipos ≠ `horoscopo`, consultar `purchased_analyses` (status `pago`) **ou** `subscriptions` (`active`/`trialing`) do `user_id`; se não houver, retornar 402 `{ error: "compra_necessaria" }`.
+- **Horóscopo livre:** aceita para qualquer usuário logado. Usa `profiles.birth_date` para derivar o signo (mesma lógica de `lib/zodiac.ts`) e o **cache diário** em `horoscopes` (uma chamada de IA por usuário/dia; leituras seguintes vêm do banco). Fazer upsert via client do service role.
+- Chama o LLM com system prompt do Mestre Agnes (persona), no idioma do usuário (`Accept-Language`), com o prompt específico por tipo. Seguir o fluxo de seleção de modelo da skill `enter_llm_integration`.
+- CORS conforme `references/edge-functions.md`; `Deno.serve`; import via esm.sh; sem SQL cru.
 
-A função `create-checkout-session` que veio com a Stripe fica **intocada e sem uso** — ela é genérica, não autentica ninguém, não registra pedido e tem `mode: 'payment'` fixo.
+Requer **`enable_ai_capability`** antes (chamado no início da implementação) e carregar a skill `enter_llm_integration`.
 
-**Esse `mode` fixo é um bug meu do turno anterior: criei o Guia Mensal como preço recorrente, e o Stripe rejeita recorrente em `mode: 'payment'`. O botão do Guia Mensal está quebrado em produção agora.** A função nova corrige.
+## Fase 3 — Frontend
 
-### `supabase/functions/agnes-checkout/index.ts` (nova)
-- Exige JWT; o `user_id` vem **do token**, nunca do corpo da requisição.
-- Valida `STRIPE_SECRET_KEY`; se faltar, 500 com `"STRIPE_SECRET_KEY nao configurada"` (item 3a).
-- Busca produto + preço ativo e **detecta `price.recurring`** → `mode: 'subscription'`, senão `'payment'`. Corrige o Guia Mensal.
-- Insere `pedidos` com `status: 'pendente'` (service role, métodos do client — sem SQL cru).
-- Manda `client_reference_id` + `metadata { pedido_id, user_id }` e usa chave de idempotência.
-- Retorna `{ url }`.
+- **`src/lib/agnes.ts`** (novo, pequeno): `invocarAnalise(tipo, inputs)` → `supabase.functions.invoke('agnes-conversar')`, tipa retorno/erros (incl. 402).
+- **`src/lib/horoscopo.ts`** (novo): derivar signo de `birth_date` (reusa `getZodiacSign` de `lib/zodiac.ts`), definir o tipo de data de hoje e mapear o resultado para exibição. Sem chaves de storage.
+- **`src/components/dashboard/HoroscopeCard.tsx`** (novo): na Visão Geral, logo após o `IdentityCard`; carrega o horóscopo do dia (gratuito) usando `useProfile` + `lib/agnes.ts`; estados carregando/erro; visual consistente com o tema (cartão dourado/navy).
+- **`src/components/dashboard/AnalysisTerminal.tsx`** (novo): terminal estilo vidro (reusa estética de `Terminal.tsx`, com `Tabs` do shadcn) com 5 abas — mapa natal, numerologia, eneagrama, compatibilidade, conselhos. Cada aba tem campo(s) específico(s) (compatibilidade pede a data do parceiro) e botão "Consultar o Mestre". Bloqueado com aviso + link para `/` quando não há compra paga (o gate real é no servidor; o bloqueio é só UX). Respostas renderizadas como mensagens do Mestre. Abas desabilitadas durante carregamento.
+- **`src/pages/DashboardPage.tsx`**: adicionar `<HoroscopeCard />` e `<AnalysisTerminal />` abaixo do `IdentityCard`, mantendo Compras/Assinatura. A Visão Geral já é a "Minha Área" — o terminal fica dentro dela, como pedido.
+- **i18n** — chaves novas nos 6 locales: seção `horoscopo.*` e `terminal.*` (títulos das 5 abas, placeholders, 402, loading, erros). Seguir o padrão de chaves achatadas de `src/i18n/config.ts`.
+- **`supabase/functions/create-checkout-session/index.ts`**: derivar `mode` de `price.recurring`; validar `STRIPE_SECRET_KEY` com erro claro. Redeploy.
 
-### `supabase/functions/agnes-checkout-status/index.ts` (nova — item 1b)
-- Exige JWT. Faz `stripe.checkout.sessions.retrieve(session_id)`.
-- **Confere que a sessão pertence a quem está chamando** (via `metadata.user_id`); senão 403. Sem isso, qualquer um poderia sondar `session_id` alheio e destravar o download.
-- Reconcilia `pedidos` para `pago` quando confirmado.
-- Retorna `{ pago: boolean, metadados }`.
-
-### `supabase/functions/stripe-webhook/index.ts` (nova — item 1d)
-- `verify_jwt = false` em `supabase/config.toml` (o Stripe não envia JWT).
-- Valida assinatura com **`constructEventAsync`** e `STRIPE_WEBHOOK_SECRET`. No Deno a variante síncrona falha — detalhe que quebra silenciosamente.
-- Segredo ausente → 500 claro; assinatura inválida → 400 **antes de ler o corpo**. Corpo sem assinatura válida nunca é processado.
-- Trata `checkout.session.completed` → marca o pedido como pago.
-
-Publicar as três com `supabase_deploy_edge_function`. Depois do deploy do webhook, peço a URL no painel do Stripe e coleto o `STRIPE_WEBHOOK_SECRET` via `supabase_add_secret`.
-
-## Fase 3 — Frontend: auth, storage e gate
-
-- **`src/lib/agnesApi.ts`** (novo) — `export const STORAGE_DADOS = "agnes:dados"` (item 2a), os wrappers `criarCheckout()` / `consultarCheckout()` e os helpers `salvarDados`/`lerDados`/`limparDados`. **Única fonte da chave**, consumida por `Pricing.tsx` e `Sucesso.tsx` — fim das chaves divergentes.
-- **`src/hooks/useAuth.tsx`** (novo) — listener `onAuthStateChange` registrado **antes** do `getSession`, guardando `user` **e** `session`, callback não-async, chamadas ao client dentro de `setTimeout(...,0)`.
-- **`src/pages/Auth.tsx`** (novo) — e-mail/senha com **login e cadastro** + botão Google. `emailRedirectTo: origin + "/"`. Antes disso, `supabase_configure_auth` (auto-confirm de e-mail) e `supabase_configure_auth_provider("google")`.
-- **`src/pages/Sucesso.tsx`** (novo) — lê `session_id` da URL e chama `consultarCheckout`. "Baixar relatório" fica **desabilitado até `pago === true`** (item 1c). **`?pago=1` é ignorado por completo** — não é lido em lugar nenhum, em nenhum ambiente.
-- **`src/pages/Cancelado.tsx`** (novo).
-- **`src/components/agnes/Pricing.tsx`** — exige login antes do checkout (senão manda pra `/auth`), chama `criarCheckout` e abre com **`window.open(data.url)`**, não `window.location.href` (outro acerto do meu turno anterior: navegar para fora mata o app).
-- **`src/components/agnes/Navbar.tsx`** — entrada de login / sair.
-- **`src/router.tsx`** — rotas `/auth`, `/sucesso`, `/cancelado`; `AuthProvider` em `src/App.tsx`.
-- **i18n** — chaves novas nos 6 locales (`en`, `es`, `fr`, `it`, `pt`, `pt-BR`).
-- **`.env.example`** — remover `VITE_API_KEY` e `VITE_API_BASE`. Deixar de fora, e não substituir: variáveis `VITE_*` não são suportadas nesta plataforma e são embutidas no bundle por natureza.
-
-## Fase 4 — Terminal com IA real
-
-Depende de `enable_ai_capability` e da skill `enter_llm_integration` (a escolha do modelo segue o fluxo dela).
-
-- **`supabase/functions/agnes-conversar/index.ts`** (nova) — exige JWT, system prompt no papel do Mestre, chave do provedor só no servidor.
-- **`src/components/agnes/Terminal.tsx`** — troca as respostas fixas pela função, com estados de carregando/erro.
+Sem novas rotas: a Visão Geral já vive em `/dashboard`. O `?pago=1` não existe e não será criado.
 
 ## Implementation checklist
 
-- [ ] Migração cria `profiles` e `pedidos` com RLS habilitada na mesma migração
-- [ ] `pedidos` sem policy de insert/update para o cliente (status só muda no servidor)
-- [ ] `supabase_get_table_schema` confirma RLS ativa nas duas tabelas
-- [ ] Trigger de signup popula `profiles`
-- [ ] `agnes-checkout` deriva `mode` de `price.recurring` (Guia Mensal volta a funcionar)
-- [ ] `agnes-checkout` retorna 500 `"STRIPE_SECRET_KEY nao configurada"` quando a env falta
-- [ ] `agnes-checkout` tira o `user_id` do JWT, não do corpo
-- [ ] `agnes-checkout-status` retorna `{ pago, metadados }` e nega sessão de outro usuário com 403
-- [ ] `stripe-webhook` usa `constructEventAsync` + `STRIPE_WEBHOOK_SECRET` e rejeita assinatura inválida com 400 antes de processar
-- [ ] `verify_jwt = false` só para `stripe-webhook` no `config.toml`
-- [ ] Três funções publicadas com `supabase_deploy_edge_function`
-- [ ] `STRIPE_WEBHOOK_SECRET` coletado via `supabase_add_secret` após criar o endpoint no Stripe
-- [ ] `STORAGE_DADOS` exportado em `agnesApi.ts` e usado em `Pricing.tsx` e `Sucesso.tsx` (nenhuma string literal solta)
-- [ ] `useAuth` registra listener antes do `getSession` e guarda user + session
-- [ ] `Auth.tsx` com login, cadastro e Google
-- [ ] `Sucesso.tsx` só habilita download com `pago === true`; `?pago=1` não é lido
-- [ ] `Pricing.tsx` usa `window.open` e exige login
-- [ ] Rotas `/auth`, `/sucesso`, `/cancelado` + `AuthProvider` no `App.tsx`
-- [ ] Chaves i18n nos 6 locales
-- [ ] `VITE_API_KEY` e `VITE_API_BASE` removidos do `.env.example`
-- [ ] `agnes-conversar` publicada e `Terminal.tsx` ligado nela
+- [ ] Migração cria `horoscopes` com RLS habilitada na mesma migração, sem policy de insert/update para o cliente
+- [ ] `supabase_get_table_schema("horoscopes")` confirma RLS ativa e policies listadas
+- [ ] `enable_ai_capability` aprovado e skill `enter_llm_integration` carregada
+- [ ] `agnes-conversar` exige JWT e deriva `user_id` do token
+- [ ] `agnes-conversar` retorna 402 `compra_necessaria` para tipos ≠ `horoscopo` sem compra paga/subscription ativa (checagem no servidor)
+- [ ] `agnes-conversar` usa cache diário em `horoscopes` (upsert service role; 1 chamada IA/dia/usuário)
+- [ ] `agnes-conversar` tem CORS completo e `Deno.serve`
+- [ ] `agnes-conversar` publicada com `supabase_deploy_edge_function`
+- [ ] `lib/agnes.ts` tipa retorno e erros (incl. 402)
+- [ ] `HoroscopeCard` na Visão Geral, estados de loading/erro/sem-aniversário
+- [ ] `AnalysisTerminal` com 5 abas, gate visual (link para pagamento) e estados de loading
+- [ ] Chaves i18n nos 6 locales (horoscopo + 5 análises + erros)
+- [ ] `create-checkout-session`: `mode` derivado de `price.recurring` + erro claro de `STRIPE_SECRET_KEY`, redeployed
+- [ ] `pnpm run build` e `pnpm run check` sem erros
 
 ## Verification checklist
 
 - [ ] `pnpm run build` e `pnpm run check` passam
-- [ ] Os 3 `prod_` em `Pricing.tsx` resolvem no Stripe (se algum ID estiver errado, o checkout falha — conferir nos logs da função)
-- [ ] **Positivo:** compra do Mapa Natal (avulso) → checkout abre → `/sucesso` libera o download
-- [ ] **Positivo (o bug):** Guia Mensal abre checkout em modo assinatura, sem erro de `mode`
-- [ ] **Negativo:** `/sucesso?pago=1` sem `session_id` → download **bloqueado**
-- [ ] **Negativo:** `session_id` de outro usuário → 403, download bloqueado
-- [ ] **Negativo:** checkout deslogado → redireciona para `/auth`, não chama a função
-- [ ] **Negativo:** POST no webhook com assinatura inválida → 400 e nada gravado (conferir em `supabase_search_edge_function_logs`)
-- [ ] **Fronteira:** tentar `update` em `pedidos` pelo client logado → negado pela RLS
-- [ ] **Bundle (item 2b invertido):** `grep -r "onrender\|agnes-secreta" dist/` não retorna nada
-- [ ] Login por e-mail e por Google entram e persistem após refresh
-- [ ] `/` e `/sucesso` verificados em `mobile_390` e `desktop_1280`
+- [ ] **Positivo:** usuário com `birth_date` no perfil vê o horóscopo do dia na Visão Geral sem pagar
+- [ ] **Fronteira:** usuário sem `birth_date` vê estado "adicione seu aniversário" com link para o perfil, sem crash
+- [ ] **Negativo:** usuário logado sem compra paga recebe 402 ao tentar análise e vê o bloqueio com link de compra
+- [ ] **Positivo:** após compra paga (status `pago`), as 5 abas consultam o Mestre e renderizam resposta
+- [ ] **Cache:** segunda visita no mesmo dia ao horóscopo não gera nova chamada de IA (registro lido do banco)
+- [ ] **Negativo:** chamar `agnes-conversar` sem JWT → 401/403, sem resposta
+- [ ] **Auth:** perfil (com aniversário) salva e reaparece após refresh
+- [ ] **Bug corrigido:** compra do Guia Mensal abre checkout em modo assinatura (sem erro de `mode`)
+- [ ] **Bundle (item 2b):** `grep -r "onrender\|agnes-secreta" dist/` não retorna nada
+- [ ] Verificar `/dashboard` em `mobile_390` e `desktop_1280`
