@@ -1,4 +1,5 @@
 import type { ZodiacSignKey } from "@/domain/models";
+import { parseDateParts } from "@/lib/dateParts";
 
 interface ZodiacRange {
   sign: ZodiacSignKey;
@@ -40,10 +41,9 @@ const isWithin = (
 /** Derive the western zodiac sign from a date string ("YYYY-MM-DD" or ISO). */
 export function getZodiacSign(value: string | Date | null): ZodiacSignKey | null {
   if (!value) return null;
-  const date = typeof value === "string" ? new Date(value) : value;
-  if (Number.isNaN(date.getTime())) return null;
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+  const parts = parseDateParts(value);
+  if (!parts) return null;
+  const { month, day } = parts;
   return RANGES.find((r) => isWithin(month, day, r.from, r.to))?.sign ?? null;
 }
 

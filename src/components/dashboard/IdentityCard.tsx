@@ -38,7 +38,9 @@ export function IdentityCard() {
   const zodiacDerived = profile?.birth_date
     ? getZodiacSign(profile.birth_date)
     : null;
-  const zodiac = zodiacStored ?? zodiacDerived;
+  // O valor derivado tem precedência: é recalculado com a lógica corrigida,
+  // enquanto `zodiac_sign` gravado no banco pode conter o cálculo antigo.
+  const zodiac = zodiacDerived ?? zodiacStored;
   const chineseZodiac = profile?.birth_date
     ? getChineseZodiacSign(profile.birth_date)
     : null;

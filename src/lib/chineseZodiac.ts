@@ -1,4 +1,5 @@
 import type { ChineseZodiacSignKey } from "@/domain/models";
+import { parseDateParts } from "@/lib/dateParts";
 
 /**
  * Zodíaco chinês — ciclo de 12 animais.
@@ -55,12 +56,10 @@ const CHINESE_NEW_YEAR: Record<number, [number, number]> = {
  */
 export function getChineseZodiacSign(value: string | Date | null): ChineseZodiacSignKey | null {
   if (!value) return null;
-  const date = typeof value === "string" ? new Date(value) : value;
-  if (Number.isNaN(date.getTime())) return null;
+  const parts = parseDateParts(value);
+  if (!parts) return null;
 
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+  const { year, month, day } = parts;
 
   // Ano "efetivo" para o ciclo animal: se a data cai antes do Ano Novo
   // Chinês do ano civil, o animal ainda é o do ano anterior.
