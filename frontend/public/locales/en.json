@@ -289,5 +289,10 @@
   "chineseStory.macaco": "The Monkey is ninth, a clever bridge-builder, a symbol of intelligence and wit.",
   "chineseStory.galo": "The Rooster is tenth, the bird that announces dawn with punctuality and discipline.",
   "chineseStory.cao": "The Dog is eleventh, the faithful guardian who protects the home and those we love.",
-  "chineseStory.porco": "The Pig closed the cycle in twelfth place, a symbol of generosity and abundance."
+  "chineseStory.porco": "The Pig closed the cycle in twelfth place, a symbol of generosity and abundance.",
+  "horoscopeCard.learnMore": "Learn more",
+  "analysesTeaser.title": "Other analyses",
+  "analysesTeaser.badge": "Subscription",
+  "analysesTeaser.note": "The complete reading of each analysis is exclusive to Monthly Guide subscribers.",
+  "analysesTeaser.cta": "See plans"
 }

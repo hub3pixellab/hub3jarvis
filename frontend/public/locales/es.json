@@ -289,5 +289,10 @@
   "chineseStory.macaco": "El Mono es el noveno, astuto constructor de puentes, símbolo de inteligencia y viveza.",
   "chineseStory.galo": "El Gallo es el décimo, el ave que anuncia el amanecer con puntualidad y disciplina.",
   "chineseStory.cao": "El Perro es el undécimo, guardián fiel que protege el hogar y a quienes amamos.",
-  "chineseStory.porco": "El Cerdo cerró el ciclo en duodécimo lugar, símbolo de generosidad y abundancia."
+  "chineseStory.porco": "El Cerdo cerró el ciclo en duodécimo lugar, símbolo de generosidad y abundancia.",
+  "horoscopeCard.learnMore": "Saber más",
+  "analysesTeaser.title": "Otras análisis",
+  "analysesTeaser.badge": "Suscripción",
+  "analysesTeaser.note": "La lectura completa de cada análisis es exclusiva para suscriptores de la Guía Mensual.",
+  "analysesTeaser.cta": "Ver planes"
 }
