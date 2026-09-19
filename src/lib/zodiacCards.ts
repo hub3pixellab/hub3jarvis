@@ -26,7 +26,11 @@ export const ZODIAC_CARD_IMAGES: Record<ZodiacSignKey, string> = {
   capricorn:
     "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/b285da56.png",
   aquarius:
-    "https://cdn.enter.pro/resources/uid_100512101/zodiaco-aquario_cc039ccf.png",
+    "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/40b14292.png",
   pisces:
-    "https://cdn.enter.pro/resources/uid_100512101/zodiaco-peixes_4a993074.png",
+    "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/5c0eba40.png",
 };
+
+/** Fundo da seção do widget de horóscopo (mapa astral widescreen). */
+export const ZODIAC_BACKGROUND_IMAGE =
+  "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/1c2020dd.png";

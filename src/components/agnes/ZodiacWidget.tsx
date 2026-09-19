@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Sparkle } from "lucide-react";
 import { ZODIAC_SIGNS, type ZodiacSignKey } from "@/domain/models";
-import { ZODIAC_CARD_IMAGES } from "@/lib/zodiacCards";
+import { ZODIAC_CARD_IMAGES, ZODIAC_BACKGROUND_IMAGE } from "@/lib/zodiacCards";
 import { getDailyHoroscope } from "@/lib/horoscope";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
@@ -56,6 +56,15 @@ const ZodiacWidget = ({
       id={id}
       className="relative overflow-hidden bg-navy-deep py-20 md:py-28"
     >
+      {/* Background — mapa astral em anexo */}
+      <img
+        src={ZODIAC_BACKGROUND_IMAGE}
+        alt=""
+        crossOrigin="anonymous"
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40"
+      />
+
       {/* Ambience */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-0 h-72 w-[36rem] -translate-x-1/2 rounded-full bg-royal/20 blur-[140px]" />
