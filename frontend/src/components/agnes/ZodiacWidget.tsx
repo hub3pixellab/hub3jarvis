@@ -60,10 +60,11 @@ const ZodiacWidget = ({
       <img
         src={ZODIAC_BACKGROUND_IMAGE}
         alt=""
-        crossOrigin="anonymous"
         aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-15"
       />
+      {/* Escurece o fundo para os cards se destacarem */}
+      <div className="pointer-events-none absolute inset-0 bg-navy-deep/60" />
 
       {/* Ambience */}
       <div className="pointer-events-none absolute inset-0">
@@ -104,7 +105,6 @@ const ZodiacWidget = ({
               <img
                 src={ZODIAC_CARD_IMAGES[sign]}
                 alt={t(`zodiac.${sign}`)}
-                crossOrigin="anonymous"
                 loading="lazy"
                 className="aspect-[3/4] w-full object-cover transition duration-700 group-hover:scale-105"
               />
@@ -131,7 +131,6 @@ const ZodiacWidget = ({
                 <img
                   src={ZODIAC_CARD_IMAGES[selected]}
                   alt={t(`zodiac.${selected}`)}
-                  crossOrigin="anonymous"
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-navy/70" />

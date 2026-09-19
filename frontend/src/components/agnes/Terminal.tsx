@@ -9,15 +9,6 @@ const QUICK_QUESTIONS = [
   "terminal.q4",
 ];
 
-// URL do backend (defina VITE_API_URL no .env do frontend, ou use localhost)
-const API_URL = (import.meta as any).env?.VITE_API_URL ?? "http://localhost:8000";
-
-// Signos reconhecidos pelo backend
-const SIGNOS = [
-  "aries", "touro", "gemeos", "cancer", "leao", "virgem",
-  "libra", "escorpiao", "sagitario", "capricornio", "aquario", "peixes",
-];
-
 const REPLIES: Record<string, string> = {
   "terminal.q1": "terminal.r1",
   "terminal.q2": "terminal.r2",
@@ -30,10 +21,17 @@ interface Message {
   text: string;
 }
 
+/**
+ * Chat terminal renderizado como overlay de vidro (glass) no Hero.
+ * Sem seção própria — o ancorador #terminal aponta para este contêiner.
+ */
 const Terminal = () => {
   const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
-    { from: "master", text: t("terminal.greeting") },
+    {
+      from: "master",
+      text: t("terminal.greeting"),
+    },
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -44,81 +42,39 @@ const Terminal = () => {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, typing]);
 
-  const detectSigno = (text: string): string | null => {
-    const lower = text.toLowerCase();
-    for (const s of SIGNOS) {
-      if (lower.includes(s)) return s;
-    }
-    return null;
-  };
-
-  const ask = async (question: string) => {
+  const ask = (question: string) => {
     const q = question.trim();
     if (!q || typing) return;
     setMessages((m) => [...m, { from: "user", text: q }]);
     setInput("");
     setTyping(true);
-
-    try {
-      let resposta = "";
-
-      // 1) Pedido de horóscopo com signo -> endpoint dedicado
-      const signo = detectSigno(q);
-      const querHoroscopo = /horoscop|horóscop|signo|previsao|previsão/i.test(q);
-
-      if (querHoroscopo && signo) {
-        const r = await fetch(`${API_URL}/api/agnes/horoscopo?signo=${signo}`);
-        if (r.ok) {
-          const data = await r.json();
-          resposta = data.texto ?? data.mensagem ?? data.horoscopo ?? JSON.stringify(data);
-        } else {
-          const err = await r.json();
-          resposta = err.detail ?? "Não consegui encontrar esse signo.";
-        }
-      } else {
-        // 2) Conversa geral -> roteador da Agnes
-        const r = await fetch(`${API_URL}/api/agnes/conversar`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mensagem: q }),
-        });
-        if (r.ok) {
-          const data = await r.json();
-          resposta = data.resposta_MestreAgnes ?? data.resposta ?? JSON.stringify(data);
-        } else {
-          const err = await r.json();
-          resposta = err.detail ?? "Desculpe, não consegui responder agora.";
-        }
-      }
-
-      setMessages((m) => [...m, { from: "master", text: resposta }]);
-    } catch {
-      // Backend offline -> fallback estático (não quebra o demo)
+    window.setTimeout(() => {
       const replyKey = REPLIES[q] ?? "terminal.rFallback";
-      setMessages((m) => [...m, { from: "master", text: t(replyKey) }]);
-    } finally {
+      setMessages((m) => [
+        ...m,
+        {
+          from: "master",
+          text: t(replyKey),
+        },
+      ]);
       setTyping(false);
-    }
+    }, 1400);
   };
 
   return (
     <div role="region" aria-label={t("terminal.windowTitle")} className="min-w-0">
-      <div className="mb-4 flex items-center gap-3">
-        <span className="h-px w-6 bg-gold" />
-        <span className="font-jost text-[10px] uppercase tracking-[0.4em] text-gold/90">
-          {t("terminal.eyebrow")}
-        </span>
-        <Sparkle className="h-3 w-3 text-gold/70" strokeWidth={1.5} />
-      </div>
-
+      {/* Glass panel — fallback opaco sem backdrop-filter, translúcido com blur */}
       <div className="overflow-hidden rounded-lg border border-gold/25 bg-navy/85 shadow-[0_30px_80px_-30px_hsl(0_0%_0%/0.85)] backdrop-blur-xl supports-[backdrop-filter]:bg-navy/55">
+        {/* Title bar */}
         <div className="flex items-center justify-between border-b border-gold/15 px-5 py-3.5">
           <div className="flex items-center gap-2">
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
                 className="h-2.5 w-2.5 rounded-full border border-gold/40"
-                style={{ background: i === 0 ? "hsl(var(--gold))" : "transparent" }}
+                style={{
+                  background: i === 0 ? "hsl(var(--gold))" : "transparent",
+                }}
               />
             ))}
           </div>
@@ -128,6 +84,7 @@ const Terminal = () => {
           <Sparkle className="h-3.5 w-3.5 text-gold/70" strokeWidth={1.5} />
         </div>
 
+        {/* Messages */}
         <div
           ref={scrollRef}
           className="flex h-[360px] flex-col gap-4 overflow-y-auto px-5 py-6 md:h-[400px]"
@@ -174,6 +131,7 @@ const Terminal = () => {
           )}
         </div>
 
+        {/* Quick questions — alvos de toque >= 44px */}
         <div className="flex flex-wrap gap-2 border-t border-gold/15 px-5 py-3">
           {QUICK_QUESTIONS.map((q) => (
             <button
@@ -187,6 +145,7 @@ const Terminal = () => {
           ))}
         </div>
 
+        {/* Input */}
         <div className="flex items-center gap-3 border-t border-gold/15 px-5 py-4">
           <input
             value={input}

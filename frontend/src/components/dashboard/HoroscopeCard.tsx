@@ -86,7 +86,6 @@ export function HoroscopeCard() {
           <img
             src={ZODIAC_CARD_IMAGES[sign]}
             alt={t(`zodiac.${sign}`)}
-            crossOrigin="anonymous"
             className="h-44 w-full object-cover object-top sm:h-full"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent sm:bg-gradient-to-r" />

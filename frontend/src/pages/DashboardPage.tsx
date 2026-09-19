@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { MessagesSquare } from "lucide-react";
 import { IdentityCard } from "@/components/dashboard/IdentityCard";
+import { HoroscopeCard } from "@/components/dashboard/HoroscopeCard";
 import { PurchasesCard } from "@/components/dashboard/PurchasesCard";
 import { SubscriptionCard } from "@/components/dashboard/SubscriptionCard";
 import Terminal from "@/components/agnes/Terminal";
@@ -21,6 +22,8 @@ export default function DashboardPage() {
       </div>
 
       <IdentityCard />
+
+      <HoroscopeCard />
 
       <Card className="border-gold/20 bg-card">
         <CardHeader className="border-b border-gold/10 pb-3">
