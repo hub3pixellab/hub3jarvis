@@ -23,7 +23,6 @@ const Hero = () => {
       <img
         src={HERO_IMG}
         alt={t("hero.imgAlt")}
-        crossOrigin="anonymous"
         className="absolute inset-0 h-full w-full object-cover"
       />
 
