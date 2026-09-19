@@ -1,34 +1,26 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { CalendarDays, Sparkle } from "lucide-react";
+import { ArrowRight, CalendarDays, Sparkle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/auth-context";
 import { useProfile } from "@/hooks/useProfile";
 import { getZodiacSign } from "@/lib/zodiac";
-import { getChineseZodiacSign } from "@/lib/chineseZodiac";
 import { getDailyHoroscope } from "@/lib/horoscope";
 import { ZODIAC_CARD_IMAGES, ZODIAC_RANGES } from "@/lib/zodiacCards";
-import {
-  CHINESE_ZODIAC_GLYPHS,
-  getChineseZodiacYears,
-} from "@/lib/chineseZodiacData";
 import SignHoroscopeDialog from "@/components/agnes/SignHoroscopeDialog";
-import ChineseZodiacDialog from "@/components/agnes/ChineseZodiacDialog";
 
 /**
- * Cards dos signos do usuário (ocidental + chinês) na área de membros.
- * Aparecem assim que há data de nascimento e, ao clicar, abrem o mesmo pop-up
- * de horóscopo do dia usado no site.
- * Sem data de nascimento: convida a preencher o perfil.
+ * Horóscopo do dia na área de membros: mostra apenas o signo e a leitura de
+ * hoje. "Saiba mais" abre o pop-up completo (leitura, números da sorte,
+ * história do símbolo e CTA para os planos).
  */
 export function HoroscopeCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile(user?.id);
   const [openSign, setOpenSign] = useState(false);
-  const [openAnimal, setOpenAnimal] = useState(false);
 
   if (isLoading || !user) {
     return (
@@ -36,7 +28,7 @@ export function HoroscopeCard() {
         <CardContent className="p-6">
           <Skeleton className="h-6 w-2/3 bg-gold/10" />
           <Skeleton className="mt-3 h-4 w-1/2 bg-gold/10" />
-          <Skeleton className="mt-6 h-24 bg-gold/10" />
+          <Skeleton className="mt-6 h-20 bg-gold/10" />
         </CardContent>
       </Card>
     );
@@ -44,7 +36,6 @@ export function HoroscopeCard() {
 
   const birthDate = profile?.birth_date ?? null;
   const sign = birthDate ? getZodiacSign(birthDate) : null;
-  const animal = birthDate ? getChineseZodiacSign(birthDate) : null;
 
   // Sem data de nascimento — convite para preencher o perfil.
   if (!birthDate || !sign) {
@@ -73,82 +64,69 @@ export function HoroscopeCard() {
   }
 
   const horoscope = getDailyHoroscope(sign);
-  const years = animal ? getChineseZodiacYears(animal, 2) : [];
 
   return (
     <Card className="border-gold/20 bg-card">
-      <CardHeader className="pb-3">
+      <CardHeader className="border-b border-gold/10 pb-3">
         <CardTitle className="flex items-center gap-2 font-cinzel text-xl text-cream">
           <Sparkle className="h-4 w-4 text-gold" strokeWidth={1.5} />
           {t("horoscopeCard.dailyLabel")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        {/* Signo ocidental */}
-        <button
-          type="button"
-          onClick={() => setOpenSign(true)}
-          className="group relative overflow-hidden rounded-md border border-gold/25 bg-navy/60 text-left transition duration-500 hover:border-gold/70 hover:shadow-[0_0_30px_hsl(var(--gold)/0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-        >
-          <img
-            src={ZODIAC_CARD_IMAGES[sign]}
-            alt={t(`zodiac.${sign}`)}
-            className="aspect-[4/3] w-full object-cover object-top transition duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-deep via-navy-deep/80 to-transparent p-4">
-            <p className="font-jost text-[9px] uppercase tracking-[0.3em] text-gold/80">
-              {t("horoscopeCard.yourSign")}
-            </p>
-            <p className="mt-1 font-cinzel text-2xl text-cream">
-              {t(`zodiac.${sign}`)}
-            </p>
-            <p className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/50">
+      <CardContent className="flex flex-col gap-4 p-5 md:p-6">
+        {/* Signo */}
+        <div className="flex items-center gap-4">
+          <span className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gold/40">
+            <img
+              src={ZODIAC_CARD_IMAGES[sign]}
+              alt={t(`zodiac.${sign}`)}
+              className="h-full w-full object-cover object-top"
+            />
+          </span>
+          <div className="min-w-0">
+            <p className="font-cinzel text-2xl text-cream">{t(`zodiac.${sign}`)}</p>
+            <p className="font-jost text-[10px] uppercase tracking-[0.3em] text-cream/50">
               {ZODIAC_RANGES[sign]}
             </p>
-            <p className="mt-2 font-jost text-[10px] uppercase tracking-[0.25em] text-gold/70">
-              {t("horoscopeCard.tapToOpen")}
-            </p>
           </div>
-        </button>
+        </div>
 
-        {/* Animal chinês */}
-        {animal && (
+        {/* Leitura do dia */}
+        <div className="flex flex-col gap-2.5">
+          <p className="font-jost text-sm leading-relaxed tracking-wide text-cream/85">
+            {t(horoscope.essenceKey)}
+          </p>
+          <p className="font-jost text-sm font-light leading-relaxed tracking-wide text-cream/70">
+            {t(horoscope.toneKey)}
+          </p>
+        </div>
+
+        {/* Ação */}
+        <div className="mt-auto flex flex-wrap items-center gap-4 border-t border-gold/15 pt-4">
           <button
             type="button"
-            onClick={() => setOpenAnimal(true)}
-            className="group flex flex-col items-center justify-center gap-3 rounded-md border border-gold/25 bg-navy/60 p-6 text-center transition duration-500 hover:border-gold/70 hover:shadow-[0_0_30px_hsl(var(--gold)/0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            onClick={() => setOpenSign(true)}
+            className="group inline-flex items-center gap-2 font-jost text-[11px] uppercase tracking-[0.3em] text-gold transition hover:text-gold-light"
           >
-            <span className="flex h-20 w-20 items-center justify-center rounded-full border border-gold/40 bg-royal/40 font-cinzel text-4xl text-gold-gradient transition group-hover:border-gold">
-              {CHINESE_ZODIAC_GLYPHS[animal]}
-            </span>
-            <span className="font-jost text-[9px] uppercase tracking-[0.3em] text-gold/80">
-              {t("horoscopeCard.yourAnimal")}
-            </span>
-            <span className="font-cinzel text-2xl text-cream">
-              {t(`chineseZodiac.${animal}`)}
-            </span>
-            <span className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/50">
-              {years.join(" · ")}
-            </span>
-            <span className="font-jost text-[10px] uppercase tracking-[0.25em] text-gold/70">
-              {t("horoscopeCard.tapToOpen")}
-            </span>
+            {t("horoscopeCard.learnMore")}
+            <ArrowRight
+              className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
+              strokeWidth={1.5}
+            />
           </button>
-        )}
-
-        {/* Números da sorte do dia */}
-        <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-          <span className="font-jost text-[10px] uppercase tracking-[0.3em] text-cream/50">
-            {t("zodiacWidget.luckyLabel")}
-          </span>
-          {horoscope.luckyNumbers.map((n, i) => (
-            <span
-              key={i}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-gold/40 bg-royal/40 font-cinzel text-sm text-gold"
-            >
-              {n}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-jost text-[10px] uppercase tracking-[0.3em] text-cream/50">
+              {t("zodiacWidget.luckyLabel")}
             </span>
-          ))}
+            {horoscope.luckyNumbers.map((n, i) => (
+              <span
+                key={i}
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-gold/40 bg-royal/40 font-cinzel text-xs text-gold"
+              >
+                {n}
+              </span>
+            ))}
+          </div>
         </div>
       </CardContent>
 
@@ -156,10 +134,6 @@ export function HoroscopeCard() {
         sign={openSign ? sign : null}
         onClose={() => setOpenSign(false)}
         plansHref="/#pagamento"
-      />
-      <ChineseZodiacDialog
-        animal={openAnimal ? animal : null}
-        onClose={() => setOpenAnimal(false)}
       />
     </Card>
   );
