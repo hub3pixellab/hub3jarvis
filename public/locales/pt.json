@@ -512,5 +512,11 @@
   "questionnaire.opt.trabalho": "Trabalho",
   "questionnaire.opt.familiar": "Familiar",
   "questionnaire.eneagramaHint": "Para cada afirmativa, escolha de 1 (discordo totalmente) a 5 (concordo totalmente) conforme o que mais se parece com você. Responda com sinceridade — não existe resposta certa ou errada.",
-  "questionnaire.eneagramaResultado": "Seu resultado provável no questionário"
+  "questionnaire.eneagramaResultado": "Seu resultado provável no questionário",
+  "hero.storeAriaAndroid": "Aplicação para Android (em breve)",
+  "hero.storeAriaIos": "Aplicação para iPhone (em breve)",
+  "hero.storeSoonEyebrow": "Aplicação Mestre Agnes",
+  "hero.storeSoonTitle": "Em breve",
+  "hero.storeSoonText": "A nossa aplicação está a chegar. Em breve poderás descarregar o Mestre Agnes na Google Play e na App Store.",
+  "hero.storeSoonClose": "Entendi"
 }

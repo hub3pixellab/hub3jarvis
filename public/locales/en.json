@@ -512,5 +512,11 @@
   "questionnaire.opt.trabalho": "Work",
   "questionnaire.opt.familiar": "Family",
   "questionnaire.eneagramaHint": "For each statement, choose from 1 (strongly disagree) to 5 (strongly agree) based on what best describes you. Answer honestly — there are no right or wrong answers.",
-  "questionnaire.eneagramaResultado": "Your likely result on the test"
+  "questionnaire.eneagramaResultado": "Your likely result on the test",
+  "hero.storeAriaAndroid": "Android app (coming soon)",
+  "hero.storeAriaIos": "iPhone app (coming soon)",
+  "hero.storeSoonEyebrow": "Master Agnes App",
+  "hero.storeSoonTitle": "Coming soon",
+  "hero.storeSoonText": "Our app is on the way. Soon you'll be able to download Master Agnes on Google Play and the App Store.",
+  "hero.storeSoonClose": "Got it"
 }

@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Sparkle } from "lucide-react";
+import { AppStoreButtons } from "@/components/agnes/AppStoreButtons";
 
 const HERO_IMG =
   "https://cdn.enter.pro/visual_resources/100512101/112a6ab6f56c4968bc9aec1c6c8a8357/c21a7765.png";
@@ -75,6 +76,7 @@ const Hero = () => {
             >
               {t("hero.ctaSecondary")}
             </a>
+            <AppStoreButtons />
           </div>
         </div>
 

@@ -512,5 +512,11 @@
   "questionnaire.opt.trabalho": "Travail",
   "questionnaire.opt.familiar": "Familial",
   "questionnaire.eneagramaHint": "Pour chaque affirmation, choisissez de 1 (pas du tout d'accord) à 5 (tout à fait d'accord) selon ce qui vous ressemble le plus. Répondez sincèrement : il n'y a ni bonne ni mauvaise réponse.",
-  "questionnaire.eneagramaResultado": "Votre résultat probable au test"
+  "questionnaire.eneagramaResultado": "Votre résultat probable au test",
+  "hero.storeAriaAndroid": "Application Android (bientôt disponible)",
+  "hero.storeAriaIos": "Application iPhone (bientôt disponible)",
+  "hero.storeSoonEyebrow": "Application Maître Agnes",
+  "hero.storeSoonTitle": "Bientôt disponible",
+  "hero.storeSoonText": "Notre application arrive. Bientôt, vous pourrez télécharger Maître Agnes sur Google Play et l'App Store.",
+  "hero.storeSoonClose": "Compris"
 }
