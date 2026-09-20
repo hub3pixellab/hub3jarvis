@@ -7,14 +7,20 @@ import { Volume2, VolumeX } from "lucide-react";
  * Set do SoundCloud ("Unreleased" — Massive Jack) tocando em loop no top bar.
  * Usa a API oficial de widgets do SoundCloud (SC.Widget): o iframe fica oculto
  * e o usuário controla apenas mudo/volume, como pedido.
+ *
+ * Nota: o widget exige a URL da API do playlist + secret_token (formato que o
+ * oEmbed do SoundCloud devolve), não a URL pública do set — sem o secret_token
+ * o player retorna 404 e nada toca.
  */
-const SOUNDCLOUD_SET_URL =
-  "https://soundcloud.com/massivejackmusic/sets/unreleased/s-xH8mqZ5tU1d";
+const SOUNDCLOUD_PLAYLIST_URL =
+  "https://api.soundcloud.com/playlists/2225068514";
+const SOUNDCLOUD_SECRET_TOKEN = "s-xH8mqZ5tU1d";
 
 const WIDGET_URL =
   "https://w.soundcloud.com/player/?" +
   new URLSearchParams({
-    url: SOUNDCLOUD_SET_URL,
+    url: SOUNDCLOUD_PLAYLIST_URL,
+    secret_token: SOUNDCLOUD_SECRET_TOKEN,
     auto_play: "true",
     hide_related: "true",
     show_comments: "false",
@@ -55,6 +61,7 @@ const SoundCloudPlayer = () => {
   const [muted, setMuted] = useState(false);
   const [volume, setVolume] = useState(80);
   const [ready, setReady] = useState(false);
+  const [started, setStarted] = useState(false);
   const [apiLoaded, setApiLoaded] = useState(() => Boolean(window.SC));
 
   // Carrega a API de widgets do SoundCloud uma única vez.
@@ -103,16 +110,20 @@ const SoundCloudPlayer = () => {
   }, []);
 
   const toggleMute = () => {
-    if (!ready) {
-      // Primeira interação: garante o autoplay quando o navegador bloqueou.
-      widgetRef.current?.play();
+    const widget = widgetRef.current;
+    if (!widget) return;
+    // Garante que a reprodução comece no primeiro clique (autoplay costuma ser
+    // bloqueado pelo navegador até uma interação do usuário).
+    if (!started) {
+      widget.play();
+      setStarted(true);
     }
     if (muted) {
-      widgetRef.current?.setVolume(lastVolumeRef.current);
+      widget.setVolume(lastVolumeRef.current);
       setVolume(lastVolumeRef.current);
       setMuted(false);
     } else {
-      widgetRef.current?.setVolume(0);
+      widget.setVolume(0);
       setMuted(true);
     }
   };
