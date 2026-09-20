@@ -21,9 +21,9 @@ const Index = () => {
         <TerminalSection />
       </SectionReveal>
 
-      <SectionReveal>
-        <Services />
-      </SectionReveal>
+      {/* Serviços fora do SectionReveal: a lista agora tem botões interativos
+          (setas que abrem o pop-up) e o reveal esconderia o conteúdo. */}
+      <Services />
 
       <SectionReveal>
         <Pricing />
