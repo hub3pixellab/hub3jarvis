@@ -3365,6 +3365,8 @@ export type Database = {
           analysis_key: string
           content: string
           created_at: string
+          document_path: string | null
+          form_data: Json | null
           id: string
           model: string | null
           plan_key: string | null
@@ -3376,6 +3378,8 @@ export type Database = {
           analysis_key: string
           content: string
           created_at?: string
+          document_path?: string | null
+          form_data?: Json | null
           id?: string
           model?: string | null
           plan_key?: string | null
@@ -3387,6 +3391,8 @@ export type Database = {
           analysis_key?: string
           content?: string
           created_at?: string
+          document_path?: string | null
+          form_data?: Json | null
           id?: string
           model?: string | null
           plan_key?: string | null

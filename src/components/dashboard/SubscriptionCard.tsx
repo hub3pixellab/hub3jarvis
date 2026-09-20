@@ -4,18 +4,20 @@ import { ChevronRight, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/auth-context";
-import { useActiveSubscription } from "@/hooks/useSubscription";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import { SubscriptionDialog } from "@/components/dashboard/SubscriptionDialog";
 
 /**
- * Resumo do plano de assinatura. Ao clicar, abre o pop-up com os detalhes
- * completos da assinatura atual.
+ * Resumo do plano vigente. Ao clicar, abre o pop-up com os detalhes
+ * do plano de assinatura / pacote ativo.
  */
 export function SubscriptionCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { data: subscription, isLoading } = useActiveSubscription(user?.id);
+  const { data: entitlements, isLoading } = useEntitlements(Boolean(user));
   const [open, setOpen] = useState(false);
+
+  const planName = entitlements?.has_plan ? entitlements.plan_name : null;
 
   return (
     <>
@@ -38,12 +40,10 @@ export function SubscriptionCard() {
               <>
                 <span className="flex flex-col">
                   <span className="font-cinzel text-2xl text-gold-gradient">
-                    {subscription
-                      ? subscription.plan_name
-                      : t("dashboard.subscriptionNone")}
+                    {planName ?? t("dashboard.subscriptionNone")}
                   </span>
                   <span className="font-jost text-[11px] text-cream/50">
-                    {subscription
+                    {planName
                       ? t("subscriptionCard.detailsCta")
                       : t("dashboard.subscriptionCta")}
                   </span>
