@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Sparkle } from "lucide-react";
+import { Loader2, MessageCircle, Sparkle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/auth-context";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,9 +35,10 @@ type SignupValues = z.infer<typeof signupSchema>;
 
 export default function AuthPage() {
   const { t, i18n } = useTranslation();
-  const { user, initializing, signIn, signUp } = useAuth();
+  const { user, initializing, signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<"login" | "signup">("login");
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const loginForm = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -84,6 +85,19 @@ export default function AuthPage() {
     }
   };
 
+  const onGoogle = async () => {
+    try {
+      setGoogleLoading(true);
+      await signInWithGoogle();
+      // O OAuth redireciona o navegador; se retornar sem erro, segue para a área.
+      navigate("/dashboard", { replace: true });
+    } catch {
+      toast.error(t("auth.errorGeneric"));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   if (initializing) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-navy-deep">
@@ -120,6 +134,30 @@ export default function AuthPage() {
         </div>
 
         <div className={cardCls}>
+          {/* Login com Google — disponível para os dois modos */}
+          <div className="border-b border-gold/15 p-6 md:p-8">
+            <button
+              type="button"
+              onClick={() => void onGoogle()}
+              disabled={googleLoading}
+              className="flex w-full items-center justify-center gap-3 rounded-full border border-cream/25 px-5 py-3 font-jost text-xs uppercase tracking-[0.3em] text-cream transition hover:border-gold hover:bg-gold/10 hover:text-gold disabled:opacity-60"
+            >
+              {googleLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
+              ) : (
+                <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
+              )}
+              {t("auth.googleButton")}
+            </button>
+            <div className="mt-4 flex items-center gap-3">
+              <span className="h-px flex-1 bg-gold/15" />
+              <span className="font-jost text-[9px] uppercase tracking-[0.3em] text-cream/40">
+                {t("auth.orDivider")}
+              </span>
+              <span className="h-px flex-1 bg-gold/15" />
+            </div>
+          </div>
+
           <Tabs value={tab} onValueChange={(v) => setTab(v as "login" | "signup")}>
             <TabsList className="grid w-full grid-cols-2 border-b border-gold/15 bg-transparent p-0">
               <TabsTrigger

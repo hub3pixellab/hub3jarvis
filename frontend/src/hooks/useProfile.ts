@@ -23,7 +23,9 @@ export function useUpdateProfile() {
       patch,
     }: {
       userId: string;
-      patch: Partial<Pick<Profile, "display_name" | "bio" | "birth_date" | "locale">>;
+      patch: Partial<
+        Pick<Profile, "display_name" | "bio" | "birth_date" | "locale" | "phone">
+      >;
     }) => upsertProfile(userId, patch),
     onSuccess: (updated) => {
       void queryClient.setQueryData(["profile", updated.id], updated);

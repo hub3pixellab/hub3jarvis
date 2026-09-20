@@ -3,6 +3,7 @@ import { MessagesSquare } from "lucide-react";
 import { IdentityCard } from "@/components/dashboard/IdentityCard";
 import { HoroscopeCard } from "@/components/dashboard/HoroscopeCard";
 import { AnalysesTeaser } from "@/components/dashboard/AnalysesTeaser";
+import { WhatsAppConnect } from "@/components/dashboard/WhatsAppConnect";
 import { PurchasesCard } from "@/components/dashboard/PurchasesCard";
 import { SubscriptionCard } from "@/components/dashboard/SubscriptionCard";
 import Terminal from "@/components/agnes/Terminal";
@@ -27,6 +28,8 @@ export default function DashboardPage() {
       <HoroscopeCard />
 
       <AnalysesTeaser />
+
+      <WhatsAppConnect />
 
       <Card className="border-gold/20 bg-card">
         <CardHeader className="border-b border-gold/10 pb-3">
