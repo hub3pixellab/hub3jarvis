@@ -7,12 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 const PLANS = [
   {
     nameKey: "pricing.p1Name",
-    price: "R$ 17",
+    price: "R$ 27",
     periodKey: "pricing.p1Period",
     descKey: "pricing.p1Desc",
-    features: ["pricing.p1f1", "pricing.p1f2", "pricing.p1f3"],
+    features: ["pricing.p1f1", "pricing.p1f2", "pricing.p1f3", "pricing.p1f4"],
     featured: false,
-    productId: "prod_VIPSTE2jPvpulW",
+    productId: "prod_VIQIXsdnf9oHok",
   },
   {
     nameKey: "pricing.p2Name",
@@ -21,16 +21,25 @@ const PLANS = [
     descKey: "pricing.p2Desc",
     features: ["pricing.p2f1", "pricing.p2f2", "pricing.p2f3", "pricing.p2f4"],
     featured: true,
-    productId: "prod_VIPSYxrjRH8vci",
+    productId: "prod_VIQIzK9y0IFKMQ",
   },
   {
     nameKey: "pricing.p3Name",
     price: "R$ 97",
     periodKey: "pricing.p3Period",
     descKey: "pricing.p3Desc",
-    features: ["pricing.p3f1", "pricing.p3f2", "pricing.p3f3"],
+    features: ["pricing.p3f1", "pricing.p3f2", "pricing.p3f3", "pricing.p3f4"],
     featured: false,
-    productId: "prod_VDub44DMiyL80u",
+    productId: "prod_VIQIULwW1OFQlH",
+  },
+  {
+    nameKey: "pricing.p4Name",
+    price: "R$ 470",
+    periodKey: "pricing.p4Period",
+    descKey: "pricing.p4Desc",
+    features: ["pricing.p4f1", "pricing.p4f2", "pricing.p4f3", "pricing.p4f4"],
+    featured: false,
+    productId: "prod_VIQI9kiyFhbk0o",
   },
 ];
 
@@ -94,7 +103,7 @@ const Pricing = () => {
           </p>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
           {PLANS.map((plan) => (
             <article
               key={plan.nameKey}

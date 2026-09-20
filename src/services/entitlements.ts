@@ -10,6 +10,8 @@ export interface Entitlements {
   analyses_avulsas?: string[];
   weekly_available?: boolean;
   weekly_used?: number;
+  /** Ciclo Contínuo: perguntas no terminal com prioridade (sem contagem). */
+  terminal_priority?: boolean;
 }
 
 type RpcResult = {

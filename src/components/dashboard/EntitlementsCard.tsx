@@ -43,16 +43,16 @@ export function EntitlementsCard() {
   const [busyKey, setBusyKey] = useState<string | null>(null);
 
   const hasPlan = entitlements?.has_plan;
-  const analyses =
-    entitlements?.plan_key === "assinatura97"
-      ? ANALYSES // assinatura libera qualquer análise, com limite semanal
-      : ANALYSES.filter((a) =>
-          (entitlements?.analyses_avulsas ?? []).includes(a.key),
-        );
-  const weekly = entitlements?.plan_key === "assinatura97";
+  const isCiclo = entitlements?.plan_key === "ciclo97";
+  const analyses = isCiclo
+    ? ANALYSES // ciclo libera qualquer análise, com ritmo de 1 por semana
+    : ANALYSES.filter((a) =>
+        (entitlements?.analyses_avulsas ?? []).includes(a.key),
+      );
   const weeklyAvailable = Boolean(entitlements?.weekly_available);
   const compatRemaining = entitlements?.compatibility_remaining ?? 0;
   const questionsRemaining = entitlements?.questions_remaining ?? 0;
+  const terminalPriority = Boolean(entitlements?.terminal_priority);
 
   const requestAnalysis = async (analysisKey: string, name: string) => {
     if (busyKey) return;
@@ -61,7 +61,11 @@ export function EntitlementsCard() {
       const result = await consumeAnalysis(analysisKey);
       if (!result.ok) {
         toast.error(
-          t(result.error === "weekly_limit" ? "entitlements.weeklyUsed" : "entitlements.error"),
+          t(
+            result.error === "weekly_limit"
+              ? "entitlements.weeklyUsed"
+              : "entitlements.error",
+          ),
         );
         return;
       }
@@ -89,7 +93,10 @@ export function EntitlementsCard() {
       }
       invalidate();
       window.open(
-        buildWhatsAppLink(undefined, WHATSAPP_MESSAGES.analysisRequest(t("services.s4Name"))),
+        buildWhatsAppLink(
+          undefined,
+          WHATSAPP_MESSAGES.analysisRequest(t("services.s4Name")),
+        ),
         "_blank",
         "noopener,noreferrer",
       );
@@ -129,21 +136,27 @@ export function EntitlementsCard() {
         ) : (
           <>
             {/* Plano atual */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge className="border-gold/50 bg-royal/40 font-jost text-xs text-gold">
                 {entitlements.plan_name}
               </Badge>
-              <span className="font-jost text-xs text-cream/55">
-                {t("entitlements.questionsLeft", {
-                  count: questionsRemaining,
-                })}
-              </span>
-              {weekly && (
+              {terminalPriority ? (
+                <span className="font-jost text-xs text-cream/55">
+                  {t("entitlements.priorityHint")}
+                </span>
+              ) : (
+                <span className="font-jost text-xs text-cream/55">
+                  {t("entitlements.questionsLeft", {
+                    count: questionsRemaining,
+                  })}
+                </span>
+              )}
+              {isCiclo && (
                 <span className="font-jost text-xs text-cream/55">
                   {t("entitlements.weeklyHint")}
                 </span>
               )}
-              {weekly && compatRemaining > 0 && (
+              {compatRemaining > 0 && (
                 <span className="font-jost text-xs text-cream/55">
                   {t("entitlements.compatLeft", { count: compatRemaining })}
                 </span>
@@ -155,7 +168,7 @@ export function EntitlementsCard() {
               <ul className="flex flex-col gap-2">
                 {analyses.map(({ key, nameKey, Icon }) => {
                   const disabled =
-                    (weekly && !weeklyAvailable) || busyKey !== null;
+                    (isCiclo && !weeklyAvailable) || busyKey !== null;
                   return (
                     <li key={key} className="flex items-center gap-3">
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
@@ -166,16 +179,20 @@ export function EntitlementsCard() {
                       </span>
                       <button
                         type="button"
-                        onClick={() =>
-                          void requestAnalysis(key, t(nameKey))
-                        }
+                        onClick={() => void requestAnalysis(key, t(nameKey))}
                         disabled={disabled}
                         className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gold px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] text-navy-deep transition hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {busyKey === key ? (
-                          <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.5} />
+                          <Loader2
+                            className="h-3 w-3 animate-spin"
+                            strokeWidth={1.5}
+                          />
                         ) : (
-                          <MessageCircle className="h-3 w-3" strokeWidth={1.5} />
+                          <MessageCircle
+                            className="h-3 w-3"
+                            strokeWidth={1.5}
+                          />
                         )}
                         {t("entitlements.receiveCta")}
                       </button>
@@ -185,8 +202,8 @@ export function EntitlementsCard() {
               </ul>
             )}
 
-            {/* Compatibilidade (apenas assinatura) */}
-            {weekly && (
+            {/* Compatibilidade (todos os planos) */}
+            {compatRemaining > 0 && (
               <div className="flex items-center gap-3 border-t border-gold/10 pt-4">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
                   <Heart className="h-3.5 w-3.5" strokeWidth={1.25} />
@@ -202,11 +219,14 @@ export function EntitlementsCard() {
                 <button
                   type="button"
                   onClick={() => void requestCompatibility()}
-                  disabled={compatRemaining <= 0 || busyKey !== null}
+                  disabled={busyKey !== null}
                   className="inline-flex shrink-0 items-center gap-2 rounded-full border border-gold/50 px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] text-gold transition hover:bg-gold/10 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {busyKey === "compat" ? (
-                    <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.5} />
+                    <Loader2
+                      className="h-3 w-3 animate-spin"
+                      strokeWidth={1.5}
+                    />
                   ) : (
                     <MessageCircle className="h-3 w-3" strokeWidth={1.5} />
                   )}

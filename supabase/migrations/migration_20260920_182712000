@@ -1,0 +1,133 @@
+create or replace function public.grant_plan_entitlements(p_user_id uuid, p_product_id text)
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_plan_key text;
+  v_plan_name text;
+  v_questions integer;
+  v_compat integer;
+  v_analyses jsonb;
+begin
+  if p_user_id is null then
+    return;
+  end if;
+
+  -- Mapa Essencial (R$27) — Mapa Natal + 3 perguntas + 1 compatibilidade
+  if p_product_id = 'prod_VIQIXsdnf9oHok' then
+    v_plan_key := 'essencial27';
+    v_plan_name := 'Mapa Essencial';
+    v_questions := 3;
+    v_compat := 1;
+    v_analyses := '["s1"]'::jsonb;
+  -- Pacote Mestre Completo (R$147) — as 5 análises + 10 perguntas + 1 compatibilidade
+  elsif p_product_id = 'prod_VIQIzK9y0IFKMQ' then
+    v_plan_key := 'mestre147';
+    v_plan_name := 'Pacote Mestre Completo';
+    v_questions := 10;
+    v_compat := 1;
+    v_analyses := '["s1","s2","s3","s4","s5"]'::jsonb;
+  -- Ciclo Contínuo (R$97/mês) — acesso contínuo (1 análise/semana) + 4 compatibilidades + prioridade
+  elsif p_product_id = 'prod_VIQIULwW1OFQlH' then
+    v_plan_key := 'ciclo97';
+    v_plan_name := 'Ciclo Contínuo';
+    v_questions := 0;
+    v_compat := 4;
+    v_analyses := '[]'::jsonb;
+  -- Jornada Anual (R$470/ano) — todo o Pacote Mestre + acesso anual
+  elsif p_product_id = 'prod_VIQI9kiyFhbk0o' then
+    v_plan_key := 'anual470';
+    v_plan_name := 'Jornada Anual';
+    v_questions := 10;
+    v_compat := 1;
+    v_analyses := '["s1","s2","s3","s4","s5"]'::jsonb;
+  else
+    return;
+  end if;
+
+  insert into public.user_entitlements (user_id, plan_key, plan_name, questions_remaining, compatibility_remaining, analyses_avulsas)
+  values (p_user_id, v_plan_key, v_plan_name, v_questions, v_compat, v_analyses)
+  on conflict (user_id)
+  do update set
+    plan_key = excluded.plan_key,
+    plan_name = excluded.plan_name,
+    questions_remaining = excluded.questions_remaining,
+    compatibility_remaining = excluded.compatibility_remaining,
+    analyses_avulsas = excluded.analyses_avulsas,
+    updated_at = now();
+end;
+$$;
+
+revoke execute on function public.grant_plan_entitlements(uuid, text) from public, anon, authenticated;
+grant execute on function public.grant_plan_entitlements(uuid, text) to service_role;
+
+create or replace function public.get_my_entitlements()
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_row public.user_entitlements%rowtype;
+  v_current_week text := to_char(current_date, 'IYYY-IW');
+begin
+  select * into v_row from public.user_entitlements where user_id = auth.uid();
+  if not found then
+    return jsonb_build_object('has_plan', false);
+  end if;
+  return jsonb_build_object(
+    'has_plan', true,
+    'plan_key', v_row.plan_key,
+    'plan_name', v_row.plan_name,
+    'questions_remaining', v_row.questions_remaining,
+    'compatibility_remaining', v_row.compatibility_remaining,
+    'analyses_avulsas', v_row.analyses_avulsas,
+    'weekly_available', v_row.plan_key = 'ciclo97' and (coalesce(v_row.weekly_week, '') <> v_current_week or v_row.weekly_used < 1),
+    'weekly_used', case when v_row.plan_key = 'ciclo97' then v_row.weekly_used else 0 end,
+    'terminal_priority', v_row.plan_key = 'ciclo97'
+  );
+end;
+$$;
+
+revoke execute on function public.get_my_entitlements() from public, anon;
+grant execute on function public.get_my_entitlements() to authenticated;
+
+create or replace function public.consume_analysis(p_analysis_key text)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_row public.user_entitlements%rowtype;
+  v_current_week text := to_char(current_date, 'IYYY-IW');
+begin
+  select * into v_row from public.user_entitlements where user_id = auth.uid();
+  if not found then
+    return jsonb_build_object('ok', false, 'error', 'no_plan');
+  end if;
+
+  -- Análise avulsa comprada (Essencial, Pacote, Anual): remove da lista se existir
+  if v_row.analyses_avulsas ? p_analysis_key then
+    update public.user_entitlements
+       set analyses_avulsas = v_row.analyses_avulsas - p_analysis_key, updated_at = now()
+     where user_id = auth.uid();
+    return jsonb_build_object('ok', true, 'kind', 'avulsa');
+  end if;
+
+  -- Ciclo Contínuo: acesso contínuo com limite de 1 análise por semana
+  if v_row.plan_key = 'ciclo97' then
+    if v_row.weekly_week = v_current_week and v_row.weekly_used >= 1 then
+      return jsonb_build_object('ok', false, 'error', 'weekly_limit');
+    end if;
+    update public.user_entitlements
+       set weekly_week = v_current_week, weekly_used = 1, updated_at = now()
+     where user_id = auth.uid();
+    return jsonb_build_object('ok', true, 'kind', 'semanal');
+  end if;
+
+  return jsonb_build_object('ok', false, 'error', 'not_available');
+end;
+$$;
+
+revoke execute on function public.consume_analysis(text) from public, anon;
+grant execute on function public.consume_analysis(text) to authenticated;
