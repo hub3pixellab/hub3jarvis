@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ArrowUpRight,
@@ -5,10 +6,20 @@ import {
   Compass,
   Hash,
   Heart,
+  Sparkle,
   Triangle,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
-const SERVICES = [
+interface ServiceDetail {
+  n: string;
+  nameKey: string;
+  tagKey: string;
+  descKey: string;
+  icon: typeof Compass;
+}
+
+const SERVICES: ServiceDetail[] = [
   {
     n: "I",
     nameKey: "services.s1Name",
@@ -46,8 +57,27 @@ const SERVICES = [
   },
 ];
 
+/** Divide uma lista de itens separados por quebras de linha. */
+const toLines = (text: string) =>
+  text
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
 const Services = () => {
   const { t } = useTranslation();
+  const [selected, setSelected] = useState<ServiceDetail | null>(null);
+
+  const detail = selected
+    ? {
+        what: t(`services.s${SERVICES.indexOf(selected) + 1}Detail.what`),
+        input: toLines(t(`services.s${SERVICES.indexOf(selected) + 1}Detail.input`)),
+        tech: toLines(t(`services.s${SERVICES.indexOf(selected) + 1}Detail.tech`)),
+        result: toLines(
+          t(`services.s${SERVICES.indexOf(selected) + 1}Detail.result`),
+        ),
+      }
+    : null;
 
   return (
     <section
@@ -97,7 +127,7 @@ const Services = () => {
           {SERVICES.map((s) => (
             <article
               key={s.n}
-              className="group grid grid-cols-[auto_minmax(0,1fr)] items-center gap-6 border-b border-gold/15 py-8 transition-colors duration-500 hover:bg-gradient-to-r hover:from-royal/30 hover:to-transparent md:grid-cols-[64px_72px_minmax(0,1fr)_minmax(0,1.2fr)_auto] md:gap-8 md:px-4"
+              className="group flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-gold/15 py-8 transition-colors duration-500 hover:bg-gradient-to-r hover:from-royal/30 hover:to-transparent md:grid md:grid-cols-[64px_72px_minmax(0,1fr)_minmax(0,1.2fr)_auto] md:gap-8 md:px-4"
             >
               <span className="font-cinzel text-2xl text-gold/60 transition-colors group-hover:text-gold md:text-3xl">
                 {s.n}
@@ -105,7 +135,7 @@ const Services = () => {
               <span className="flex h-12 w-12 items-center justify-center rounded-full border border-gold/30 text-gold transition group-hover:border-gold group-hover:shadow-[0_0_18px_hsl(var(--gold)/0.3)]">
                 <s.icon className="h-5 w-5" strokeWidth={1.25} />
               </span>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1 basis-40 md:flex-none">
                 <h3 className="font-cinzel text-2xl text-cream transition-colors group-hover:text-gold-gradient md:text-3xl">
                   {t(s.nameKey)}
                 </h3>
@@ -116,15 +146,85 @@ const Services = () => {
               <p className="hidden max-w-md font-jost text-sm font-light leading-relaxed tracking-wide text-cream/60 md:block">
                 {t(s.descKey)}
               </p>
-              <span className="hidden h-10 w-10 items-center justify-center justify-self-end rounded-full border border-gold/25 text-gold transition-all duration-500 group-hover:border-gold group-hover:bg-gold group-hover:text-navy-deep group-hover:shadow-[0_0_20px_hsl(var(--gold)/0.4)] md:flex">
+              {/* Seta lateral — abre o pop-up com a explicação */}
+              <button
+                type="button"
+                onClick={() => setSelected(s)}
+                aria-label={t("services.dialog.aria", { name: t(s.nameKey) })}
+                title={t("services.dialog.aria", { name: t(s.nameKey) })}
+                className="ml-auto flex h-11 w-11 items-center justify-center rounded-full border border-gold/25 text-gold transition-all duration-500 hover:border-gold hover:bg-gold hover:text-navy-deep hover:shadow-[0_0_20px_hsl(var(--gold)/0.4)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold md:ml-0 md:justify-self-end"
+              >
                 <ArrowUpRight className="h-4 w-4" strokeWidth={1.25} />
-              </span>
+              </button>
             </article>
           ))}
         </div>
       </div>
+
+      {/* Pop-up com a explicação do serviço */}
+      <Dialog open={selected !== null} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto border-gold/30 bg-navy p-0 text-cream">
+          {selected && detail && (
+            <div className="flex flex-col gap-5 p-6 md:p-8">
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/40 bg-royal/40 text-gold">
+                  <selected.icon className="h-5 w-5" strokeWidth={1.25} />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-jost text-[10px] uppercase tracking-[0.35em] text-gold/70">
+                    {t(selected.tagKey)}
+                  </p>
+                  <DialogTitle className="mt-1 font-cinzel text-2xl text-cream md:text-3xl">
+                    {t(selected.nameKey)}
+                  </DialogTitle>
+                </div>
+              </div>
+
+              <DetailBlock label={t("services.dialog.what")} paragraphs={[detail.what]} />
+
+              <DetailBlock label={t("services.dialog.input")} bullets={detail.input} />
+
+              <DetailBlock label={t("services.dialog.tech")} bullets={detail.tech} />
+
+              <DetailBlock label={t("services.dialog.result")} bullets={detail.result} />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
+
+const DetailBlock = ({
+  label,
+  paragraphs = [],
+  bullets = [],
+}: {
+  label: string;
+  paragraphs?: string[];
+  bullets?: string[];
+}) => (
+  <div className="border-t border-gold/15 pt-4">
+    <p className="flex items-center gap-2 font-jost text-[10px] uppercase tracking-[0.35em] text-gold/80">
+      <Sparkle className="h-3 w-3 text-gold/70" strokeWidth={1.5} />
+      {label}
+    </p>
+    {paragraphs.map((p, i) => (
+      <p key={i} className="mt-3 font-jost text-sm leading-relaxed tracking-wide text-cream/80">
+        {p}
+      </p>
+    ))}
+    {bullets.length > 0 && (
+      <ul className="mt-3 flex flex-col gap-2">
+        {bullets.map((b, i) => (
+          <li key={i} className="flex gap-3 font-jost text-sm font-light leading-relaxed tracking-wide text-cream/70">
+            <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold" />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+);
 
 export default Services;
