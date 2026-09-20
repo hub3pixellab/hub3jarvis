@@ -47,19 +47,38 @@ def humanizar_texto(texto):
     if not texto:
         return texto
     t = texto
-    t = re.sub(r"^#{1,6}\s*", "", t, flags=re.MULTILINE)
-    t = re.sub(r"\*\*(.+?)\*\*", r"", t)
-    t = re.sub(r"__(.+?)__", r"", t)
-    t = re.sub(r"^[ 	]*[-*+]\s+", "", t, flags=re.MULTILINE)
-    t = re.sub(r"^[ 	]*\d+[.)]\s+", "", t, flags=re.MULTILINE)
-    t = re.sub(r"^[ 	]*\|.*\|[ 	]*$", "", t, flags=re.MULTILINE)
-    t = re.sub(r"^[ 	]*\|[\-\s|]*\|[ 	]*$", "", t, flags=re.MULTILINE)
-    t = re.sub(r"^[ 	]*>+[ 	]*", "", t, flags=re.MULTILINE)
-    t = re.sub(r"^[ 	]*[-_=]{3,}[ 	]*$", "", t, flags=re.MULTILINE)
-    t = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"", t)
-    t = re.sub(r"`([^`]*)`", r"", t)
+    # Cabecalhos: "## Titulo" -> "Titulo"
+    t = re.sub(r"^[ \t]*#{1,6}[ \t]*", "", t, flags=re.MULTILINE)
+    # Negrito/itálico: mantem o texto, remove so os marcadores
+    t = re.sub(r"\*\*(.+?)\*\*", r"\1", t, flags=re.DOTALL)
+    t = re.sub(r"__(.+?)__", r"\1", t, flags=re.DOTALL)
+    t = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"\1", t)
+    t = re.sub(r"(?<!_)_([^_\n]+)_(?!_)", r"\1", t)
+    # Linha separadora de tabela: |---|---|
+    t = re.sub(r"^[ \t]*\|?[ \t]*:?-{2,}:?[ \t]*(\|[ \t]*:?-{2,}:?[ \t]*)*\|?[ \t]*$", "", t, flags=re.MULTILINE)
+    # Linhas de tabela: "| a | b |" -> "a — b" (prosa corrida)
+    def _tabela(m):
+        celulas = [c.strip() for c in m.group(0).strip().strip("|").split("|")]
+        celulas = [c for c in celulas if c]
+        return " — ".join(celulas)
+    t = re.sub(r"^[ \t]*\|.*\|[ \t]*$", _tabela, t, flags=re.MULTILINE)
+    # Listas: "- item", "* item", "1. item" -> "item"
+    t = re.sub(r"^[ \t]*[-*+][ \t]+", "", t, flags=re.MULTILINE)
+    t = re.sub(r"^[ \t]*\d+[.)][ \t]+", "", t, flags=re.MULTILINE)
+    # Blockquote: "> texto" -> "texto"
+    t = re.sub(r"^[ \t]*>[ \t]*", "", t, flags=re.MULTILINE)
+    # Linhas separadoras: ---, ===, ***
+    t = re.sub(r"^[ \t]*[-_=*]{3,}[ \t]*$", "", t, flags=re.MULTILINE)
+    # Links: [texto](url) -> texto
+    t = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", t)
+    # Codigo inline: `texto` -> texto
+    t = re.sub(r"`([^`]*)`", r"\1", t)
+    # Espacos multiplos
+    t = re.sub(r"[ \t]{2,}", " ", t)
+    # Linhas em branco em excesso
     t = re.sub(r"\n{3,}", "\n\n", t)
-    t = re.sub(r"[ 	]+$", "", t, flags=re.MULTILINE)
+    t = re.sub(r"[ \t]+$", "", t, flags=re.MULTILINE)
+    # Terminologia e genero (mantem as regras existentes)
     t = t.replace("mapa astral", "mapa natal")
     t = t.replace("astral", "natal")
     for a, b in [
