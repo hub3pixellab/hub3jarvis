@@ -21,6 +21,8 @@ export interface Profile {
   zodiac_sign: string | null;
   avatar_url: string | null;
   locale: string;
+  /** WhatsApp do usuário (somente dígitos, DDI+DDD+número) — usado na conexão com o terminal. */
+  phone: string | null;
   created_at: string;
   updated_at: string;
 }

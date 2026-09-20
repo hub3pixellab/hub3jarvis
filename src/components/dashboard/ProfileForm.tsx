@@ -19,6 +19,7 @@ import { useUpdateProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/auth-context";
 import { getZodiacSign } from "@/lib/zodiac";
 import { getChineseZodiacSign } from "@/lib/chineseZodiac";
+import { normalizePhone } from "@/lib/whatsapp";
 import { languageOptions } from "@/i18n/config";
 import type { Profile } from "@/domain/models";
 
@@ -26,6 +27,14 @@ const profileSchema = z.object({
   display_name: z.string().trim().min(2).max(60).optional().or(z.literal("")),
   bio: z.string().trim().max(500).optional().or(z.literal("")),
   birth_date: z.string().optional().or(z.literal("")),
+  phone: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || /^\+?[0-9\s()-]{10,20}$/.test(v), {
+      message: "profile.errorPhone",
+    })
+    .optional()
+    .or(z.literal("")),
   locale: z.string(),
 });
 
@@ -47,6 +56,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         display_name: profile?.display_name ?? "",
         bio: profile?.bio ?? "",
         birth_date: profile?.birth_date ?? "",
+        phone: profile?.phone ?? "",
         locale: profile?.locale ?? i18n.resolvedLanguage ?? "pt-BR",
       },
     });
@@ -64,6 +74,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           display_name: values.display_name || null,
           bio: values.bio || null,
           birth_date: values.birth_date || null,
+          phone: values.phone ? normalizePhone(values.phone) : null,
           locale: values.locale,
         },
       });
@@ -124,6 +135,24 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="phone">{t("profile.phoneLabel")}</Label>
+          <Input
+            id="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder={t("profile.phonePlaceholder")}
+            className="border-gold/25 bg-navy/60 text-cream placeholder:text-cream/35 focus:border-gold"
+            {...register("phone")}
+          />
+          {formState.errors.phone ? (
+            <p className="text-xs text-destructive">{t("profile.errorPhone")}</p>
+          ) : (
+            <p className="text-[11px] text-cream/45">{t("profile.phoneHint")}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
