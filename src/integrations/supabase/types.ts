@@ -3360,6 +3360,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      delivered_analyses: {
+        Row: {
+          analysis_key: string
+          content: string
+          created_at: string
+          id: string
+          model: string | null
+          plan_key: string | null
+          product_name: string | null
+          provider: string | null
+          user_id: string
+        }
+        Insert: {
+          analysis_key: string
+          content: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          plan_key?: string | null
+          product_name?: string | null
+          provider?: string | null
+          user_id: string
+        }
+        Update: {
+          analysis_key?: string
+          content?: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          plan_key?: string | null
+          product_name?: string | null
+          provider?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string
