@@ -48,14 +48,17 @@ Deno.serve(async (req)=>{
       });
     }
     const product = await stripe.products.retrieve(productId);
+    const price = prices.data[0];
+    // Um preço recorrente exige mode 'subscription'; avulso usa 'payment'.
+    const mode = price.recurring ? 'subscription' : 'payment';
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price: prices.data[0].id,
+          price: price.id,
           quantity: 1
         }
       ],
-      mode: 'payment',
+      mode,
       success_url: successUrl,
       cancel_url: cancelUrl,
       // Metadata drives the webhook: which analysis was bought and (when
