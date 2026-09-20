@@ -518,5 +518,7 @@
   "hero.storeSoonEyebrow": "Application Maître Agnes",
   "hero.storeSoonTitle": "Bientôt disponible",
   "hero.storeSoonText": "Notre application arrive. Bientôt, vous pourrez télécharger Maître Agnes sur Google Play et l'App Store.",
-  "hero.storeSoonClose": "Compris"
+  "hero.storeSoonClose": "Compris",
+  "footer.appTitle": "Téléchargez l'application",
+  "dashboard.appTitle": "Application Maître Agnes"
 }

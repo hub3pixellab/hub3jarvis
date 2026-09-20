@@ -518,5 +518,7 @@
   "hero.storeSoonEyebrow": "Aplicación Maestro Agnes",
   "hero.storeSoonTitle": "Próximamente",
   "hero.storeSoonText": "Nuestra aplicación está en camino. Pronto podrás descargar al Maestro Agnes en Google Play y en la App Store.",
-  "hero.storeSoonClose": "Entendido"
+  "hero.storeSoonClose": "Entendido",
+  "footer.appTitle": "Descarga la aplicación",
+  "dashboard.appTitle": "Aplicación Maestro Agnes"
 }

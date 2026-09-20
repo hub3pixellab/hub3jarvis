@@ -518,5 +518,7 @@
   "hero.storeSoonEyebrow": "Master Agnes App",
   "hero.storeSoonTitle": "Coming soon",
   "hero.storeSoonText": "Our app is on the way. Soon you'll be able to download Master Agnes on Google Play and the App Store.",
-  "hero.storeSoonClose": "Got it"
+  "hero.storeSoonClose": "Got it",
+  "footer.appTitle": "Download the app",
+  "dashboard.appTitle": "Master Agnes App"
 }

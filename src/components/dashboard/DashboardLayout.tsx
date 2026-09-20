@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/auth-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AppStoreButtons } from "@/components/agnes/AppStoreButtons";
 import {
   Sheet,
   SheetContent,
@@ -115,6 +116,16 @@ function SignOutButton({ className = "" }: { className?: string }) {
   );
 }
 
+/** Título curto acima dos botões das lojas. */
+function AppTitle() {
+  const { t } = useTranslation();
+  return (
+    <p className="font-jost text-[10px] uppercase tracking-[0.35em] text-cream/40">
+      {t("dashboard.appTitle")}
+    </p>
+  );
+}
+
 function FullPageSkeleton() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-navy-deep">
@@ -148,7 +159,11 @@ export default function DashboardLayout() {
         <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-8 border-r border-gold/15 bg-navy p-6 lg:flex">
           <Brand />
           <NavList />
-          <SignOutButton className="mt-auto justify-start" />
+          <div className="mt-auto flex flex-col gap-3">
+            <AppTitle />
+            <AppStoreButtons size="sm" />
+            <SignOutButton className="justify-start" />
+          </div>
         </aside>
 
         {/* Main column */}
@@ -177,6 +192,10 @@ export default function DashboardLayout() {
                   </SheetHeader>
                   <div className="flex flex-col gap-6 pt-6">
                     <NavList onNavigate={() => setMenuOpen(false)} />
+                    <div className="flex flex-col gap-3">
+                      <AppTitle />
+                      <AppStoreButtons size="sm" />
+                    </div>
                     <SignOutButton className="justify-start" />
                   </div>
                 </SheetContent>

@@ -33,9 +33,13 @@ function AndroidLogo({ className = "" }: { className?: string }) {
  * Botões das lojas de aplicativos (Google Play e App Store).
  * Ainda não publicados: o clique abre um pop-up "em breve".
  */
-export function AppStoreButtons() {
+export function AppStoreButtons({ size = "md" }: { size?: "sm" | "md" }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+
+  const btn =
+    size === "sm" ? "h-10 w-10" : "h-12 w-12";
+  const icon = size === "sm" ? "h-4 w-4" : "h-5 w-5";
 
   return (
     <>
@@ -45,18 +49,18 @@ export function AppStoreButtons() {
           onClick={() => setOpen(true)}
           aria-label={t("hero.storeAriaAndroid")}
           title={t("hero.storeAriaAndroid")}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 text-cream/80 transition hover:border-gold hover:text-gold hover:shadow-[0_0_20px_hsl(var(--gold)/0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+          className={`inline-flex ${btn} items-center justify-center rounded-full border border-gold/40 text-cream/80 transition hover:border-gold hover:text-gold hover:shadow-[0_0_20px_hsl(var(--gold)/0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold`}
         >
-          <AndroidLogo className="h-5 w-5" />
+          <AndroidLogo className={icon} />
         </button>
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label={t("hero.storeAriaIos")}
           title={t("hero.storeAriaIos")}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-gold/40 text-cream/80 transition hover:border-gold hover:text-gold hover:shadow-[0_0_20px_hsl(var(--gold)/0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+          className={`inline-flex ${btn} items-center justify-center rounded-full border border-gold/40 text-cream/80 transition hover:border-gold hover:text-gold hover:shadow-[0_0_20px_hsl(var(--gold)/0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold`}
         >
-          <Apple className="h-5 w-5" strokeWidth={1.5} />
+          <Apple className={icon} strokeWidth={1.5} />
         </button>
       </div>
 
