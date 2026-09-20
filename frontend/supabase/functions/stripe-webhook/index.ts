@@ -78,5 +78,21 @@ Deno.serve(async (req) => {
     return json({ error: 'Falha ao registrar compra' }, 500);
   }
 
+  // Grant the plan entitlements (questions, analyses, compatibility) tied to
+  // the purchased product. Only meaningful for a logged-in owner.
+  if (isNew === true && userId && metadata.product_id) {
+    const { error: grantError } = await supabase.rpc(
+      'grant_plan_entitlements',
+      {
+        p_user_id: userId,
+        p_product_id: metadata.product_id,
+      }
+    );
+    if (grantError) {
+      console.error('grant_plan_entitlements failed:', grantError.message);
+      return json({ error: 'Falha ao conceder plano' }, 500);
+    }
+  }
+
   return json({ received: true, new: isNew === true });
 });

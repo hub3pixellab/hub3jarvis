@@ -3,6 +3,7 @@ import { MessagesSquare } from "lucide-react";
 import { IdentityCard } from "@/components/dashboard/IdentityCard";
 import { HoroscopeCard } from "@/components/dashboard/HoroscopeCard";
 import { AnalysesTeaser } from "@/components/dashboard/AnalysesTeaser";
+import { EntitlementsCard } from "@/components/dashboard/EntitlementsCard";
 import { WhatsAppConnect } from "@/components/dashboard/WhatsAppConnect";
 import { PurchasesCard } from "@/components/dashboard/PurchasesCard";
 import { SubscriptionCard } from "@/components/dashboard/SubscriptionCard";
@@ -28,6 +29,8 @@ export default function DashboardPage() {
       <HoroscopeCard />
 
       <AnalysesTeaser />
+
+      <EntitlementsCard />
 
       <WhatsAppConnect />
 

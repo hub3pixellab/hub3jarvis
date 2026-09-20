@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Send, Sparkle } from "lucide-react";
+import { useAuth } from "@/hooks/auth-context";
+import { useEntitlements, useInvalidateEntitlements } from "@/hooks/useEntitlements";
+import { consumeTerminalQuestion } from "@/services/entitlements";
 
 const QUICK_QUESTIONS = [
   "terminal.q1",
@@ -27,6 +30,9 @@ interface Message {
  */
 const Terminal = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { data: entitlements } = useEntitlements(Boolean(user));
+  const invalidate = useInvalidateEntitlements();
   const [messages, setMessages] = useState<Message[]>([
     {
       from: "master",
@@ -37,27 +43,49 @@ const Terminal = () => {
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const questionsRemaining = entitlements?.questions_remaining ?? 0;
+  const hasPlan = Boolean(entitlements?.has_plan);
+
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, typing]);
 
-  const ask = (question: string) => {
+  const reply = (text: string) => {
+    setMessages((m) => [...m, { from: "master", text }]);
+    setTyping(false);
+  };
+
+  const ask = async (question: string) => {
     const q = question.trim();
     if (!q || typing) return;
     setMessages((m) => [...m, { from: "user", text: q }]);
     setInput("");
     setTyping(true);
+
+    // Usuário logado sem perguntas restantes: orienta a pedir pelo WhatsApp.
+    if (user && hasPlan && questionsRemaining <= 0) {
+      window.setTimeout(() => reply(t("terminal.noQuestionsLeft")), 900);
+      return;
+    }
+
+    // Usuário logado com plano: cada pergunta consome 1 crédito.
+    if (user && hasPlan) {
+      try {
+        const result = await consumeTerminalQuestion();
+        invalidate();
+        if (!result.ok) {
+          window.setTimeout(() => reply(t("terminal.noQuestionsLeft")), 900);
+          return;
+        }
+      } catch {
+        // Falha de rede: ainda responde, sem descontar.
+      }
+    }
+
     window.setTimeout(() => {
       const replyKey = REPLIES[q] ?? "terminal.rFallback";
-      setMessages((m) => [
-        ...m,
-        {
-          from: "master",
-          text: t(replyKey),
-        },
-      ]);
-      setTyping(false);
+      reply(t(replyKey));
     }, 1400);
   };
 
@@ -81,7 +109,12 @@ const Terminal = () => {
           <span className="font-jost text-[10px] uppercase tracking-[0.4em] text-cream/70">
             {t("terminal.windowTitle")}
           </span>
-          <Sparkle className="h-3.5 w-3.5 text-gold/70" strokeWidth={1.5} />
+          {user && hasPlan && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-royal/40 px-2.5 py-1 font-jost text-[9px] uppercase tracking-[0.2em] text-gold">
+              <Sparkle className="h-2.5 w-2.5" strokeWidth={1.5} />
+              {t("terminal.creditsLeft", { count: questionsRemaining })}
+            </span>
+          )}
         </div>
 
         {/* Messages */}

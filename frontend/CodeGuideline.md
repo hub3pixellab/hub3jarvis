@@ -1,6 +1,4 @@
-git add -A
-git commit -m "feat(zodiaco): adiciona 12 cartas do zodíaco ocidental no estilo Agnes"
-git pull --rebase origin main && git push origin main# Code Guideline
+# Code Guideline
 
 ## Project Structure Overview
 
