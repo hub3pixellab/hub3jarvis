@@ -201,7 +201,7 @@ MESTRES DO ENEAGRAMA: Claudio Naranjo (paixoes/fixacoes, 27 subtipos, psicologia
     resultado = await groq_chat.chat(prompt_usuario, temperature=0.8, max_tokens=3000)
 
     return {
-        "relatorio": resultado.get("resposta", ""),
+        "relatorio": humanizar_texto(resultado.get("resposta", "")),
         "numero_caminho_vida": numero,
         "provider": resultado.get("provider", "unknown"),
         "model": resultado.get("model", "unknown"),
@@ -500,7 +500,7 @@ Escrea de forma humanizada, empatica e com rigor tecnico. Assine no final com: â
     resultado = await groq_chat.chat(prompt_usuario, temperature=0.8, max_tokens=3500)
 
     return {
-        "analise": resultado.get("resposta", ""),
+        "analise": humanizar_texto(resultado.get("resposta", "")),
         "pessoas": [p.nome for p in req.pessoas],
         "caminhos_vida": numeros,
         "provider": resultado.get("provider", "unknown"),
