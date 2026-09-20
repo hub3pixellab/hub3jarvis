@@ -8,7 +8,6 @@ import { useAuth } from "@/hooks/auth-context";
 
 const NAV_ITEMS = [
   { key: "nav.home", href: "#inicio" },
-  { key: "nav.terminal", href: "#terminal" },
   { key: "nav.services", href: "#servicos" },
   { key: "nav.plans", href: "#pagamento" },
   { key: "nav.faq", href: "#faq" },

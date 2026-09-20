@@ -60,7 +60,7 @@ const Hero = () => {
 
           <div className="mt-10 flex flex-wrap items-center gap-5">
             <a
-              href="#terminal"
+              href="#pagamento"
               className="group inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 font-jost text-xs uppercase tracking-[0.3em] text-navy-deep shadow-[0_0_30px_hsl(var(--gold)/0.35)] transition hover:bg-gold-light hover:shadow-[0_0_44px_hsl(var(--gold)/0.55)]"
             >
               {t("hero.ctaPrimary")}

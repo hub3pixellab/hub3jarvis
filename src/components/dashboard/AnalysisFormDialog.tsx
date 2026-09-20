@@ -47,8 +47,12 @@ const FORM_FIELDS: Record<string, FieldDef[]> = {
   s4: [
     { name: "nome_completo", type: "text", required: true },
     { name: "data_nascimento", type: "date", required: true },
+    { name: "hora_nascimento", type: "time" },
+    { name: "cidade_nascimento", type: "text" },
     { name: "parceiro_nome", type: "text", required: true },
     { name: "parceiro_data_nascimento", type: "date", required: true },
+    { name: "parceiro_hora_nascimento", type: "time" },
+    { name: "parceiro_cidade_nascimento", type: "text" },
     { name: "observacoes", type: "textarea" },
   ],
   s5: [

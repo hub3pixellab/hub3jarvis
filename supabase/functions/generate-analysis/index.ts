@@ -27,7 +27,7 @@ const FOCOS: Record<string, { mensagem: string; foco: string; productName: strin
     productName: 'Eneagrama',
   },
   s4: {
-    mensagem: 'Preciso da minha análise de Compatibilidade completa, lendo a sintonia entre dois mapas.',
+    mensagem: 'Preciso do Mapa Astral Combinado (sinastria) entre mim e a outra pessoa: a sintonia dos dois mapas, pontos fortes e desafios da união.',
     foco: 'compatibilidade',
     productName: 'Compatibilidade',
   },
@@ -49,6 +49,8 @@ function buildContext(form: Record<string, unknown> | null): string {
     cidade_nascimento: 'Cidade/país de nascimento',
     parceiro_nome: 'Nome do outro (compatibilidade)',
     parceiro_data_nascimento: 'Data de nascimento do outro',
+    parceiro_hora_nascimento: 'Hora de nascimento do outro',
+    parceiro_cidade_nascimento: 'Cidade/país de nascimento do outro',
     pergunta: 'Dúvida/decisão do cliente',
     observacoes: 'Observações',
   };
