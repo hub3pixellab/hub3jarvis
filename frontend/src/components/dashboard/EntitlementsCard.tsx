@@ -23,7 +23,16 @@ import {
   consumeAnalysis,
   consumeCompatibility,
 } from "@/services/entitlements";
-import { buildWhatsAppLink, WHATSAPP_MESSAGES } from "@/lib/whatsapp";
+import { AnalysisResultDialog } from "@/components/dashboard/AnalysisResultDialog";
+import {
+  generateAnalysis,
+  useDeliveredAnalyses,
+  useInvalidateDeliveries,
+} from "@/hooks/useDeliveries";
+import {
+  buildWhatsAppLink,
+  WHATSAPP_MESSAGES,
+} from "@/lib/whatsapp";
 
 /** As 5 análises do Mestre (chaves i18n em services.s*Name). */
 const ANALYSES = [
@@ -39,45 +48,80 @@ export function EntitlementsCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: entitlements, isLoading } = useEntitlements(Boolean(user));
+  const { data: delivered } = useDeliveredAnalyses(user?.id);
   const invalidate = useInvalidateEntitlements();
+  const invalidateDeliveries = useInvalidateDeliveries();
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [resultOpen, setResultOpen] = useState(false);
+  const [resultTitle, setResultTitle] = useState("");
+  const [resultContent, setResultContent] = useState("");
+  const [resultProvider, setResultProvider] = useState<string | null>(null);
+  const [resultLoading, setResultLoading] = useState(false);
 
   const hasPlan = entitlements?.has_plan;
   const isCiclo = entitlements?.plan_key === "ciclo97";
-  const analyses = isCiclo
+  const deliveredMap = new Map(
+    (delivered ?? []).map((d) => [d.analysis_key, d]),
+  );
+  // Análises exibidas: as liberadas pelo plano + as já entregues (para rever).
+  const available = isCiclo
     ? ANALYSES // ciclo libera qualquer análise, com ritmo de 1 por semana
     : ANALYSES.filter((a) =>
         (entitlements?.analyses_avulsas ?? []).includes(a.key),
       );
+  const analyses = ANALYSES.filter(
+    (a) =>
+      available.some((x) => x.key === a.key) || deliveredMap.has(a.key),
+  );
   const weeklyAvailable = Boolean(entitlements?.weekly_available);
   const compatRemaining = entitlements?.compatibility_remaining ?? 0;
   const questionsRemaining = entitlements?.questions_remaining ?? 0;
   const terminalPriority = Boolean(entitlements?.terminal_priority);
 
-  const requestAnalysis = async (analysisKey: string, name: string) => {
+  /** Mostra uma análise já entregue (sem consumir nada). */
+  const openDelivered = (analysisKey: string, name: string) => {
+    const item = deliveredMap.get(analysisKey);
+    if (!item) return;
+    setResultTitle(name);
+    setResultContent(item.content);
+    setResultProvider(item.provider);
+    setResultLoading(false);
+    setResultOpen(true);
+  };
+
+  /** Consome o direito e gera a análise pela IA, abrindo o pop-up do resultado. */
+  const deliverAnalysis = async (analysisKey: string, name: string) => {
     if (busyKey) return;
     setBusyKey(analysisKey);
+    setResultTitle(name);
+    setResultContent("");
+    setResultProvider(null);
+    setResultLoading(true);
+    setResultOpen(true);
     try {
-      const result = await consumeAnalysis(analysisKey);
-      if (!result.ok) {
+      // Gera primeiro (a função valida o direito); só então consome o crédito,
+      // para não perder a análise se a IA falhar.
+      const generated = await generateAnalysis(analysisKey);
+      setResultContent(generated.analysis.content);
+      setResultProvider(generated.analysis.provider);
+      invalidateDeliveries();
+
+      const consumed = await consumeAnalysis(analysisKey);
+      if (!consumed.ok && !consumed.kind) {
         toast.error(
           t(
-            result.error === "weekly_limit"
+            consumed.error === "weekly_limit"
               ? "entitlements.weeklyUsed"
               : "entitlements.error",
           ),
         );
-        return;
       }
       invalidate();
-      window.open(
-        buildWhatsAppLink(undefined, WHATSAPP_MESSAGES.analysisRequest(name)),
-        "_blank",
-        "noopener,noreferrer",
-      );
     } catch {
-      toast.error(t("entitlements.error"));
+      setResultOpen(false);
+      toast.error(t("delivery.error"));
     } finally {
+      setResultLoading(false);
       setBusyKey(null);
     }
   };
@@ -135,7 +179,6 @@ export function EntitlementsCard() {
           </div>
         ) : (
           <>
-            {/* Plano atual */}
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="border-gold/50 bg-royal/40 font-jost text-xs text-gold">
                 {entitlements.plan_name}
@@ -163,12 +206,13 @@ export function EntitlementsCard() {
               )}
             </div>
 
-            {/* Análises liberadas */}
             {analyses.length > 0 && (
               <ul className="flex flex-col gap-2">
                 {analyses.map(({ key, nameKey, Icon }) => {
+                  const isDelivered = deliveredMap.has(key);
                   const disabled =
-                    (isCiclo && !weeklyAvailable) || busyKey !== null;
+                    (!isDelivered && isCiclo && !weeklyAvailable) ||
+                    busyKey !== null;
                   return (
                     <li key={key} className="flex items-center gap-3">
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
@@ -177,11 +221,27 @@ export function EntitlementsCard() {
                       <span className="min-w-0 flex-1 truncate font-jost text-sm text-cream/85">
                         {t(nameKey)}
                       </span>
+                      {isDelivered && (
+                        <Badge
+                          variant="outline"
+                          className="hidden shrink-0 border-gold/40 bg-gold/5 px-2 py-0 font-jost text-[8px] uppercase tracking-[0.2em] text-gold sm:inline-flex"
+                        >
+                          {t("delivery.deliveredBadge")}
+                        </Badge>
+                      )}
                       <button
                         type="button"
-                        onClick={() => void requestAnalysis(key, t(nameKey))}
+                        onClick={() =>
+                          isDelivered
+                            ? openDelivered(key, t(nameKey))
+                            : void deliverAnalysis(key, t(nameKey))
+                        }
                         disabled={disabled}
-                        className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gold px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] text-navy-deep transition hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-50"
+                        className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                          isDelivered
+                            ? "border border-gold/50 text-gold hover:bg-gold/10"
+                            : "bg-gold text-navy-deep hover:bg-gold-light"
+                        }`}
                       >
                         {busyKey === key ? (
                           <Loader2
@@ -194,7 +254,9 @@ export function EntitlementsCard() {
                             strokeWidth={1.5}
                           />
                         )}
-                        {t("entitlements.receiveCta")}
+                        {isDelivered
+                          ? t("delivery.viewCta")
+                          : t("entitlements.receiveCta")}
                       </button>
                     </li>
                   );
@@ -202,7 +264,6 @@ export function EntitlementsCard() {
               </ul>
             )}
 
-            {/* Compatibilidade (todos os planos) */}
             {compatRemaining > 0 && (
               <div className="flex items-center gap-3 border-t border-gold/10 pt-4">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
@@ -237,6 +298,15 @@ export function EntitlementsCard() {
           </>
         )}
       </CardContent>
+
+      <AnalysisResultDialog
+        open={resultOpen}
+        onOpenChange={setResultOpen}
+        title={resultTitle}
+        content={resultContent}
+        isLoading={resultLoading}
+        provider={resultProvider}
+      />
     </Card>
   );
 }

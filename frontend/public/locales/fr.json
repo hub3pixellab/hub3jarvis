@@ -390,5 +390,12 @@
   "social.visible": "Profil désormais visible par les membres.",
   "social.hidden": "Profil masqué du réseau.",
   "social.error": "Impossible de terminer l'action. Réessayez.",
-  "dashboard.social": "Réseau"
+  "dashboard.social": "Réseau",
+  "delivery.eyebrow": "Analyse livrée",
+  "delivery.generating": "Le Maître Agnes prépare votre analyse. Cela prend quelques secondes...",
+  "delivery.generatedBy": "Généré par {{provider}}",
+  "delivery.sendWhatsApp": "Envoyer via WhatsApp",
+  "delivery.error": "Impossible de générer votre analyse. Réessayez.",
+  "delivery.deliveredBadge": "Livrée",
+  "delivery.viewCta": "Voir"
 }
