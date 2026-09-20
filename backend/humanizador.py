@@ -1,6 +1,8 @@
 # humanizador.py
-# Regras do repositório blader/humanizer (35 padrões de escrita de IA)
-# Fonte: https://github.com/blader/humanizer | Wikipedia: Signs of AI writing
+# Converte a resposta da IA em prosa corrida limpa, sem markdown.
+# Remove tabelas, cabecalhos, negrito, listas, travessoes, barras e blocos.
+
+import re
 
 REGRAS_HUMANIZADOR = """
 Escreva como um ser humano, nao como um chatbot. Mantenha TODOS os fatos, nomes, numeros e datas do conhecimento fornecido (nunca invente nada), mas elimine os padroes de escrita de IA abaixo:
@@ -15,18 +17,24 @@ Escreva como um ser humano, nao como um chatbot. Mantenha TODOS os fatos, nomes,
 8. REPETICAO DE ABERTURA DE FRASES: nao comece varias frases com o mesmo sujeito. Varie ou una as frases.
 9. VOZ PASSIVA: prefira voz ativa sempre que o agente da acao ficar claro.
 10. TRAVESSOES (—) E MEIOS-TRAVESSOES (–): remova quase todos. Use virgulas ou pontos.
-11. NEGRITO EXCESSIVO: nao coloque palavras em negrito sem motivo dentro dos paragrafos. Mantenha apenas os titulos de secao.
+11. NEGRITO EXCESSIVO: nao coloque palavras em negrito sem motivo dentro dos paragrafos.
 12. TITULOS EM CAIXA ALTA: titulos e subtitulos com letras normais, nao "Cada Palavra Em Maiuscula".
 13. EMOJIS: nao use emojis em titulos, listas ou paragrafos.
 14. ASPAS CURVAS: use aspas retas.
 15. QUALIFICADORES EMPILHADOS: elimine "potencialmente", "possivelmente", "provavelmente" repetidos.
 16. FILLER: "a fim de" -> "para", "devido ao fato de" -> "porque", "neste momento" -> "agora", "e importante notar que" -> remova.
-17. FINAIS GENERICOS: nao termine com otimismo vago ("em ultima analise", "o futuro parece brilhante"). Termine com o ultimo fato util.
+17. FINAIS GENERICOS: nao termine com otimismo vago. Termine com o ultimo fato util.
 18. "A VERDADEIRA QUESTAO E", "NO FUNDO", "O QUE REALMENTE IMPORTA": evite fingir revelar uma verdade oculta.
 19. FRASES DE EFEITO EM SEQUENCIA: nao transforme cada frase em um final dramatico. Ritmo natural.
 20. DITADOS FORMULAICOS: evite "X e o Y de Z", "X nao e uma ferramenta, e um espelho", "a linguagem de", "a moeda de". Diga o fato especifico.
 21. RESPONDER OBJECOES QUE NINGUEM FEZ: nao defenda algo que ninguem questionou.
 22. REJEITAR ALTERNATIVAS FALSAS: nao introduza "uma tentacao seria...", "alguem poderia pensar..." para descartar e nunca mais voltar.
+
+FORMATO OBRIGATORIO DE SAIDA:
+- Responda SEMPRE em prosa corrida, como uma carta pessoal.
+- PROIBIDO usar: tabelas (|), cabecalhos (#, ##), negrito (**), italico (*), listas (-, *, 1.), linhas separadoras (---), blocos de citacao (>), codigo (`).
+- Use apenas paragrafos e frases. Nunca use asteriscos nem barras verticais.
+- Escreva de forma natural, humana, calorosa e profissional.
 
 PROCESSO OBRIGATORIO:
 1. Escreva o relatorio de forma natural, como uma pessoa especialista conversando com o cliente.
@@ -36,49 +44,82 @@ PROCESSO OBRIGATORIO:
 """
 
 
+def _limpar_linha_tabela(linha):
+    """Converte uma linha de tabela '| a | b |' em prosa 'a: b'."""
+    celulas = [c.strip() for c in linha.strip().strip("|").split("|")]
+    celulas = [c for c in celulas if c]
+    if not celulas:
+        return ""
+    if len(celulas) == 1:
+        return celulas[0]
+    # primeira celula vira rotulo, o resto vira conteudo
+    rotulo = celulas[0].rstrip(":")
+    conteudo = " ".join(celulas[1:])
+    return f"{rotulo}: {conteudo}"
 
-
-# === FIX FINAL AGNES ===
-import re
-
-import re
 
 def humanizar_texto(texto):
     if not texto:
         return texto
     t = texto
-    # Cabecalhos: "## Titulo" -> "Titulo"
+
+    # 1) Remover linha separadora de tabela (|---|---|)
+    t = re.sub(
+        r"^[ \t]*\|?[ \t]*:?-{2,}:?[ \t]*(\|[ \t]*:?-{2,}:?[ \t]*)*\|?[ \t]*$",
+        "",
+        t,
+        flags=re.MULTILINE,
+    )
+
+    # 2) Converter linhas de tabela em prosa
+    linhas = []
+    for linha in t.splitlines():
+        if linha.strip().startswith("|") and linha.strip().endswith("|"):
+            limpa = _limpar_linha_tabela(linha)
+            if limpa:
+                linhas.append(limpa)
+        else:
+            linhas.append(linha)
+    t = "\n".join(linhas)
+
+    # 3) Remover cabecalhos mantendo o texto: "## Titulo" -> "Titulo"
     t = re.sub(r"^[ \t]*#{1,6}[ \t]*", "", t, flags=re.MULTILINE)
-    # Negrito/itálico: mantem o texto, remove so os marcadores
+
+    # 4) Remover negrito/italico mantendo o texto
     t = re.sub(r"\*\*(.+?)\*\*", r"\1", t, flags=re.DOTALL)
     t = re.sub(r"__(.+?)__", r"\1", t, flags=re.DOTALL)
     t = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"\1", t)
     t = re.sub(r"(?<!_)_([^_\n]+)_(?!_)", r"\1", t)
-    # Linha separadora de tabela: |---|---|
-    t = re.sub(r"^[ \t]*\|?[ \t]*:?-{2,}:?[ \t]*(\|[ \t]*:?-{2,}:?[ \t]*)*\|?[ \t]*$", "", t, flags=re.MULTILINE)
-    # Linhas de tabela: "| a | b |" -> "a — b" (prosa corrida)
-    def _tabela(m):
-        celulas = [c.strip() for c in m.group(0).strip().strip("|").split("|")]
-        celulas = [c for c in celulas if c]
-        return " — ".join(celulas)
-    t = re.sub(r"^[ \t]*\|.*\|[ \t]*$", _tabela, t, flags=re.MULTILINE)
-    # Listas: "- item", "* item", "1. item" -> "item"
+
+    # 5) Remover marcadores de lista: "- item", "* item", "1. item"
     t = re.sub(r"^[ \t]*[-*+][ \t]+", "", t, flags=re.MULTILINE)
     t = re.sub(r"^[ \t]*\d+[.)][ \t]+", "", t, flags=re.MULTILINE)
-    # Blockquote: "> texto" -> "texto"
+
+    # 6) Remover blocos de citacao: "> texto" -> "texto"
     t = re.sub(r"^[ \t]*>[ \t]*", "", t, flags=re.MULTILINE)
-    # Linhas separadoras: ---, ===, ***
+
+    # 7) Remover linhas separadoras: ---, ===, ***
     t = re.sub(r"^[ \t]*[-_=*]{3,}[ \t]*$", "", t, flags=re.MULTILINE)
-    # Links: [texto](url) -> texto
+
+    # 8) Remover links mantendo o texto: [texto](url) -> texto
     t = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", t)
-    # Codigo inline: `texto` -> texto
+
+    # 9) Remover codigo inline: `texto` -> texto
     t = re.sub(r"`([^`]*)`", r"\1", t)
-    # Espacos multiplos
+
+    # 10) Remover travessoes e meios-travessoes soltos
+    t = re.sub(r"\s*[—–]\s*", " ", t)
+
+    # 11) Remover asteriscos e barras verticais restantes
+    t = t.replace("*", "")
+    t = t.replace("|", "")
+
+    # 12) Colapsar espacos multiplos e linhas em branco em excesso
     t = re.sub(r"[ \t]{2,}", " ", t)
-    # Linhas em branco em excesso
     t = re.sub(r"\n{3,}", "\n\n", t)
     t = re.sub(r"[ \t]+$", "", t, flags=re.MULTILINE)
-    # Terminologia e genero (mantem as regras existentes)
+
+    # 13) Terminologia e genero (mantem as regras existentes)
     t = t.replace("mapa astral", "mapa natal")
     t = t.replace("astral", "natal")
     for a, b in [
@@ -90,4 +131,5 @@ def humanizar_texto(texto):
         ("minha guia", "meu guia"), ("sua guia", "seu guia"),
     ]:
         t = t.replace(a, b)
+
     return t.strip()
