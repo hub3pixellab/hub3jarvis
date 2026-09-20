@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/auth-context";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import { useActiveSubscription } from "@/hooks/useSubscription";
 import { formatDate } from "@/lib/format";
 import type { SubscriptionStatus } from "@/domain/models";
@@ -14,14 +15,19 @@ interface SubscriptionDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/** Pop-up com o plano de assinatura atual do usuário. */
+/** Pop-up com o plano vigente do usuário (o que foi liberado pela compra). */
 export function SubscriptionDialog({
   open,
   onOpenChange,
 }: SubscriptionDialogProps) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { data: subscription, isLoading } = useActiveSubscription(user?.id);
+  const { data: entitlements, isLoading } = useEntitlements(Boolean(user));
+  const { data: subscription } = useActiveSubscription(user?.id);
+
+  const hasPlan = Boolean(entitlements?.has_plan);
+  const isCiclo = entitlements?.plan_key === "ciclo97";
+  const analyses = entitlements?.analyses_avulsas ?? [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -39,38 +45,77 @@ export function SubscriptionDialog({
               <Skeleton className="h-8 w-2/3 bg-gold/10" />
               <Skeleton className="h-4 w-1/2 bg-gold/10" />
             </div>
-          ) : subscription ? (
+          ) : hasPlan ? (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-cinzel text-2xl text-gold-gradient">
-                  {subscription.plan_name}
+                  {entitlements?.plan_name}
                 </p>
-                <StatusBadge status={subscription.status} />
+                <Badge className="border-gold/50 bg-gold/10 text-gold">
+                  {t("entitlements.activeBadge")}
+                </Badge>
               </div>
-              <dl className="grid grid-cols-2 gap-3 border-t border-gold/10 pt-4 text-sm">
-                <div>
-                  <dt className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/45">
-                    {t("dashboard.subscriptionStart")}
-                  </dt>
-                  <dd className="mt-1 font-jost text-cream/85">
-                    {formatDate(
-                      subscription.current_period_start,
-                      i18n.resolvedLanguage ?? "pt-BR",
-                    )}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/45">
-                    {t("dashboard.subscriptionEnd")}
-                  </dt>
-                  <dd className="mt-1 font-jost text-cream/85">
-                    {formatDate(
-                      subscription.current_period_end,
-                      i18n.resolvedLanguage ?? "pt-BR",
-                    )}
-                  </dd>
-                </div>
-              </dl>
+
+              <ul className="flex flex-col gap-2 border-t border-gold/10 pt-4">
+                {isCiclo ? (
+                  <li className="font-jost text-sm text-cream/80">
+                    {t("entitlements.weeklyHint")}
+                  </li>
+                ) : (
+                  <li className="font-jost text-sm text-cream/80">
+                    {t("entitlements.planAnalyses", { count: analyses.length })}
+                  </li>
+                )}
+                {!isCiclo && (
+                  <li className="font-jost text-sm text-cream/80">
+                    {t("entitlements.questionsLeft", {
+                      count: entitlements?.questions_remaining ?? 0,
+                    })}
+                  </li>
+                )}
+                {isCiclo && (
+                  <li className="font-jost text-sm text-cream/80">
+                    {t("entitlements.priorityHint")}
+                  </li>
+                )}
+                {(entitlements?.compatibility_remaining ?? 0) > 0 && (
+                  <li className="font-jost text-sm text-cream/80">
+                    {t("entitlements.compatLeft", {
+                      count: entitlements?.compatibility_remaining ?? 0,
+                    })}
+                  </li>
+                )}
+              </ul>
+
+              {subscription && (
+                <dl className="grid grid-cols-2 gap-3 border-t border-gold/10 pt-4 text-sm">
+                  <div>
+                    <dt className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/45">
+                      {t("dashboard.subscriptionStart")}
+                    </dt>
+                    <dd className="mt-1 font-jost text-cream/85">
+                      {formatDate(
+                        subscription.current_period_start,
+                        i18n.resolvedLanguage ?? "pt-BR",
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/45">
+                      {t("dashboard.subscriptionEnd")}
+                    </dt>
+                    <dd className="mt-1 font-jost text-cream/85">
+                      {formatDate(
+                        subscription.current_period_end,
+                        i18n.resolvedLanguage ?? "pt-BR",
+                      )}
+                    </dd>
+                  </div>
+                  <div className="col-span-2">
+                    <StatusBadge status={subscription.status} />
+                  </div>
+                </dl>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 py-8 text-center">

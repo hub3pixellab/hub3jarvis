@@ -10,6 +10,8 @@ export interface DeliveredAnalysis {
   content: string;
   provider: string | null;
   model: string | null;
+  form_data: Record<string, unknown> | null;
+  document_path: string | null;
   created_at: string;
 }
 
@@ -19,14 +21,16 @@ export interface GenerateAnalysisResult {
 }
 
 /**
- * Gera (ou retorna a já entregue) a análise via IA do Mestre Agnes.
- * O texto é produzido pelo backend agnes e salvo em delivered_analyses.
+ * Gera (ou retorna a já entregue) a análise via IA do Mestre Agnes,
+ * enviando os dados do formulário e o anexo opcional (certidão).
  */
 export async function generateAnalysis(
   analysisKey: string,
+  formData?: Record<string, unknown> | null,
+  documentPath?: string | null,
 ): Promise<GenerateAnalysisResult> {
   const { data, error } = await supabase.functions.invoke("generate-analysis", {
-    body: { analysisKey },
+    body: { analysisKey, formData: formData ?? null, documentPath: documentPath ?? null },
   });
   if (error) {
     throw new Error(
@@ -47,4 +51,30 @@ export async function getDeliveredAnalyses(
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as DeliveredAnalysis[];
+}
+
+export const DOCUMENTS_BUCKET = "documents";
+export const DOCUMENT_MAX_BYTES = 10 * 1024 * 1024;
+export const DOCUMENT_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+]);
+
+/**
+ * Envia a certidão (ou outro documento) para a pasta do próprio usuário
+ * e devolve o caminho relativo no bucket.
+ */
+export async function uploadDocument(
+  userId: string,
+  file: File,
+): Promise<string> {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
+  const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(DOCUMENTS_BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw error;
+  return path;
 }

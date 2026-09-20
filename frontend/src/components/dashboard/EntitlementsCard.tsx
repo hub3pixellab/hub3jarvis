@@ -24,6 +24,7 @@ import {
   consumeCompatibility,
 } from "@/services/entitlements";
 import { AnalysisResultDialog } from "@/components/dashboard/AnalysisResultDialog";
+import { AnalysisFormDialog } from "@/components/dashboard/AnalysisFormDialog";
 import {
   generateAnalysis,
   useDeliveredAnalyses,
@@ -57,6 +58,9 @@ export function EntitlementsCard() {
   const [resultContent, setResultContent] = useState("");
   const [resultProvider, setResultProvider] = useState<string | null>(null);
   const [resultLoading, setResultLoading] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [formKey, setFormKey] = useState("s1");
+  const [formTitle, setFormTitle] = useState("");
 
   const hasPlan = entitlements?.has_plan;
   const isCiclo = entitlements?.plan_key === "ciclo97";
@@ -89,11 +93,21 @@ export function EntitlementsCard() {
     setResultOpen(true);
   };
 
-  /** Consome o direito e gera a análise pela IA, abrindo o pop-up do resultado. */
-  const deliverAnalysis = async (analysisKey: string, name: string) => {
-    if (busyKey) return;
-    setBusyKey(analysisKey);
-    setResultTitle(name);
+  /** Abre o formulário de dados da análise (com anexo da certidão). */
+  const startDelivery = (analysisKey: string, name: string) => {
+    setFormKey(analysisKey);
+    setFormTitle(name);
+    setFormOpen(true);
+  };
+
+  /** Recebe os dados do formulário e gera a análise pela IA. */
+  const runDelivery = async (
+    formData: Record<string, unknown>,
+    documentPath: string | null,
+  ) => {
+    const key = formKey;
+    setBusyKey(key);
+    setResultTitle(formTitle);
     setResultContent("");
     setResultProvider(null);
     setResultLoading(true);
@@ -101,12 +115,12 @@ export function EntitlementsCard() {
     try {
       // Gera primeiro (a função valida o direito); só então consome o crédito,
       // para não perder a análise se a IA falhar.
-      const generated = await generateAnalysis(analysisKey);
+      const generated = await generateAnalysis(key, formData, documentPath);
       setResultContent(generated.analysis.content);
       setResultProvider(generated.analysis.provider);
       invalidateDeliveries();
 
-      const consumed = await consumeAnalysis(analysisKey);
+      const consumed = await consumeAnalysis(key);
       if (!consumed.ok && !consumed.kind) {
         toast.error(
           t(
@@ -234,7 +248,7 @@ export function EntitlementsCard() {
                         onClick={() =>
                           isDelivered
                             ? openDelivered(key, t(nameKey))
-                            : void deliverAnalysis(key, t(nameKey))
+                            : startDelivery(key, t(nameKey))
                         }
                         disabled={disabled}
                         className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] transition disabled:cursor-not-allowed disabled:opacity-50 ${
@@ -298,6 +312,16 @@ export function EntitlementsCard() {
           </>
         )}
       </CardContent>
+
+      <AnalysisFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        analysisKey={formKey}
+        title={formTitle}
+        onSubmitted={(formData, documentPath) =>
+          void runDelivery(formData, documentPath)
+        }
+      />
 
       <AnalysisResultDialog
         open={resultOpen}
