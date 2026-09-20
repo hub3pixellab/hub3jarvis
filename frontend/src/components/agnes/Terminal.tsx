@@ -45,6 +45,7 @@ const Terminal = () => {
 
   const questionsRemaining = entitlements?.questions_remaining ?? 0;
   const hasPlan = Boolean(entitlements?.has_plan);
+  const terminalPriority = Boolean(entitlements?.terminal_priority);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -62,6 +63,15 @@ const Terminal = () => {
     setMessages((m) => [...m, { from: "user", text: q }]);
     setInput("");
     setTyping(true);
+
+    // Ciclo Contínuo: prioridade no terminal — não consome e nunca bloqueia.
+    if (user && hasPlan && terminalPriority) {
+      window.setTimeout(() => {
+        const replyKey = REPLIES[q] ?? "terminal.rFallback";
+        reply(t(replyKey));
+      }, 1400);
+      return;
+    }
 
     // Usuário logado sem perguntas restantes: orienta a pedir pelo WhatsApp.
     if (user && hasPlan && questionsRemaining <= 0) {
@@ -112,7 +122,9 @@ const Terminal = () => {
           {user && hasPlan && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-royal/40 px-2.5 py-1 font-jost text-[9px] uppercase tracking-[0.2em] text-gold">
               <Sparkle className="h-2.5 w-2.5" strokeWidth={1.5} />
-              {t("terminal.creditsLeft", { count: questionsRemaining })}
+              {terminalPriority
+                ? t("terminal.priorityBadge")
+                : t("terminal.creditsLeft", { count: questionsRemaining })}
             </span>
           )}
         </div>

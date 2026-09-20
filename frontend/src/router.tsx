@@ -3,6 +3,8 @@ import AuthPage from "./pages/AuthPage";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
+import RedePage from "./pages/RedePage";
+import MemberProfilePage from "./pages/MemberProfilePage";
 import HoroscopoSolo from "./pages/HoroscopoSolo";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +31,8 @@ export const routers = [
     children: [
       { index: true, element: <DashboardPage /> },
       { path: "perfil", element: <ProfilePage /> },
+      { path: "rede", element: <RedePage /> },
+      { path: "membro/:userId", element: <MemberProfilePage /> },
     ],
   },
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */

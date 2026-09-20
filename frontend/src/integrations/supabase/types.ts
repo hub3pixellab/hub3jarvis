@@ -3360,6 +3360,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: []
+      }
       global_stats: {
         Row: {
           analysis_count: number
@@ -3391,6 +3409,7 @@ export type Database = {
           id: string
           locale: string
           phone: string | null
+          social_visible: boolean
           updated_at: string
           zodiac_sign: string | null
         }
@@ -3403,6 +3422,7 @@ export type Database = {
           id: string
           locale?: string
           phone?: string | null
+          social_visible?: boolean
           updated_at?: string
           zodiac_sign?: string | null
         }
@@ -3415,6 +3435,7 @@ export type Database = {
           id?: string
           locale?: string
           phone?: string | null
+          social_visible?: boolean
           updated_at?: string
           zodiac_sign?: string | null
         }
@@ -3569,8 +3590,20 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      follow_member: {
+        Args: { p_target_id: string }
+        Returns: Json
+      }
       get_my_entitlements: {
         Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_my_social: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_public_member: {
+        Args: { p_user_id: string }
         Returns: Json
       }
       grant_plan_entitlements: {
@@ -3580,6 +3613,10 @@ export type Database = {
       increment_analysis_counter: {
         Args: { p_count?: number }
         Returns: number
+      }
+      list_public_members: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       record_checkout_completion: {
         Args: {
@@ -3591,6 +3628,14 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      set_social_visibility: {
+        Args: { p_visible: boolean }
+        Returns: Json
+      }
+      unfollow_member: {
+        Args: { p_target_id: string }
+        Returns: Json
       }
     }
     Enums: {
