@@ -25,9 +25,10 @@ const Index = () => {
           (setas que abrem o pop-up) e o reveal esconderia o conteúdo. */}
       <Services />
 
-      <SectionReveal>
-        <Pricing />
-      </SectionReveal>
+      {/* Preços fora do SectionReveal: os cards têm botões de checkout
+          interativos e o reveal esconderia o conteúdo até o observer
+          disparar, deixando a seção vazia. */}
+      <Pricing />
 
       {/* FAQ fora do SectionReveal: o acordeão tem botões interativos e o
           reveal esconderia os triggers até o observer disparar. */}

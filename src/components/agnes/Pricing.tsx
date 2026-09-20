@@ -7,12 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 const PLANS = [
   {
     nameKey: "pricing.p1Name",
-    price: "R$ 47",
+    price: "R$ 17",
     periodKey: "pricing.p1Period",
     descKey: "pricing.p1Desc",
     features: ["pricing.p1f1", "pricing.p1f2", "pricing.p1f3"],
     featured: false,
-    productId: "prod_VDubKDp1jKVsL8",
+    productId: "prod_VIPSTE2jPvpulW",
   },
   {
     nameKey: "pricing.p2Name",
@@ -21,7 +21,7 @@ const PLANS = [
     descKey: "pricing.p2Desc",
     features: ["pricing.p2f1", "pricing.p2f2", "pricing.p2f3", "pricing.p2f4"],
     featured: true,
-    productId: "prod_VDubmi1896ALiM",
+    productId: "prod_VIPSYxrjRH8vci",
   },
   {
     nameKey: "pricing.p3Name",
@@ -53,7 +53,7 @@ const Pricing = () => {
       );
       if (error) throw error;
       if (data?.url) {
-        window.location.href = data.url;
+        window.open(data.url, "_blank", "noopener,noreferrer");
       } else {
         throw new Error(data?.error ?? "No checkout URL");
       }

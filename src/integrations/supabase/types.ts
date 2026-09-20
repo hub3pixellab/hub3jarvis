@@ -3513,11 +3513,70 @@ export type Database = {
         }
         Relationships: []
       }
+      user_entitlements: {
+        Row: {
+          analyses_avulsas: Json
+          compatibility_remaining: number
+          created_at: string
+          plan_key: string
+          plan_name: string
+          questions_remaining: number
+          updated_at: string
+          user_id: string
+          weekly_used: number
+          weekly_week: string | null
+        }
+        Insert: {
+          analyses_avulsas?: Json
+          compatibility_remaining?: number
+          created_at?: string
+          plan_key: string
+          plan_name: string
+          questions_remaining?: number
+          updated_at?: string
+          user_id: string
+          weekly_used?: number
+          weekly_week?: string | null
+        }
+        Update: {
+          analyses_avulsas?: Json
+          compatibility_remaining?: number
+          created_at?: string
+          plan_key?: string
+          plan_name?: string
+          questions_remaining?: number
+          updated_at?: string
+          user_id?: string
+          weekly_used?: number
+          weekly_week?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      consume_analysis: {
+        Args: { p_analysis_key: string }
+        Returns: Json
+      }
+      consume_compatibility: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      consume_terminal_question: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_my_entitlements: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      grant_plan_entitlements: {
+        Args: { p_product_id: string; p_user_id: string }
+        Returns: undefined
+      }
       increment_analysis_counter: {
         Args: { p_count?: number }
         Returns: number
