@@ -66,18 +66,6 @@ export function SubscriptionDialog({
                     {t("entitlements.planAnalyses", { count: analyses.length })}
                   </li>
                 )}
-                {!isCiclo && (
-                  <li className="font-jost text-sm text-cream/80">
-                    {t("entitlements.questionsLeft", {
-                      count: entitlements?.questions_remaining ?? 0,
-                    })}
-                  </li>
-                )}
-                {isCiclo && (
-                  <li className="font-jost text-sm text-cream/80">
-                    {t("entitlements.priorityHint")}
-                  </li>
-                )}
                 {(entitlements?.compatibility_remaining ?? 0) > 0 && (
                   <li className="font-jost text-sm text-cream/80">
                     {t("entitlements.compatLeft", {

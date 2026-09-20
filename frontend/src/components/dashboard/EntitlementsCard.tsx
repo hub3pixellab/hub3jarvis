@@ -30,10 +30,6 @@ import {
   useDeliveredAnalyses,
   useInvalidateDeliveries,
 } from "@/hooks/useDeliveries";
-import {
-  buildWhatsAppLink,
-  WHATSAPP_MESSAGES,
-} from "@/lib/whatsapp";
 
 /** As 5 análises do Mestre (chaves i18n em services.s*Name). */
 const ANALYSES = [
@@ -79,8 +75,6 @@ export function EntitlementsCard() {
   );
   const weeklyAvailable = Boolean(entitlements?.weekly_available);
   const compatRemaining = entitlements?.compatibility_remaining ?? 0;
-  const questionsRemaining = entitlements?.questions_remaining ?? 0;
-  const terminalPriority = Boolean(entitlements?.terminal_priority);
 
   /** Mostra uma análise já entregue (sem consumir nada). */
   const openDelivered = (analysisKey: string, name: string) => {
@@ -120,7 +114,14 @@ export function EntitlementsCard() {
       setResultProvider(generated.analysis.provider);
       invalidateDeliveries();
 
-      const consumed = await consumeAnalysis(key);
+      // Compatibilidade usa o crédito de compatibilidade quando o plano não
+      // libera a análise s4 na lista de avulsas (ex.: Mapa Essencial, Ciclo).
+      const isCompatCredit =
+        key === "s4" &&
+        !(entitlements?.analyses_avulsas ?? []).includes("s4");
+      const consumed = isCompatCredit
+        ? await consumeCompatibility()
+        : await consumeAnalysis(key);
       if (!consumed.ok && !consumed.kind) {
         toast.error(
           t(
@@ -136,31 +137,6 @@ export function EntitlementsCard() {
       toast.error(t("delivery.error"));
     } finally {
       setResultLoading(false);
-      setBusyKey(null);
-    }
-  };
-
-  const requestCompatibility = async () => {
-    if (busyKey) return;
-    setBusyKey("compat");
-    try {
-      const result = await consumeCompatibility();
-      if (!result.ok) {
-        toast.error(t("entitlements.compatUsed"));
-        return;
-      }
-      invalidate();
-      window.open(
-        buildWhatsAppLink(
-          undefined,
-          WHATSAPP_MESSAGES.analysisRequest(t("services.s4Name")),
-        ),
-        "_blank",
-        "noopener,noreferrer",
-      );
-    } catch {
-      toast.error(t("entitlements.error"));
-    } finally {
       setBusyKey(null);
     }
   };
@@ -197,17 +173,6 @@ export function EntitlementsCard() {
               <Badge className="border-gold/50 bg-royal/40 font-jost text-xs text-gold">
                 {entitlements.plan_name}
               </Badge>
-              {terminalPriority ? (
-                <span className="font-jost text-xs text-cream/55">
-                  {t("entitlements.priorityHint")}
-                </span>
-              ) : (
-                <span className="font-jost text-xs text-cream/55">
-                  {t("entitlements.questionsLeft", {
-                    count: questionsRemaining,
-                  })}
-                </span>
-              )}
               {isCiclo && (
                 <span className="font-jost text-xs text-cream/55">
                   {t("entitlements.weeklyHint")}
@@ -224,9 +189,18 @@ export function EntitlementsCard() {
               <ul className="flex flex-col gap-2">
                 {analyses.map(({ key, nameKey, Icon }) => {
                   const isDelivered = deliveredMap.has(key);
+                  // Compatibilidade usa o crédito de compatibilidade quando o
+                  // plano não libera s4 na lista de avulsas (ex.: Essencial, Ciclo).
+                  const isCompatCredit =
+                    key === "s4" &&
+                    !(entitlements?.analyses_avulsas ?? []).includes("s4");
                   const disabled =
-                    (!isDelivered && isCiclo && !weeklyAvailable) ||
-                    busyKey !== null;
+                    busyKey !== null ||
+                    (isDelivered
+                      ? false
+                      : isCompatCredit
+                        ? compatRemaining <= 0
+                        : isCiclo && !weeklyAvailable);
                   return (
                     <li key={key} className="flex items-center gap-3">
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
@@ -278,7 +252,7 @@ export function EntitlementsCard() {
               </ul>
             )}
 
-            {compatRemaining > 0 && (
+            {compatRemaining > 0 && !analyses.some((a) => a.key === "s4") && (
               <div className="flex items-center gap-3 border-t border-gold/10 pt-4">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
                   <Heart className="h-3.5 w-3.5" strokeWidth={1.25} />
@@ -293,11 +267,11 @@ export function EntitlementsCard() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => void requestCompatibility()}
+                  onClick={() => startDelivery("s4", t("services.s4Name"))}
                   disabled={busyKey !== null}
                   className="inline-flex shrink-0 items-center gap-2 rounded-full border border-gold/50 px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] text-gold transition hover:bg-gold/10 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {busyKey === "compat" ? (
+                  {busyKey === "s4" ? (
                     <Loader2
                       className="h-3 w-3 animate-spin"
                       strokeWidth={1.5}

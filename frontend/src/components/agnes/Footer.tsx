@@ -14,7 +14,6 @@ const SERVICES = [
 
 const NAVIGATION = [
   { key: "nav.home", href: "#inicio" },
-  { key: "nav.terminal", href: "#terminal" },
   { key: "nav.services", href: "#servicos" },
   { key: "nav.plans", href: "#pagamento" },
   { key: "nav.faq", href: "#faq" },
@@ -23,7 +22,11 @@ const NAVIGATION = [
 ];
 
 const SOCIALS = [
-  { label: "Instagram", href: "#", Icon: Instagram },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/mestreagnes.br?stkn=cGVmNnpsMXNzeDRw",
+    Icon: Instagram,
+  },
   { label: "WhatsApp", href: "#", Icon: MessageCircle },
   { label: "YouTube", href: "#", Icon: Youtube },
 ];
@@ -132,6 +135,8 @@ const Footer = () => {
                 <a
                   key={label}
                   href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                   aria-label={label}
                   title={label}
                   className="social-icon flex h-10 w-10 items-center justify-center rounded-full border border-gold/25 text-gold/80"

@@ -1,12 +1,10 @@
 import Navbar from "@/components/agnes/Navbar";
 import Hero from "@/components/agnes/Hero";
 import ZodiacWidget from "@/components/agnes/ZodiacWidget";
-import TerminalSection from "@/components/agnes/TerminalSection";
 import Services from "@/components/agnes/Services";
 import Pricing from "@/components/agnes/Pricing";
 import Faq from "@/components/agnes/Faq";
 import Footer from "@/components/agnes/Footer";
-import SectionReveal from "@/components/museum/SectionReveal";
 
 const Index = () => {
   return (
@@ -16,10 +14,6 @@ const Index = () => {
 
       {/* Widget de tráfego: 12 signos + horóscopo do dia em pop-up */}
       <ZodiacWidget />
-
-      <SectionReveal>
-        <TerminalSection />
-      </SectionReveal>
 
       {/* Serviços fora do SectionReveal: a lista agora tem botões interativos
           (setas que abrem o pop-up) e o reveal esconderia o conteúdo. */}
