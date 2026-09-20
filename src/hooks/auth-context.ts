@@ -13,6 +13,7 @@ export interface AuthContextValue {
     displayName?: string,
     locale?: string,
   ) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 

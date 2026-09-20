@@ -319,5 +319,17 @@
   "services.s5Detail.input": "The client's urgent question or decision\nOptionally, the natal chart or numerology as a reading base",
   "services.s5Detail.tech": "Combined reading: crosses the three tools (astrology + numerology + enneagram) to answer the specific question\nCurrent transits: where the planets are now relative to the natal chart (e.g.: Jupiter transiting the 10th house = career expansion moment)\nPractical guidance: not just prediction, but actionable advice",
   "services.s5Detail.result": "Direct answer to the question\nAstrological/numerological context of that moment\nA suggested action plan",
-  "services.dialog.aria": "See explanation of {{name}}"
+  "services.dialog.aria": "See explanation of {{name}}",
+  "whatsapp.title": "Master's WhatsApp",
+  "whatsapp.yourNumber": "Your registered WhatsApp",
+  "whatsapp.noNumber": "No number registered yet. Add it in your profile.",
+  "whatsapp.hint": "Receive your analysis and ask your questions straight via WhatsApp. The buttons open a conversation with the message ready.",
+  "whatsapp.receiveAnalysis": "Receive my analysis",
+  "whatsapp.askQuestion": "Ask a question",
+  "profile.phoneLabel": "Phone / WhatsApp",
+  "profile.phonePlaceholder": "e.g. +55 11 99999-9999",
+  "profile.phoneHint": "Used to connect your WhatsApp to the Master's terminal.",
+  "profile.errorPhone": "Enter a valid phone number.",
+  "auth.googleButton": "Continue with Google",
+  "auth.orDivider": "or"
 }

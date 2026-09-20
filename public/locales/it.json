@@ -319,5 +319,17 @@
   "services.s5Detail.input": "La domanda o decisione urgente del cliente\nOpzionalmente, il tema natale o la numerologia come base di lettura",
   "services.s5Detail.tech": "Lettura combinata: incrocia i tre strumenti (astrologia + numerologia + enneagramma) per rispondere al dubbio specifico\nTransiti attuali: dove sono i pianeti ora rispetto al tema natale (es.: Giove in transito sulla casa 10 = momento di espansione di carriera)\nOrientamento pratico: non solo previsione, ma un consiglio azionabile",
   "services.s5Detail.result": "Risposta diretta al dubbio\nContesto astrologico/numerologico di quel momento\nUn piano d'azione suggerito",
-  "services.dialog.aria": "Vedi la spiegazione di {{name}}"
+  "services.dialog.aria": "Vedi la spiegazione di {{name}}",
+  "whatsapp.title": "WhatsApp del Maestro",
+  "whatsapp.yourNumber": "Il tuo WhatsApp registrato",
+  "whatsapp.noNumber": "Nessun numero registrato per ora. Aggiungilo nel tuo profilo.",
+  "whatsapp.hint": "Ricevi la tua analisi e fai le tue domande direttamente via WhatsApp. I pulsanti aprono una conversazione con il messaggio pronto.",
+  "whatsapp.receiveAnalysis": "Ricevi la mia analisi",
+  "whatsapp.askQuestion": "Fai una domanda",
+  "profile.phoneLabel": "Cellulare / WhatsApp",
+  "profile.phonePlaceholder": "Es.: +55 11 99999-9999",
+  "profile.phoneHint": "Usato per collegare il tuo WhatsApp al terminale del Maestro.",
+  "profile.errorPhone": "Inserisci un numero di cellulare valido.",
+  "auth.googleButton": "Continua con Google",
+  "auth.orDivider": "oppure"
 }

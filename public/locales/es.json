@@ -319,5 +319,17 @@
   "services.s5Detail.input": "La pregunta o decisión urgente del cliente\nOpcionalmente, el mapa natal o numerología como base de lectura",
   "services.s5Detail.tech": "Lectura combinada: cruza las tres herramientas (astrología + numerología + eneagrama) para responder a la duda específica\nTránsitos actuales: dónde están los planetas ahora respecto al mapa natal (ej.: Júpiter transitando la casa 10 = momento de expansión en la carrera)\nOrientación práctica: no solo predicción, sino un consejo accionable",
   "services.s5Detail.result": "Respuesta directa a la duda\nContexto astrológico/numerológico de ese momento\nUn plan de acción sugerido",
-  "services.dialog.aria": "Ver explicación de {{name}}"
+  "services.dialog.aria": "Ver explicación de {{name}}",
+  "whatsapp.title": "WhatsApp del Maestro",
+  "whatsapp.yourNumber": "Tu WhatsApp registrado",
+  "whatsapp.noNumber": "Aún no has registrado un número. Añádelo en tu perfil.",
+  "whatsapp.hint": "Recibe tu análisis y haz tus preguntas directo por WhatsApp. Los botones abren una conversación con el mensaje listo.",
+  "whatsapp.receiveAnalysis": "Recibir mi análisis",
+  "whatsapp.askQuestion": "Hacer una pregunta",
+  "profile.phoneLabel": "Celular / WhatsApp",
+  "profile.phonePlaceholder": "Ej.: +55 11 99999-9999",
+  "profile.phoneHint": "Se usa para conectar tu WhatsApp al terminal del Maestro.",
+  "profile.errorPhone": "Escribe un número de celular válido.",
+  "auth.googleButton": "Continuar con Google",
+  "auth.orDivider": "o"
 }

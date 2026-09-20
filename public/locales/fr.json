@@ -319,5 +319,17 @@
   "services.s5Detail.input": "La question ou décision urgente du client\nOptionnellement, le thème natal ou la numérologie comme base de lecture",
   "services.s5Detail.tech": "Lecture combinée : croise les trois outils (astrologie + numérologie + ennéagramme) pour répondre à la question spécifique\nTransits actuels : où sont les planètes maintenant par rapport au thème natal (ex. : Jupiter transitant la maison 10 = moment d'expansion de carrière)\nOrientation pratique : pas seulement une prédiction, mais un conseil actionnable",
   "services.s5Detail.result": "Réponse directe à la question\nContexte astrologique/numérologique de ce moment\nUn plan d'action suggéré",
-  "services.dialog.aria": "Voir l'explication de {{name}}"
+  "services.dialog.aria": "Voir l'explication de {{name}}",
+  "whatsapp.title": "WhatsApp du Maître",
+  "whatsapp.yourNumber": "Votre WhatsApp enregistré",
+  "whatsapp.noNumber": "Aucun numéro enregistré pour l'instant. Ajoutez-le dans votre profil.",
+  "whatsapp.hint": "Recevez votre analyse et posez vos questions directement via WhatsApp. Les boutons ouvrent une conversation avec le message prêt.",
+  "whatsapp.receiveAnalysis": "Recevoir mon analyse",
+  "whatsapp.askQuestion": "Poser une question",
+  "profile.phoneLabel": "Mobile / WhatsApp",
+  "profile.phonePlaceholder": "Ex. : +55 11 99999-9999",
+  "profile.phoneHint": "Utilisé pour connecter votre WhatsApp au terminal du Maître.",
+  "profile.errorPhone": "Saisissez un numéro de mobile valide.",
+  "auth.googleButton": "Continuer avec Google",
+  "auth.orDivider": "ou"
 }
