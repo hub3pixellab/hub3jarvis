@@ -1,17 +1,45 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ScrollText, Crown, Share2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/auth-context";
 import { useProfile } from "@/hooks/useProfile";
 import { AvatarUpload } from "@/components/dashboard/AvatarUpload";
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
+import { PurchasesDialog } from "@/components/dashboard/PurchasesDialog";
+import { SubscriptionDialog } from "@/components/dashboard/SubscriptionDialog";
+import { SocialVisibilityToggle } from "@/components/dashboard/SocialVisibilityToggle";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export default function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: profile, isLoading } = useProfile(user?.id);
+  const [purchasesOpen, setPurchasesOpen] = useState(false);
+  const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+
+  const shareProfile = async () => {
+    const url = `${window.location.origin}/dashboard/membro/${user?.id}`;
+    const data = {
+      title: t("social.shareTitle"),
+      text: t("social.shareText", {
+        name: profile?.display_name ?? user?.email ?? "",
+      }),
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(data);
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert(t("social.linkCopied"));
+      }
+    } catch {
+      // usuário cancelou ou clipboard indisponível
+    }
+  };
 
   return (
     <div className="flex max-w-3xl flex-col gap-6">
@@ -40,12 +68,20 @@ export default function ProfilePage() {
                 displayName={profile?.display_name ?? null}
               />
             )}
-            <div className="text-center sm:text-left">
+            <div className="min-w-0 flex-1 text-center sm:text-left">
               <p className="font-cinzel text-xl text-cream">
                 {profile?.display_name ?? user?.email}
               </p>
               <p className="font-jost text-sm text-cream/50">{user?.email}</p>
             </div>
+            <button
+              type="button"
+              onClick={() => void shareProfile()}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-gold/50 px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] text-gold transition hover:bg-gold/10"
+            >
+              <Share2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+              {t("social.share")}
+            </button>
           </div>
 
           {isLoading ? (
@@ -57,8 +93,37 @@ export default function ProfilePage() {
           ) : (
             <ProfileForm profile={profile} />
           )}
+
+          {/* Rede social: visibilidade + atalhos */}
+          <div className="flex flex-col gap-3 border-t border-gold/10 pt-6">
+            <SocialVisibilityToggle />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setPurchasesOpen(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-gold/40 bg-navy/40 px-4 py-3 font-jost text-[11px] uppercase tracking-[0.25em] text-cream transition hover:border-gold hover:bg-gold/10"
+              >
+                <ScrollText className="h-4 w-4 text-gold" strokeWidth={1.5} />
+                {t("profile.purchasesCta")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubscriptionOpen(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-gold/40 bg-navy/40 px-4 py-3 font-jost text-[11px] uppercase tracking-[0.25em] text-cream transition hover:border-gold hover:bg-gold/10"
+              >
+                <Crown className="h-4 w-4 text-gold" strokeWidth={1.5} />
+                {t("profile.subscriptionCta")}
+              </button>
+            </div>
+          </div>
         </CardContent>
       </Card>
+
+      <PurchasesDialog open={purchasesOpen} onOpenChange={setPurchasesOpen} />
+      <SubscriptionDialog
+        open={subscriptionOpen}
+        onOpenChange={setSubscriptionOpen}
+      />
     </div>
   );
 }

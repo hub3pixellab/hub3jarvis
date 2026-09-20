@@ -1,23 +1,26 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Compass, Crown, Hash, Heart, Triangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AnalysisSampleDialog } from "@/components/dashboard/AnalysisSampleDialog";
 
-/** Outras leituras oferecidas pelo Mestre — liberadas por assinatura. */
+/** Outras leituras oferecidas pelo Mestre — cada uma abre uma amostra em popup. */
 const ANALYSES = [
-  { key: "services.s1Name", Icon: Compass },
-  { key: "services.s2Name", Icon: Hash },
-  { key: "services.s3Name", Icon: Triangle },
-  { key: "services.s4Name", Icon: Heart },
-  { key: "services.s5Name", Icon: BookOpen },
+  { key: "s1", nameKey: "services.s1Name", Icon: Compass },
+  { key: "s2", nameKey: "services.s2Name", Icon: Hash },
+  { key: "s3", nameKey: "services.s3Name", Icon: Triangle },
+  { key: "s4", nameKey: "services.s4Name", Icon: Heart },
+  { key: "s5", nameKey: "services.s5Name", Icon: BookOpen },
 ];
 
 /**
- * Versão simplificada das demais análises na área de membros.
- * A leitura completa é exclusiva para assinantes.
+ * Outras análises do Mestre na área de membros.
+ * Cada linha abre um pop-up com uma amostra da análise correspondente.
  */
 export function AnalysesTeaser() {
   const { t } = useTranslation();
+  const [selected, setSelected] = useState<string | null>(null);
 
   return (
     <Card className="border-gold/20 bg-card">
@@ -29,20 +32,26 @@ export function AnalysesTeaser() {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <ul className="grid grid-cols-1 gap-x-6 gap-y-1 sm:grid-cols-2">
-          {ANALYSES.map(({ key, Icon }) => (
-            <li key={key} className="flex items-center gap-3 py-2">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
-                <Icon className="h-3.5 w-3.5" strokeWidth={1.25} />
-              </span>
-              <span className="min-w-0 flex-1 truncate font-jost text-sm text-cream/85">
-                {t(key)}
-              </span>
-              <Badge
-                variant="outline"
-                className="border-gold/30 bg-gold/5 px-2 py-0 font-jost text-[8px] uppercase tracking-[0.2em] text-gold/80"
+          {ANALYSES.map(({ key, nameKey, Icon }) => (
+            <li key={key}>
+              <button
+                type="button"
+                onClick={() => setSelected(key)}
+                className="flex w-full items-center gap-3 rounded-md py-2 text-left transition hover:bg-gold/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
               >
-                {t("analysesTeaser.badge")}
-              </Badge>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/30 text-gold">
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.25} />
+                </span>
+                <span className="min-w-0 flex-1 truncate font-jost text-sm text-cream/85">
+                  {t(nameKey)}
+                </span>
+                <Badge
+                  variant="outline"
+                  className="border-gold/30 bg-gold/5 px-2 py-0 font-jost text-[8px] uppercase tracking-[0.2em] text-gold/80"
+                >
+                  {t("analysesTeaser.badge")}
+                </Badge>
+              </button>
             </li>
           ))}
         </ul>
@@ -59,6 +68,12 @@ export function AnalysesTeaser() {
           </a>
         </div>
       </CardContent>
+
+      <AnalysisSampleDialog
+        analysisKey={selected ?? "s1"}
+        open={selected !== null}
+        onOpenChange={(o) => !o && setSelected(null)}
+      />
     </Card>
   );
 }

@@ -23,6 +23,8 @@ export interface Profile {
   locale: string;
   /** WhatsApp do usuário (somente dígitos, DDI+DDD+número) — usado na conexão com o terminal. */
   phone: string | null;
+  /** Se o perfil está visível para outros membros na rede social. */
+  social_visible: boolean;
   created_at: string;
   updated_at: string;
 }

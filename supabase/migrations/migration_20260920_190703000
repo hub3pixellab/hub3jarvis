@@ -1,0 +1,172 @@
+-- Rede social: coluna de visibilidade no perfil (mesmo negócio, manutenção compatível)
+alter table public.profiles add column if not exists social_visible boolean not null default true;
+
+-- Seguidores/seguindo
+create table if not exists public.follows (
+  follower_id uuid not null references auth.users(id) on delete cascade,
+  following_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (follower_id, following_id)
+);
+
+create index if not exists follows_following_idx on public.follows (following_id);
+
+-- RLS da tabela follows
+create policy "follows_select_own" on public.follows
+  for select to authenticated using (auth.uid() = follower_id or auth.uid() = following_id);
+create policy "follows_insert_own" on public.follows
+  for insert to authenticated with check (auth.uid() = follower_id);
+create policy "follows_delete_own" on public.follows
+  for delete to authenticated using (auth.uid() = follower_id);
+
+-- Perfil público de um membro (apenas campos liberados pelo usuário)
+create or replace function public.get_public_member(p_user_id uuid)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_profile public.profiles%rowtype;
+  v_followers bigint;
+  v_following bigint;
+  v_self boolean := auth.uid() = p_user_id;
+begin
+  select * into v_profile from public.profiles where id = p_user_id;
+  if not found then
+    return jsonb_build_object('found', false);
+  end if;
+  -- Só expõe perfil se o usuário liberou (ou se for o próprio usuário)
+  if not v_profile.social_visible and not v_self then
+    return jsonb_build_object('found', true, 'hidden', true);
+  end if;
+  select count(*) into v_followers from public.follows where following_id = p_user_id;
+  select count(*) into v_following from public.follows where follower_id = p_user_id;
+  return jsonb_build_object(
+    'found', true,
+    'hidden', false,
+    'is_self', v_self,
+    'id', v_profile.id,
+    'display_name', v_profile.display_name,
+    'bio', v_profile.bio,
+    'zodiac_sign', v_profile.zodiac_sign,
+    'avatar_url', v_profile.avatar_url,
+    'birth_date', case when v_self then v_profile.birth_date else null end,
+    'social_visible', v_profile.social_visible,
+    'followers', v_followers,
+    'following', v_following,
+    'is_following', case when v_self then false else exists(select 1 from public.follows where follower_id = auth.uid() and following_id = p_user_id) end
+  );
+end;
+$$;
+
+revoke execute on function public.get_public_member(uuid) from public, anon;
+grant execute on function public.get_public_member(uuid) to authenticated;
+
+-- Lista de membros públicos (rede)
+create or replace function public.list_public_members()
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_result jsonb;
+begin
+  select coalesce(jsonb_agg(row_to_jsonb(t) order by t.display_name), '[]'::jsonb)
+  into v_result
+  from (
+    select
+      p.id,
+      p.display_name,
+      p.bio,
+      p.zodiac_sign,
+      p.avatar_url,
+      (select count(*) from public.follows f where f.following_id = p.id) as followers,
+      (select count(*) from public.follows f where f.follower_id = p.id) as following,
+      exists(select 1 from public.follows f where f.follower_id = auth.uid() and f.following_id = p.id) as is_following
+    from public.profiles p
+    where p.social_visible = true and p.id <> auth.uid()
+  ) t;
+  return v_result;
+end;
+$$;
+
+revoke execute on function public.list_public_members() from public, anon;
+grant execute on function public.list_public_members() to authenticated;
+
+-- Seguir / deixar de seguir
+create or replace function public.follow_member(p_target_id uuid)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if auth.uid() is null then
+    return jsonb_build_object('ok', false, 'error', 'no_auth');
+  end if;
+  if auth.uid() = p_target_id then
+    return jsonb_build_object('ok', false, 'error', 'self');
+  end if;
+  insert into public.follows (follower_id, following_id)
+  values (auth.uid(), p_target_id)
+  on conflict do nothing;
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
+revoke execute on function public.follow_member(uuid) from public, anon;
+grant execute on function public.follow_member(uuid) to authenticated;
+
+create or replace function public.unfollow_member(p_target_id uuid)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  delete from public.follows
+  where follower_id = auth.uid() and following_id = p_target_id;
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
+revoke execute on function public.unfollow_member(uuid) from public, anon;
+grant execute on function public.unfollow_member(uuid) to authenticated;
+
+-- Meus números e visibilidade
+create or replace function public.get_my_social()
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_social boolean;
+  v_followers bigint;
+  v_following bigint;
+begin
+  select social_visible into v_social from public.profiles where id = auth.uid();
+  select count(*) into v_followers from public.follows where following_id = auth.uid();
+  select count(*) into v_following from public.follows where follower_id = auth.uid();
+  return jsonb_build_object(
+    'social_visible', coalesce(v_social, true),
+    'followers', v_followers,
+    'following', v_following
+  );
+end;
+$$;
+
+revoke execute on function public.get_my_social() from public, anon;
+grant execute on function public.get_my_social() to authenticated;
+
+-- Alterna visibilidade (só o próprio perfil)
+create or replace function public.set_social_visibility(p_visible boolean)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  update public.profiles set social_visible = p_visible, updated_at = now() where id = auth.uid();
+  return jsonb_build_object('ok', true, 'social_visible', p_visible);
+end;
+$$;
+
+revoke execute on function public.set_social_visibility(boolean) from public, anon;
+grant execute on function public.set_social_visibility(boolean) to authenticated;

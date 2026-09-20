@@ -27,10 +27,10 @@ import {
 const NAV_ITEMS = [
   { key: "dashboard.overview", to: "/dashboard", Icon: LayoutDashboard },
   { key: "dashboard.profile", to: "/dashboard/perfil", Icon: UserRound },
+  { key: "dashboard.social", to: "/dashboard/rede", Icon: Users },
 ];
 
 const COMING_SOON = [
-  { key: "dashboard.comingSoonSocial", Icon: Users },
   { key: "dashboard.comingSoonMatches", Icon: HeartHandshake },
   { key: "dashboard.comingSoonChat", Icon: MessagesSquare },
 ];
@@ -136,7 +136,10 @@ export default function DashboardLayout() {
   const currentTitle =
     location.pathname === "/dashboard/perfil"
       ? t("dashboard.profile")
-      : t("dashboard.overview");
+      : location.pathname.startsWith("/dashboard/rede") ||
+          location.pathname.startsWith("/dashboard/membro/")
+        ? t("dashboard.social")
+        : t("dashboard.overview");
 
   return (
     <div className="min-h-screen bg-navy-deep text-cream">
