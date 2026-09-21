@@ -56,12 +56,14 @@ const SignHoroscopeDialog = ({
                 <p className="font-jost text-sm leading-relaxed tracking-wide text-cream/85">
                   {t(horoscope.essenceKey)}
                 </p>
-                <p className="font-jost text-sm font-light leading-relaxed tracking-wide text-cream/70">
-                  {t(horoscope.toneKey)}
-                </p>
-                <p className="font-jost text-sm font-light leading-relaxed tracking-wide text-cream/70">
-                  {t(horoscope.adviceKey)}
-                </p>
+
+                {/* Seções: panorama, amor, carreira, conselho */}
+                <div className="mt-2 flex flex-col gap-4">
+                  <Section label={t("horoscope.section.overview")} text={t(horoscope.overviewKey)} />
+                  <Section label={t("horoscope.section.love")} text={t(horoscope.loveKey)} />
+                  <Section label={t("horoscope.section.career")} text={t(horoscope.careerKey)} />
+                  <Section label={t("horoscope.section.advice")} text={t(horoscope.adviceKey)} />
+                </div>
               </div>
 
               {/* História do símbolo e da constelação */}
@@ -114,3 +116,17 @@ const SignHoroscopeDialog = ({
 };
 
 export default SignHoroscopeDialog;
+
+/** Bloco com título dourado + texto da seção. */
+function Section({ label, text }: { label: string; text: string }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="font-jost text-[10px] uppercase tracking-[0.3em] text-gold/80">
+        {label}
+      </span>
+      <p className="font-jost text-sm font-light leading-relaxed tracking-wide text-cream/75">
+        {text}
+      </p>
+    </div>
+  );
+}
