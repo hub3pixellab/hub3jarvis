@@ -24,7 +24,16 @@ export function useUpdateProfile() {
     }: {
       userId: string;
       patch: Partial<
-        Pick<Profile, "display_name" | "bio" | "birth_date" | "locale" | "phone">
+        Pick<
+          Profile,
+          | "display_name"
+          | "bio"
+          | "birth_date"
+          | "locale"
+          | "phone"
+          | "gender"
+          | "sexuality"
+        >
       >;
     }) => upsertProfile(userId, patch),
     onSuccess: (updated) => {

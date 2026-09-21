@@ -5,6 +5,8 @@ import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import RedePage from "./pages/RedePage";
 import MemberProfilePage from "./pages/MemberProfilePage";
+import ChatPage from "./pages/ChatPage";
+import ChatRoomPage from "./pages/ChatRoomPage";
 import HoroscopoSolo from "./pages/HoroscopoSolo";
 import NotFound from "./pages/NotFound";
 
@@ -33,6 +35,8 @@ export const routers = [
       { path: "perfil", element: <ProfilePage /> },
       { path: "rede", element: <RedePage /> },
       { path: "membro/:userId", element: <MemberProfilePage /> },
+      { path: "chat", element: <ChatPage /> },
+      { path: "chat/:userId", element: <ChatRoomPage /> },
     ],
   },
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */

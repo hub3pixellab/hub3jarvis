@@ -3360,6 +3360,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          read_at: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       delivered_analyses: {
         Row: {
           analysis_key: string
@@ -3448,9 +3475,11 @@ export type Database = {
           birth_date: string | null
           created_at: string
           display_name: string | null
+          gender: string | null
           id: string
           locale: string
           phone: string | null
+          sexuality: string | null
           social_visible: boolean
           updated_at: string
           zodiac_sign: string | null
@@ -3461,9 +3490,11 @@ export type Database = {
           birth_date?: string | null
           created_at?: string
           display_name?: string | null
+          gender?: string | null
           id: string
           locale?: string
           phone?: string | null
+          sexuality?: string | null
           social_visible?: boolean
           updated_at?: string
           zodiac_sign?: string | null
@@ -3474,9 +3505,11 @@ export type Database = {
           birth_date?: string | null
           created_at?: string
           display_name?: string | null
+          gender?: string | null
           id?: string
           locale?: string
           phone?: string | null
+          sexuality?: string | null
           social_visible?: boolean
           updated_at?: string
           zodiac_sign?: string | null
@@ -3636,6 +3669,14 @@ export type Database = {
         Args: { p_target_id: string }
         Returns: Json
       }
+      get_match_messages: {
+        Args: { p_partner_id: string }
+        Returns: Json
+      }
+      get_my_conversations: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_my_entitlements: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -3656,6 +3697,10 @@ export type Database = {
         Args: { p_count?: number }
         Returns: number
       }
+      is_matched: {
+        Args: { p_user_a: string; p_user_b: string }
+        Returns: boolean
+      }
       list_public_members: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -3670,6 +3715,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      send_match_message: {
+        Args: { p_content: string; p_partner_id: string }
+        Returns: Json
       }
       set_social_visibility: {
         Args: { p_visible: boolean }
@@ -3921,6 +3970,39 @@ export type Database = {
         Relationships: []
       }
       messages_2026_09_23: {
+        Row: {
+          event: string | null
+          extension: string
+          id: string
+          inserted_at: string
+          payload: Json | null
+          private: boolean | null
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          event?: string | null
+          extension: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          event?: string | null
+          extension?: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages_2026_09_24: {
         Row: {
           event: string | null
           extension: string
