@@ -1,0 +1,34 @@
+-- Permitir que o usuário apague as próprias análises entregues (para refazer após nova compra)
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'delivered_analyses'
+      and policyname = 'delivered_analyses_delete_own'
+  ) then
+    execute $policy$
+      create policy "delivered_analyses_delete_own" on public.delivered_analyses
+        for delete to authenticated
+        using (auth.uid() = user_id)
+    $policy$;
+  end if;
+end $$;
+
+-- Permitir que o usuário apague os próprios documentos anexados (certidão)
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'storage' and tablename = 'objects'
+      and policyname = 'documents_delete_own'
+  ) then
+    execute $policy$
+      create policy "documents_delete_own" on storage.objects
+        for delete to authenticated
+        using (
+          bucket_id = 'documents'
+          and (storage.foldername(name))[1] = auth.uid()::text
+        )
+    $policy$;
+  end if;
+end $$;

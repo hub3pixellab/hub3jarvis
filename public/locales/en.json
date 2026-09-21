@@ -520,5 +520,12 @@
   "hero.storeSoonText": "Our app is on the way. Soon you'll be able to download Master Agnes on Google Play and the App Store.",
   "hero.storeSoonClose": "Got it",
   "footer.appTitle": "Download the app",
-  "dashboard.appTitle": "Master Agnes App"
+  "dashboard.appTitle": "Master Agnes App",
+  "delivery.downloadPdf": "Download PDF",
+  "delivery.deleteCta": "Delete reading",
+  "delivery.deleteTitle": "Delete this reading?",
+  "delivery.deleteConfirm": "The reading will be removed from your members area. To generate it again, you'll need to purchase it once more.",
+  "delivery.deleteHint": "Want to redo this reading? Delete it and generate it again after a new purchase.",
+  "delivery.deleted": "Reading deleted.",
+  "delivery.deleteError": "We couldn't delete the reading. Please try again."
 }

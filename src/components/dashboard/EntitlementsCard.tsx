@@ -27,6 +27,7 @@ import { AnalysisResultDialog } from "@/components/dashboard/AnalysisResultDialo
 import { AnalysisFormDialog } from "@/components/dashboard/AnalysisFormDialog";
 import {
   generateAnalysis,
+  useDeleteDelivery,
   useDeliveredAnalyses,
   useInvalidateDeliveries,
 } from "@/hooks/useDeliveries";
@@ -54,9 +55,15 @@ export function EntitlementsCard() {
   const [resultContent, setResultContent] = useState("");
   const [resultProvider, setResultProvider] = useState<string | null>(null);
   const [resultLoading, setResultLoading] = useState(false);
+  const [resultId, setResultId] = useState<string | null>(null);
+  const [resultDocumentPath, setResultDocumentPath] = useState<string | null>(
+    null,
+  );
+  const [resultDate, setResultDate] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [formKey, setFormKey] = useState("s1");
   const [formTitle, setFormTitle] = useState("");
+  const deleteDelivery = useDeleteDelivery();
 
   const hasPlan = entitlements?.has_plan;
   const isCiclo = entitlements?.plan_key === "ciclo97";
@@ -83,8 +90,30 @@ export function EntitlementsCard() {
     setResultTitle(name);
     setResultContent(item.content);
     setResultProvider(item.provider);
+    setResultId(item.id);
+    setResultDocumentPath(item.document_path);
+    setResultDate(item.created_at);
     setResultLoading(false);
     setResultOpen(true);
+  };
+
+  /** Apaga a análise aberta e libera o item para refazer após nova compra. */
+  const removeDelivered = async () => {
+    if (!resultId) return;
+    try {
+      await deleteDelivery.mutateAsync({
+        id: resultId,
+        documentPath: resultDocumentPath,
+      });
+      setResultOpen(false);
+      setResultId(null);
+      setResultDocumentPath(null);
+      setResultDate(null);
+      invalidate();
+      toast.success(t("delivery.deleted"));
+    } catch {
+      toast.error(t("delivery.deleteError"));
+    }
   };
 
   /** Abre o formulário de dados da análise (com anexo da certidão). */
@@ -104,6 +133,9 @@ export function EntitlementsCard() {
     setResultTitle(formTitle);
     setResultContent("");
     setResultProvider(null);
+    setResultId(null);
+    setResultDocumentPath(documentPath);
+    setResultDate(null);
     setResultLoading(true);
     setResultOpen(true);
     try {
@@ -112,6 +144,9 @@ export function EntitlementsCard() {
       const generated = await generateAnalysis(key, formData, documentPath);
       setResultContent(generated.analysis.content);
       setResultProvider(generated.analysis.provider);
+      setResultId(generated.analysis.id);
+      setResultDocumentPath(generated.analysis.document_path);
+      setResultDate(generated.analysis.created_at);
       invalidateDeliveries();
 
       // Compatibilidade usa o crédito de compatibilidade quando o plano não
@@ -304,6 +339,9 @@ export function EntitlementsCard() {
         content={resultContent}
         isLoading={resultLoading}
         provider={resultProvider}
+        deliveredAt={resultDate}
+        onDelete={resultId ? () => void removeDelivered() : undefined}
+        isDeleting={deleteDelivery.isPending}
       />
     </Card>
   );
