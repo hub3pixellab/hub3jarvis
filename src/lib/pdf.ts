@@ -5,8 +5,6 @@ interface AnalysisPdfInput {
   content: string;
   /** Data da entrega (ISO) — opcional. */
   date?: string | null;
-  /** Linha de crédito ("Gerado por ...") — opcional. */
-  credit?: string | null;
 }
 
 /** Limpa a marcação Markdown para o texto ficar legível no PDF. */
@@ -38,7 +36,6 @@ export function downloadAnalysisPdf({
   title,
   content,
   date,
-  credit,
 }: AnalysisPdfInput): void {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margin = 56;
@@ -76,13 +73,12 @@ export function downloadAnalysisPdf({
   doc.text(title, margin, y);
   y += 20;
 
-  // Data + crédito
+  // Data
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(muted[0], muted[1], muted[2]);
-  const metaLine = [date, credit].filter(Boolean).join("  ·  ");
-  if (metaLine) {
-    doc.text(metaLine, margin, y);
+  if (date) {
+    doc.text(date, margin, y);
     y += 18;
   }
   y += 8;

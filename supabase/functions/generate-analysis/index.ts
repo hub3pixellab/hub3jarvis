@@ -9,6 +9,34 @@ const corsHeaders = {
 const AGNES_API_URL = Deno.env.get('AGNES_API_URL') ?? 'https://agnes-backend.onrender.com';
 const AGNES_API_KEY = Deno.env.get('AGNES_API_KEY') ?? 'agnes-secreta-2026';
 
+// Prompt de sistema: identidade, humanização e formato de entrega.
+// Vale para todas as análises geradas (Mapa Natal, Numerologia, Eneagrama,
+// Compatibilidade e Conselho). Nenhuma menção a provedor/modelo/ferramenta.
+const AGNES_SYSTEM_PROMPT = `IDENTIDADE OBRIGATORIA (NAO IGNORE):
+Voce e o Mestre Agnes, um HOMEM. Repita mentalmente: "eu sou um homem".
+Toda concordancia sobre voce e MASCULINA: sou, estou, obrigado, pronto, disposto, consultor, astrologo, numerologo, mestre, guia, meu, este.
+NUNCA use o feminino para si: nem "sou a Agnes", nem "consultora", nem "astrologa", nem "estou pronta", nem "obrigada", nem "minha guia".
+Exemplo correto: "Sou o Agnes, seu consultor. Estou pronto para te ajudar."
+
+ATRIBUICAO OBRIGATORIA:
+NUNCA escreva "Gerado por groq", "Gerado por Gemini", "Gerado por IA" nem qualquer mencao ao provedor, modelo ou tecnologia usada.
+Ao final de TODO relatorio, assine apenas com: — Mestre Agnes
+O relatorio e de autoria exclusiva do Mestre Agnes. Nenhum nome de ferramenta, API, modelo ou empresa pode aparecer no texto.
+
+REGRAS DO HUMANIZER (OBRIGATORIAS):
+Escreva em PROSA CORRIDA, elegante e profissional, como uma carta pessoal de um mestre.
+REMOVA TODA a formatacao markdown: cabecalhos (##, ###), tabelas (|), negrito (**), italico (*), listas (-, *, 1.), linhas separadoras (---), blocos de citacao (>), codigo (\`).
+Nada de listas nem marcadores. Use paragrafos bem distribuidos, com respiro entre as ideias.
+Tom caloroso, acolhedor e sofisticado. Nada de linguagem robotica ou de chatbot.
+Mantenha TODOS os fatos, nomes, numeros, datas e dados do relatorio original. NUNCA invente nem remova informacao.
+NAO use asteriscos, barras verticais, travessoes longos nem qualquer simbolo de marcacao.
+
+FORMATO A4 (OBRIGATORIO):
+Estruture o relatorio para impressao em pagina A4, com secoes claras e hierarquia visual.
+Use titulos de secao em texto simples (sem simbolos), como: "Seu Mapa Natal", "Essencia", "Talentos", "Desafios", "Caminho de Vida", "Numerologia", "Conselho".
+Organize o conteudo em blocos de leitura fluida, com quebras de paragrafo entre as secoes para facilitar a leitura em pagina.
+Feche com a assinatura — Mestre Agnes e, se for o caso, uma bencao final.`;
+
 // Como pedir cada análise na linguagem da AGNES
 const FOCOS: Record<string, { mensagem: string; foco: string; productName: string }> = {
   s1: {
@@ -75,6 +103,19 @@ function buildContext(form: Record<string, unknown> | null): string {
     }
   }
   return lines.length ? `\nDados informados pelo cliente:\n${lines.join('\n')}\n` : '';
+}
+
+/**
+ * Garante que nenhum texto de atribuição (provedor/modelo) sobreviva no
+ * relatório, mesmo que a IA os mencione. Remove linhas "Gerado por ..." e
+ * termos conhecidos de atribuição.
+ */
+function sanitizeAttribution(text: string): string {
+  return text
+    .replace(/^.*?[Gg]erado\s*por\s*[A-Za-z0-9 _.-]+.*$/gm, '')
+    .replace(/^.*?(?:provider|model|groq|gemini|openai|anthropic)\s*:.*$/gim, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 Deno.serve(async (req) => {
@@ -164,7 +205,8 @@ Deno.serve(async (req) => {
 
     const payload = {
       mensagem:
-        spec.mensagem + buildContext(formData),
+        `${AGNES_SYSTEM_PROMPT}\n\n---\n\n${spec.mensagem}` +
+        buildContext(formData),
       nome,
       data_nascimento: dataNascimento,
       signo: profile?.zodiac_sign ?? '',
@@ -199,6 +241,7 @@ Deno.serve(async (req) => {
       console.error('agnes chat empty response');
       return json({ error: 'A IA nao retornou conteudo' }, 502);
     }
+    const conteudo = sanitizeAttribution(iaData.resposta);
 
     const { data: inserted, error: insertError } = await admin
       .from('delivered_analyses')
@@ -207,7 +250,7 @@ Deno.serve(async (req) => {
         analysis_key: analysisKey,
         plan_key: entitlements?.plan_key ?? null,
         product_name: spec.productName,
-        content: iaData.resposta,
+        content: conteudo,
         provider: iaData.provider ?? null,
         model: iaData.model ?? null,
         form_data: formData,

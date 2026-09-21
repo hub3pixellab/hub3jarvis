@@ -57,7 +57,6 @@ export function AnalysisResultDialog({
       title,
       content,
       date: deliveredAt ? formatDate(deliveredAt, locale) : undefined,
-      credit: provider ? t("delivery.generatedBy", { provider }) : undefined,
     });
   };
 
@@ -97,9 +96,7 @@ export function AnalysisResultDialog({
 
               <div className="flex flex-col gap-3 border-t border-gold/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <span className="font-jost text-[10px] uppercase tracking-[0.25em] text-cream/40">
-                  {t("delivery.generatedBy", {
-                    provider: provider ?? "IA",
-                  })}
+                  {t("delivery.signedBy")}
                 </span>
 
                 <div className="flex flex-wrap items-center gap-3">
