@@ -22,7 +22,6 @@ REESCRITA (somente o texto final, sem comentarios):"""
 
 
 def polir_com_gemini(texto: str) -> dict:
-    """Envia o texto ao Gemini para polimento final. Retorna o texto limpo."""
     if not texto or not texto.strip():
         return {"resposta": "", "polido": False, "motivo": "texto vazio"}
 
@@ -31,7 +30,6 @@ def polir_com_gemini(texto: str) -> dict:
         prompt = PROMPT_POLIMENTO.format(texto=texto)
         r = gemini(prompt, temperature=0.6, max_tokens=4000)
 
-        # Extrai a resposta do Gemini (dict com chave "resposta" ou string)
         if isinstance(r, dict):
             polido = r.get("resposta", "") or r.get("texto", "") or ""
         else:
@@ -40,16 +38,13 @@ def polir_com_gemini(texto: str) -> dict:
         if not polido.strip():
             return {"resposta": texto, "polido": False, "motivo": "gemini retornou vazio"}
 
-        # Garantia extra: remove qualquer markdown que ainda tenha escapado
         polido = _limpeza_final(polido)
         return {"resposta": polido, "polido": True, "motivo": "ok"}
     except Exception as e:
-        # Se o Gemini falhar, devolve o texto original (ja humanizado) como fallback
         return {"resposta": texto, "polido": False, "motivo": f"gemini indisponivel: {e}"}
 
 
 def _limpeza_final(texto: str) -> str:
-    """Limpeza de seguranca: remove qualquer marcacao residual."""
     t = texto
     t = re.sub(r"^[ \t]*#{1,6}[ \t]*", "", t, flags=re.MULTILINE)
     t = re.sub(r"\*\*(.+?)\*\*", r"\1", t, flags=re.DOTALL)
