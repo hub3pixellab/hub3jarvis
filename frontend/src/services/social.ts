@@ -15,6 +15,8 @@ export interface PublicMember {
   followers?: number;
   following?: number;
   is_following?: boolean;
+  /** Se há match (follow mútuo) entre o usuário logado e o membro. */
+  matched?: boolean;
 }
 
 /** Item da lista de membros públicos. */

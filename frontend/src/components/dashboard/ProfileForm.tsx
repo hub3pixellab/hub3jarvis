@@ -35,10 +35,26 @@ const profileSchema = z.object({
     })
     .optional()
     .or(z.literal("")),
+  gender: z.string().optional().or(z.literal("")),
+  sexuality: z.string().optional().or(z.literal("")),
   locale: z.string(),
 });
 
 type ProfileValues = z.infer<typeof profileSchema>;
+
+/** Gêneros disponíveis (valores → i18n `profile.gender.*`). */
+const GENDERS = ["homem", "mulher", "sem_genero"];
+
+/** Sexualidades disponíveis (valores → i18n `profile.sexuality.*`). */
+const SEXUALITIES = [
+  "heterossexual",
+  "homossexual",
+  "bissexual",
+  "pansexual",
+  "assexual",
+  "queer",
+  "outro",
+];
 
 interface ProfileFormProps {
   profile: Profile | null;
@@ -57,6 +73,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         bio: profile?.bio ?? "",
         birth_date: profile?.birth_date ?? "",
         phone: profile?.phone ?? "",
+        gender: profile?.gender ?? "",
+        sexuality: profile?.sexuality ?? "",
         locale: profile?.locale ?? i18n.resolvedLanguage ?? "pt-BR",
       },
     });
@@ -75,6 +93,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           bio: values.bio || null,
           birth_date: values.birth_date || null,
           phone: values.phone ? normalizePhone(values.phone) : null,
+          gender: values.gender || null,
+          sexuality: values.sexuality || null,
           locale: values.locale,
         },
       });
@@ -154,6 +174,59 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             <p className="text-[11px] text-cream/45">{t("profile.phoneHint")}</p>
           )}
         </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="gender">{t("profile.genderLabel")}</Label>
+          <Select
+            value={watch("gender")}
+            onValueChange={(v) => setValue("gender", v)}
+          >
+            <SelectTrigger
+              id="gender"
+              className="w-full border-gold/25 bg-navy/60 text-cream focus:border-gold"
+            >
+              <SelectValue placeholder="…" />
+            </SelectTrigger>
+            <SelectContent>
+              {GENDERS.map((g) => (
+                <SelectItem key={g} value={g}>
+                  {t(`profile.gender.${g}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="sexuality">{t("profile.sexualityLabel")}</Label>
+          <Select
+            value={watch("sexuality")}
+            onValueChange={(v) => setValue("sexuality", v)}
+          >
+            <SelectTrigger
+              id="sexuality"
+              className="w-full border-gold/25 bg-navy/60 text-cream focus:border-gold"
+            >
+              <SelectValue placeholder="…" />
+            </SelectTrigger>
+            <SelectContent>
+              {SEXUALITIES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {t(`profile.sexuality.${s}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Aviso sobre gênero e a leitura */}
+        {watch("gender") && (
+          <div className="rounded-md border border-gold/30 bg-gold/5 px-4 py-3 sm:col-span-2">
+            <p className="font-jost text-xs leading-relaxed text-gold">
+              {t("profile.genderWarning")}
+            </p>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <Label>{t("profile.zodiacLabel")}</Label>

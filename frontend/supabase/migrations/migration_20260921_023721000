@@ -1,0 +1,143 @@
+-- Gênero e sexualidade no perfil (mesmo negócio, colunas aditivas nulas)
+alter table public.profiles add column if not exists gender text;
+alter table public.profiles add column if not exists sexuality text;
+
+-- Chat privado: só entre membros com match (follow mútuo)
+create table if not exists public.chat_messages (
+  id uuid primary key default gen_random_uuid(),
+  sender_id uuid not null references auth.users(id) on delete cascade,
+  receiver_id uuid not null references auth.users(id) on delete cascade,
+  content text not null,
+  read_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists chat_messages_pair_idx on public.chat_messages (sender_id, receiver_id, created_at);
+create index if not exists chat_messages_receiver_idx on public.chat_messages (receiver_id, created_at);
+
+alter table public.chat_messages enable row level security;
+
+-- Leitura: apenas os dois participantes
+create policy "chat_messages_select_pair" on public.chat_messages
+  for select to authenticated using (auth.uid() = sender_id or auth.uid() = receiver_id);
+
+-- Escrita: quem envia é o próprio usuário E existe match (follow mútuo)
+create policy "chat_messages_insert_match" on public.chat_messages
+  for insert to authenticated with check (
+    auth.uid() = sender_id
+    and sender_id <> receiver_id
+    and exists (
+      select 1 from public.follows a
+      join public.follows b on b.follower_id = a.following_id and b.following_id = a.follower_id
+      where a.follower_id = sender_id and a.following_id = receiver_id
+    )
+  );
+
+-- Auxiliar: verifica se há match (follow mútuo)
+create or replace function public.is_matched(p_user_a uuid, p_user_b uuid)
+returns boolean
+language sql stable security definer set search_path = public
+as $$
+  select exists (select 1 from public.follows a where a.follower_id = p_user_a and a.following_id = p_user_b)
+     and exists (select 1 from public.follows b where b.follower_id = p_user_b and b.following_id = p_user_a)
+$$;
+
+revoke execute on function public.is_matched(uuid, uuid) from public, anon;
+grant execute on function public.is_matched(uuid, uuid) to authenticated;
+
+-- Lista minhas conversas (com o perfil do parceiro, última mensagem e não lidas)
+create or replace function public.get_my_conversations()
+returns jsonb
+language plpgsql security definer set search_path = public
+as $$
+declare
+  v_result jsonb;
+begin
+  select coalesce(jsonb_agg(row_to_jsonb(t) order by t.last_at desc nulls last), '[]'::jsonb)
+  into v_result
+  from (
+    select
+      p.id as partner_id,
+      p.display_name,
+      p.avatar_url,
+      p.zodiac_sign,
+      public.is_matched(auth.uid(), p.id) as matched,
+      (select m.content from public.chat_messages m
+        where (m.sender_id = auth.uid() and m.receiver_id = p.id)
+           or (m.sender_id = p.id and m.receiver_id = auth.uid())
+        order by m.created_at desc limit 1) as last_message,
+      (select m.created_at from public.chat_messages m
+        where (m.sender_id = auth.uid() and m.receiver_id = p.id)
+           or (m.sender_id = p.id and m.receiver_id = auth.uid())
+        order by m.created_at desc limit 1) as last_at,
+      (select count(*) from public.chat_messages m
+        where m.sender_id = p.id and m.receiver_id = auth.uid() and m.read_at is null) as unread
+    from public.profiles p
+    where p.id <> auth.uid()
+      and exists (
+        select 1 from public.chat_messages m
+        where (m.sender_id = auth.uid() and m.receiver_id = p.id)
+           or (m.sender_id = p.id and m.receiver_id = auth.uid())
+      )
+  ) t;
+  return v_result;
+end;
+$$;
+
+revoke execute on function public.get_my_conversations() from public, anon;
+grant execute on function public.get_my_conversations() to authenticated;
+
+-- Mensagens do chat com um parceiro (valida match e marca lidas)
+create or replace function public.get_match_messages(p_partner_id uuid)
+returns jsonb
+language plpgsql security definer set search_path = public
+as $$
+declare
+  v_result jsonb;
+begin
+  if not public.is_matched(auth.uid(), p_partner_id) then
+    return jsonb_build_object('matched', false, 'messages', '[]'::jsonb);
+  end if;
+
+  select coalesce(jsonb_agg(row_to_jsonb(t) order by t.created_at), '[]'::jsonb)
+  into v_result
+  from (
+    select m.id, m.sender_id, m.content, m.created_at, m.read_at
+    from public.chat_messages m
+    where (m.sender_id = auth.uid() and m.receiver_id = p_partner_id)
+       or (m.sender_id = p_partner_id and m.receiver_id = auth.uid())
+  ) t;
+
+  update public.chat_messages set read_at = now()
+  where sender_id = p_partner_id and receiver_id = auth.uid() and read_at is null;
+
+  return jsonb_build_object('matched', true, 'messages', v_result);
+end;
+$$;
+
+revoke execute on function public.get_match_messages(uuid) from public, anon;
+grant execute on function public.get_match_messages(uuid) to authenticated;
+
+-- Envia mensagem (valida match)
+create or replace function public.send_match_message(p_partner_id uuid, p_content text)
+returns jsonb
+language plpgsql security definer set search_path = public
+as $$
+declare
+  v_msg record;
+begin
+  if p_content is null or length(trim(p_content)) = 0 then
+    return jsonb_build_object('ok', false, 'error', 'empty');
+  end if;
+  if not public.is_matched(auth.uid(), p_partner_id) then
+    return jsonb_build_object('ok', false, 'error', 'not_matched');
+  end if;
+  insert into public.chat_messages (sender_id, receiver_id, content)
+  values (auth.uid(), p_partner_id, left(trim(p_content), 2000))
+  returning id, sender_id, receiver_id, content, created_at, read_at into v_msg;
+  return jsonb_build_object('ok', true, 'message', row_to_jsonb(v_msg));
+end;
+$$;
+
+revoke execute on function public.send_match_message(uuid, text) from public, anon;
+grant execute on function public.send_match_message(uuid, text) to authenticated;

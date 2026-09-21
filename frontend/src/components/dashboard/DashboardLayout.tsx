@@ -29,11 +29,11 @@ const NAV_ITEMS = [
   { key: "dashboard.overview", to: "/dashboard", Icon: LayoutDashboard },
   { key: "dashboard.profile", to: "/dashboard/perfil", Icon: UserRound },
   { key: "dashboard.social", to: "/dashboard/rede", Icon: Users },
+  { key: "dashboard.chat", to: "/dashboard/chat", Icon: MessagesSquare },
 ];
 
 const COMING_SOON = [
   { key: "dashboard.comingSoonMatches", Icon: HeartHandshake },
-  { key: "dashboard.comingSoonChat", Icon: MessagesSquare },
 ];
 
 function Brand() {
@@ -150,7 +150,9 @@ export default function DashboardLayout() {
       : location.pathname.startsWith("/dashboard/rede") ||
           location.pathname.startsWith("/dashboard/membro/")
         ? t("dashboard.social")
-        : t("dashboard.overview");
+        : location.pathname.startsWith("/dashboard/chat")
+          ? t("dashboard.chat")
+          : t("dashboard.overview");
 
   return (
     <div className="min-h-screen bg-navy-deep text-cream">

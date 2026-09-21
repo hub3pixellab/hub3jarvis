@@ -23,6 +23,10 @@ export interface Profile {
   locale: string;
   /** WhatsApp do usuário (somente dígitos, DDI+DDD+número) — usado na conexão com o terminal. */
   phone: string | null;
+  /** Gênero declarado (usado na leitura astrológica): homem, mulher, sem_genero. */
+  gender: string | null;
+  /** Sexualidade declarada: heterossexual, homossexual, bissexual, pansexual, assexual, queer, outro. */
+  sexuality: string | null;
   /** Se o perfil está visível para outros membros na rede social. */
   social_visible: boolean;
   created_at: string;

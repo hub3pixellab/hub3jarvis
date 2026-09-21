@@ -18,7 +18,18 @@ export async function getProfile(userId: string): Promise<Profile | null> {
  */
 export async function upsertProfile(
   userId: string,
-  patch: Partial<Pick<Profile, "display_name" | "bio" | "birth_date" | "locale" | "phone">>,
+  patch: Partial<
+    Pick<
+      Profile,
+      | "display_name"
+      | "bio"
+      | "birth_date"
+      | "locale"
+      | "phone"
+      | "gender"
+      | "sexuality"
+    >
+  >,
 ): Promise<Profile> {
   const birthDate = patch.birth_date ?? null;
   const zodiacSign = birthDate ? getZodiacSign(birthDate) : null;

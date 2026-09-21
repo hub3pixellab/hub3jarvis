@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   Check,
+  Lock,
   MessageCircle,
+  MessagesSquare,
   Share2,
   Sparkle,
   UserPlus,
@@ -185,6 +187,26 @@ export default function MemberProfilePage() {
                   <MessageCircle className="h-3.5 w-3.5" strokeWidth={1.5} />
                   {t("social.contact")}
                 </a>
+
+                {/* Chat privado: habilitado apenas com match (follow mútuo) */}
+                {member.matched ? (
+                  <Link
+                    to={`/dashboard/chat/${member.id}`}
+                    className="inline-flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-navy-deep shadow-[0_0_24px_hsl(var(--gold)/0.3)] transition hover:bg-gold-light"
+                  >
+                    <MessagesSquare className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    {t("chat.start")}
+                  </Link>
+                ) : (
+                  <span
+                    aria-disabled
+                    title={t("chat.matchRequiredShort")}
+                    className="inline-flex items-center gap-2 rounded-full border border-gold/20 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-cream/35"
+                  >
+                    <Lock className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    {t("chat.locked")}
+                  </span>
+                )}
               </div>
             )}
 
