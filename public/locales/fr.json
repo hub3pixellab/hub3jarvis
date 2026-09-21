@@ -583,5 +583,10 @@
   "horoscope.career.5": "Moment de planifier la prochaine étape avec calme et stratégie.",
   "horoscope.career.6": "Collaborez : les partenariats d'aujourd'hui accélèrent les résultats de demain.",
   "horoscope.career.7": "L'effort récent demande une récompense ; valorisez votre progression et continuez.",
-  "delivery.signedBy": "Signé par — Maître Agnes"
+  "delivery.signedBy": "Signé par — Maître Agnes",
+  "social.previewEyebrow": "Aperçu du profil",
+  "social.previewTitle": "Voici comment vous apparaissez sur le réseau",
+  "social.previewHint": "Ceci est un aperçu de votre profil public. C'est exactement ce que voient les autres membres lorsque vous êtes visible sur le réseau.",
+  "social.previewViewFull": "Voir ma page complète",
+  "social.previewOpen": "Voir l'aperçu"
 }

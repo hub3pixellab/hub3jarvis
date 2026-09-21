@@ -583,5 +583,10 @@
   "horoscope.career.5": "Momento de planear el siguiente paso con calma y estrategia.",
   "horoscope.career.6": "Colabora: las alianzas de hoy aceleran los resultados de mañana.",
   "horoscope.career.7": "El esfuerzo reciente pide recompensa; valora tu progreso y sigue.",
-  "delivery.signedBy": "Firmado por — Maestro Agnes"
+  "delivery.signedBy": "Firmado por — Maestro Agnes",
+  "social.previewEyebrow": "Vista previa del perfil",
+  "social.previewTitle": "Así apareces en la red",
+  "social.previewHint": "Esta es la vista previa de tu perfil público. Es exactamente lo que ven otros miembros cuando estás visible en la red.",
+  "social.previewViewFull": "Ver mi página completa",
+  "social.previewOpen": "Ver vista previa"
 }

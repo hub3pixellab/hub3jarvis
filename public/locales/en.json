@@ -583,5 +583,10 @@
   "horoscope.career.5": "Time to plan the next step calmly and strategically.",
   "horoscope.career.6": "Collaborate: today's partnerships speed up tomorrow's results.",
   "horoscope.career.7": "Recent effort calls for reward; value your progress and keep going.",
-  "delivery.signedBy": "Signed by — Master Agnes"
+  "delivery.signedBy": "Signed by — Master Agnes",
+  "social.previewEyebrow": "Profile preview",
+  "social.previewTitle": "This is how you appear on the network",
+  "social.previewHint": "This is a preview of your public profile. It's exactly what other members see when you're visible on the network.",
+  "social.previewViewFull": "View my full page",
+  "social.previewOpen": "See preview"
 }
