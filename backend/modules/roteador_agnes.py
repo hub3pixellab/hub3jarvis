@@ -1,4 +1,5 @@
 # Roteador: tema do Mestre Agnes -> Agnes (groq) com fallback Gemini; resto -> Gemini
+from humanizador import humanizar_texto
 
 TEMAS_AGNES = [
     "astrologia", "astrologico", "astral", "mapa astral", "signo", "signos",
@@ -28,7 +29,10 @@ async def responder(mensagem, temperature=0.8):
     from modules.gemini_chat import chat as gemini
 
     if not e_tema_agnes(mensagem):
-        return gemini(mensagem, temperature=temperature, max_tokens=2000)
+        r = gemini(mensagem, temperature=temperature, max_tokens=2000)
+        if isinstance(r, dict) and r.get("resposta"):
+            r["resposta"] = humanizar_texto(r["resposta"])
+        return r
 
     try:
         from modules.groq_chat import groq_chat
@@ -37,6 +41,7 @@ async def responder(mensagem, temperature=0.8):
         r = {}
 
     if _resposta_ok(r):
+        r["resposta"] = humanizar_texto(r.get("resposta", ""))
         return r  # Agnes acordou e assumiu o tema
 
     # LLM principal fora do ar -> Gemini assume temporariamente
