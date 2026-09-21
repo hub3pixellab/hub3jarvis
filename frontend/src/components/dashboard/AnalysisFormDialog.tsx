@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FileUp, Loader2, Sparkle, X } from "lucide-react";
 import { toast } from "sonner";
@@ -6,7 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/auth-context";
 import {
   DOCUMENTS_BUCKET,
@@ -14,54 +23,14 @@ import {
   DOCUMENT_MIME_TYPES,
   uploadDocument,
 } from "@/services/deliveries";
+import {
+  ENNEAGRAM_ITEMS,
+  scoreEnneagram,
+  type LikertValue,
+} from "@/domain/enneagram";
+import { QUESTIONNAIRES, type QField } from "@/domain/questionnaires";
 
-type FieldType = "text" | "date" | "time" | "textarea";
-
-interface FieldDef {
-  name: string;
-  type: FieldType;
-  required?: boolean;
-}
-
-/** Campos pedidos em cada análise (os básicos + os específicos do saber). */
-const FORM_FIELDS: Record<string, FieldDef[]> = {
-  s1: [
-    { name: "nome_completo", type: "text", required: true },
-    { name: "data_nascimento", type: "date", required: true },
-    { name: "hora_nascimento", type: "time" },
-    { name: "cidade_nascimento", type: "text" },
-    { name: "observacoes", type: "textarea" },
-  ],
-  s2: [
-    { name: "nome_completo", type: "text", required: true },
-    { name: "nome_nascimento", type: "text" },
-    { name: "data_nascimento", type: "date", required: true },
-    { name: "observacoes", type: "textarea" },
-  ],
-  s3: [
-    { name: "nome_completo", type: "text", required: true },
-    { name: "data_nascimento", type: "date", required: true },
-    { name: "hora_nascimento", type: "time" },
-    { name: "observacoes", type: "textarea" },
-  ],
-  s4: [
-    { name: "nome_completo", type: "text", required: true },
-    { name: "data_nascimento", type: "date", required: true },
-    { name: "hora_nascimento", type: "time" },
-    { name: "cidade_nascimento", type: "text" },
-    { name: "parceiro_nome", type: "text", required: true },
-    { name: "parceiro_data_nascimento", type: "date", required: true },
-    { name: "parceiro_hora_nascimento", type: "time" },
-    { name: "parceiro_cidade_nascimento", type: "text" },
-    { name: "observacoes", type: "textarea" },
-  ],
-  s5: [
-    { name: "nome_completo", type: "text", required: true },
-    { name: "data_nascimento", type: "date", required: true },
-    { name: "pergunta", type: "textarea", required: true },
-    { name: "observacoes", type: "textarea" },
-  ],
-};
+const SCALE: LikertValue[] = [1, 2, 3, 4, 5];
 
 interface AnalysisFormDialogProps {
   open: boolean;
@@ -72,8 +41,8 @@ interface AnalysisFormDialogProps {
 }
 
 /**
- * Pop-up com o formulário de dados de cada análise. Permite anexar a
- * certidão de nascimento para quem não sabe todas as informações.
+ * Questionário profissional de cada análise, com anexo de certidão e,
+ * para o Eneagrama, um teste de 27 afirmativas que calcula o tipo.
  */
 export function AnalysisFormDialog({
   open,
@@ -84,18 +53,28 @@ export function AnalysisFormDialog({
 }: AnalysisFormDialogProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const fields = QUESTIONNAIRES[analysisKey] ?? QUESTIONNAIRES.s1;
+  const isEneagrama = analysisKey === "s3";
+
   const [values, setValues] = useState<Record<string, string>>({});
+  const [likert, setLikert] = useState<Record<string, LikertValue>>({});
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const fields = FORM_FIELDS[analysisKey] ?? FORM_FIELDS.s1;
+  const enneagramScore = useMemo(
+    () => (isEneagrama ? scoreEnneagram(likert) : null),
+    [isEneagrama, likert],
+  );
+
+  const answeredCount = ENNEAGRAM_ITEMS.filter((i) => likert[i.id]).length;
 
   const setValue = (name: string, value: string) =>
     setValues((prev) => ({ ...prev, [name]: value }));
 
   const reset = () => {
     setValues({});
+    setLikert({});
     setFile(null);
   };
 
@@ -118,17 +97,31 @@ export function AnalysisFormDialog({
       toast.error(t("deliveryForm.errorRequired"));
       return;
     }
+    // Eneagrama: exige o questionário completo
+    if (isEneagrama && answeredCount < ENNEAGRAM_ITEMS.length) {
+      toast.error(t("deliveryForm.errorEneagrama"));
+      return;
+    }
     if (!user) return;
+
+    const formData: Record<string, unknown> = {
+      ...values,
+      tem_documento: Boolean(file),
+    };
+    if (enneagramScore) {
+      formData.eneagrama_tipo = enneagramScore.dominant;
+      formData.eneagrama_asa = enneagramScore.wing;
+      formData.eneagrama_respostas = likert;
+      formData.eneagrama_pontuacao = enneagramScore.byType;
+    }
+
     setIsUploading(true);
     try {
       let documentPath: string | null = null;
       if (file) {
         documentPath = await uploadDocument(user.id, file);
       }
-      onSubmitted(
-        { ...values, tem_documento: Boolean(file) },
-        documentPath,
-      );
+      onSubmitted(formData, documentPath);
       reset();
       onOpenChange(false);
     } catch {
@@ -137,6 +130,18 @@ export function AnalysisFormDialog({
       setIsUploading(false);
     }
   };
+
+  // Agrupa campos por seção, mantendo a ordem
+  const sections = useMemo(() => {
+    const map = new Map<string, QField[]>();
+    for (const f of fields) {
+      const key = f.sectionKey ?? "questionnaire.section.birth";
+      const list = map.get(key) ?? [];
+      list.push(f);
+      map.set(key, list);
+    }
+    return Array.from(map.entries());
+  }, [fields]);
 
   return (
     <Dialog
@@ -166,38 +171,94 @@ export function AnalysisFormDialog({
             {t("deliveryForm.subtitle")}
           </p>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {fields.map((field) => (
-              <div
-                key={field.name}
-                className={`flex flex-col gap-2 ${
-                  field.type === "textarea" ? "sm:col-span-2" : ""
-                }`}
-              >
-                <Label htmlFor={`f-${field.name}`}>
-                  {t(`deliveryForm.f.${field.name}`)}
-                  {field.required && <span className="text-gold"> *</span>}
-                </Label>
-                {field.type === "textarea" ? (
-                  <Textarea
-                    id={`f-${field.name}`}
-                    rows={3}
+          {sections.map(([sectionKey, sectionFields]) => (
+            <div key={sectionKey} className="flex flex-col gap-4">
+              <SectionTitle>{t(sectionKey)}</SectionTitle>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {sectionFields.map((field) => (
+                  <Field
+                    key={field.name}
+                    field={field}
                     value={values[field.name] ?? ""}
-                    onChange={(e) => setValue(field.name, e.target.value)}
-                    className="border-gold/25 bg-navy/60 text-cream placeholder:text-cream/35 focus:border-gold"
+                    onChange={(v) => setValue(field.name, v)}
                   />
-                ) : (
-                  <Input
-                    id={`f-${field.name}`}
-                    type={field.type}
-                    value={values[field.name] ?? ""}
-                    onChange={(e) => setValue(field.name, e.target.value)}
-                    className="border-gold/25 bg-navy/60 text-cream placeholder:text-cream/35 focus:border-gold [color-scheme:dark]"
-                  />
-                )}
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+
+          {/* Teste do Eneagrama */}
+          {isEneagrama && (
+            <div className="flex flex-col gap-4 border-t border-gold/15 pt-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <SectionTitle>{t("questionnaire.section.eneagramaTeste")}</SectionTitle>
+                <Badge className="border-gold/40 bg-gold/5 px-2 py-0.5 font-jost text-[9px] uppercase tracking-[0.2em] text-gold">
+                  {answeredCount}/{ENNEAGRAM_ITEMS.length}
+                </Badge>
+              </div>
+              <p className="font-jost text-xs leading-relaxed text-cream/50">
+                {t("questionnaire.eneagramaHint")}
+              </p>
+
+              <div className="flex flex-col gap-3">
+                {ENNEAGRAM_ITEMS.map((item, idx) => (
+                  <div
+                    key={item.id}
+                    className="flex flex-col gap-2 rounded-md border border-gold/15 bg-navy/40 p-3"
+                  >
+                    <p className="font-jost text-sm leading-relaxed text-cream/85">
+                      <span className="mr-2 font-cinzel text-gold/70">
+                        {String(idx + 1).padStart(2, "0")}.
+                      </span>
+                      {t(`eneagrama.q.${item.id}`)}
+                    </p>
+                    <RadioGroup
+                      value={String(likert[item.id] ?? "")}
+                      onValueChange={(v) =>
+                        setLikert((prev) => ({
+                          ...prev,
+                          [item.id]: Number(v) as LikertValue,
+                        }))
+                      }
+                      className="flex flex-wrap items-center gap-1"
+                    >
+                      {SCALE.map((n) => (
+                        <div
+                          key={n}
+                          className="flex flex-col items-center gap-1"
+                        >
+                          <RadioGroupItem
+                            value={String(n)}
+                            id={`${item.id}-${n}`}
+                            className="border-gold/40 text-gold data-[state=checked]:border-gold"
+                          />
+                          <label
+                            htmlFor={`${item.id}-${n}`}
+                            className="font-jost text-[9px] uppercase tracking-wider text-cream/45"
+                          >
+                            {t(`eneagrama.scale.${n}`)}
+                          </label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+                ))}
+              </div>
+
+              {enneagramScore && answeredCount === ENNEAGRAM_ITEMS.length && (
+                <div className="rounded-md border border-gold/40 bg-royal/30 p-4">
+                  <p className="font-jost text-[10px] uppercase tracking-[0.3em] text-gold">
+                    {t("questionnaire.eneagramaResultado")}
+                  </p>
+                  <p className="mt-2 font-cinzel text-2xl text-gold-gradient">
+                    {t(`eneagrama.tipo.${enneagramScore.dominant}`)}
+                    {enneagramScore.wing &&
+                      ` – ${t(`eneagrama.tipo.${enneagramScore.wing}`)}`}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Anexo: certidão de nascimento */}
           <div className="flex flex-col gap-2 border-t border-gold/15 pt-4">
@@ -268,6 +329,91 @@ export function AnalysisFormDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+const SectionTitle = ({ children }: { children: string }) => (
+  <h4 className="flex items-center gap-2 font-cinzel text-sm uppercase tracking-[0.3em] text-gold/90">
+    <span className="h-px w-5 bg-gold/60" />
+    {children}
+  </h4>
+);
+
+function Field({
+  field,
+  value,
+  onChange,
+}: {
+  field: QField;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const { t } = useTranslation();
+  if (field.type === "select") {
+    return (
+      <div className="flex flex-col gap-2">
+        <Label htmlFor={`q-${field.name}`}>
+          {t(field.labelKey)}
+          {field.required && <span className="text-gold"> *</span>}
+        </Label>
+        <Select value={value} onValueChange={onChange}>
+          <SelectTrigger
+            id={`q-${field.name}`}
+            className="w-full border-gold/25 bg-navy/60 text-cream focus:border-gold"
+          >
+            <SelectValue placeholder="…" />
+          </SelectTrigger>
+          <SelectContent>
+            {(field.options ?? []).map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {t(`questionnaire.opt.${opt}`)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {field.hintKey && (
+          <p className="text-[11px] text-cream/45">{t(field.hintKey)}</p>
+        )}
+      </div>
+    );
+  }
+  if (field.type === "textarea") {
+    return (
+      <div className="flex flex-col gap-2 sm:col-span-2">
+        <Label htmlFor={`q-${field.name}`}>
+          {t(field.labelKey)}
+          {field.required && <span className="text-gold"> *</span>}
+        </Label>
+        <Textarea
+          id={`q-${field.name}`}
+          rows={3}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="border-gold/25 bg-navy/60 text-cream placeholder:text-cream/35 focus:border-gold"
+        />
+        {field.hintKey && (
+          <p className="text-[11px] text-cream/45">{t(field.hintKey)}</p>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={`q-${field.name}`}>
+        {t(field.labelKey)}
+        {field.required && <span className="text-gold"> *</span>}
+      </Label>
+      <Input
+        id={`q-${field.name}`}
+        type={field.type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="border-gold/25 bg-navy/60 text-cream placeholder:text-cream/35 focus:border-gold [color-scheme:dark]"
+      />
+      {field.hintKey && (
+        <p className="text-[11px] text-cream/45">{t(field.hintKey)}</p>
+      )}
+    </div>
   );
 }
 

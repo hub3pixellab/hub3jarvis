@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Instagram, Mail, MessageCircle, Sparkle, Youtube } from "lucide-react";
 import { AnalysisCounter } from "@/components/agnes/AnalysisCounter";
+import { AppStoreButtons } from "@/components/agnes/AppStoreButtons";
 
 const SERVICES = [
   "services.s1Name",
@@ -144,6 +145,14 @@ const Footer = () => {
                   <Icon className="h-4 w-4" strokeWidth={1.5} />
                 </a>
               ))}
+            </div>
+
+            {/* Aplicativo (em breve) */}
+            <div className="mt-8 flex flex-col gap-3">
+              <p className="font-jost text-[10px] font-light uppercase tracking-[0.4em] text-cream/45">
+                {t("footer.appTitle")}
+              </p>
+              <AppStoreButtons size="sm" />
             </div>
           </div>
         </div>

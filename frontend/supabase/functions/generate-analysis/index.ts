@@ -22,7 +22,7 @@ const FOCOS: Record<string, { mensagem: string; foco: string; productName: strin
     productName: 'Numerologia',
   },
   s3: {
-    mensagem: 'Preciso da minha análise de Eneagrama: qual é o meu tipo de personalidade e os padrões que se repetem na minha história.',
+    mensagem: 'O cliente respondeu ao teste do Eneagrama. Use o tipo e a asa indicados como base e cruze com a astrologia e a numerologia para entregar o perfil eneagramático completo, profundo e acolhedor.',
     foco: 'eneagrama',
     productName: 'Eneagrama',
   },
@@ -63,6 +63,16 @@ function buildContext(form: Record<string, unknown> | null): string {
   }
   if (form.tem_documento === true) {
     lines.push('- O cliente anexou a certidão de nascimento (documento enviado).');
+  }
+  // Eneagrama: envia o resultado do questionário (tipo, asa e pontuação)
+  if (form.eneagrama_tipo !== undefined) {
+    lines.push(`- Resultado do teste de Eneagrama: Tipo ${form.eneagrama_tipo}`);
+    if (form.eneagrama_asa !== undefined && form.eneagrama_asa !== null) {
+      lines.push(`- Asa: Tipo ${form.eneagrama_asa}`);
+    }
+    if (form.eneagrama_pontuacao) {
+      lines.push(`- Pontuação por tipo: ${JSON.stringify(form.eneagrama_pontuacao)}`);
+    }
   }
   return lines.length ? `\nDados informados pelo cliente:\n${lines.join('\n')}\n` : '';
 }
