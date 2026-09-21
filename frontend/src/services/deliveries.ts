@@ -53,6 +53,25 @@ export async function getDeliveredAnalyses(
   return (data ?? []) as DeliveredAnalysis[];
 }
 
+/**
+ * Apaga uma análise entregue (e o documento anexado, se houver), para que
+ * o usuário possa gerá-la de novo depois de uma nova compra.
+ */
+export async function deleteDeliveredAnalysis(
+  id: string,
+  documentPath?: string | null,
+): Promise<void> {
+  if (documentPath) {
+    // Não bloqueia a exclusão se o arquivo já não existir.
+    await supabase.storage.from(DOCUMENTS_BUCKET).remove([documentPath]);
+  }
+  const { error } = await supabase
+    .from("delivered_analyses")
+    .delete()
+    .eq("id", id);
+  if (error) throw error;
+}
+
 export const DOCUMENTS_BUCKET = "documents";
 export const DOCUMENT_MAX_BYTES = 10 * 1024 * 1024;
 export const DOCUMENT_MIME_TYPES = new Set([

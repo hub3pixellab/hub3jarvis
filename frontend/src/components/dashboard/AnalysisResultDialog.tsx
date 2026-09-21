@@ -1,7 +1,20 @@
 import { useTranslation } from "react-i18next";
-import { Loader2, MessageCircle, Sparkle } from "lucide-react";
+import { Loader2, MessageCircle, Sparkle, Trash2, Download } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { buildWhatsAppLink, WHATSAPP_MESSAGES } from "@/lib/whatsapp";
+import { downloadAnalysisPdf } from "@/lib/pdf";
+import { formatDate } from "@/lib/format";
 
 interface AnalysisResultDialogProps {
   open: boolean;
@@ -12,11 +25,17 @@ interface AnalysisResultDialogProps {
   content: string;
   isLoading: boolean;
   provider: string | null;
+  /** Data da entrega (ISO) — usada no PDF. */
+  deliveredAt?: string | null;
+  /** Quando informado, habilita a exclusão da análise entregue. */
+  onDelete?: () => void;
+  isDeleting?: boolean;
 }
 
 /**
  * Pop-up com o resultado da análise gerado pela IA do Mestre Agnes.
- * Também oferece o envio do resultado pelo WhatsApp.
+ * Oferece download em PDF, envio pelo WhatsApp e exclusão (para refazer
+ * após uma nova compra).
  */
 export function AnalysisResultDialog({
   open,
@@ -25,8 +44,22 @@ export function AnalysisResultDialog({
   content,
   isLoading,
   provider,
+  deliveredAt,
+  onDelete,
+  isDeleting,
 }: AnalysisResultDialogProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? "pt-BR";
+  const hasContent = !isLoading && content.trim().length > 0;
+
+  const download = () => {
+    downloadAnalysisPdf({
+      title,
+      content,
+      date: deliveredAt ? formatDate(deliveredAt, locale) : undefined,
+      credit: provider ? t("delivery.generatedBy", { provider }) : undefined,
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -68,19 +101,80 @@ export function AnalysisResultDialog({
                     provider: provider ?? "IA",
                   })}
                 </span>
-                <a
-                  href={buildWhatsAppLink(
-                    undefined,
-                    WHATSAPP_MESSAGES.analysisRequest(title),
+
+                <div className="flex flex-wrap items-center gap-3">
+                  {hasContent && (
+                    <button
+                      type="button"
+                      onClick={download}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-gold/50 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-gold transition hover:bg-gold/10"
+                    >
+                      <Download className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      {t("delivery.downloadPdf")}
+                    </button>
                   )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-gold/50 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-gold transition hover:bg-gold/10"
-                >
-                  <MessageCircle className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  {t("delivery.sendWhatsApp")}
-                </a>
+                  <a
+                    href={buildWhatsAppLink(
+                      undefined,
+                      WHATSAPP_MESSAGES.analysisRequest(title),
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-gold/50 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-gold transition hover:bg-gold/10"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    {t("delivery.sendWhatsApp")}
+                  </a>
+                </div>
               </div>
+
+              {onDelete && (
+                <div className="flex flex-col gap-2 border-t border-gold/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="max-w-md font-jost text-[11px] leading-relaxed text-cream/45">
+                    {t("delivery.deleteHint")}
+                  </p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        type="button"
+                        disabled={isDeleting}
+                        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-destructive/50 px-5 py-2.5 font-jost text-[11px] uppercase tracking-[0.3em] text-destructive transition hover:bg-destructive/10 disabled:opacity-50"
+                      >
+                        {isDeleting ? (
+                          <Loader2
+                            className="h-3.5 w-3.5 animate-spin"
+                            strokeWidth={1.5}
+                          />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                        )}
+                        {t("delivery.deleteCta")}
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="border-gold/30 bg-navy text-cream">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="font-cinzel text-cream">
+                          {t("delivery.deleteTitle")}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="font-jost text-cream/65">
+                          {t("delivery.deleteConfirm")}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="border-gold/30 bg-transparent text-cream hover:bg-gold/10 hover:text-cream">
+                          {t("deliveryForm.cancel")}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => onDelete()}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {t("delivery.deleteCta")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
             </>
           )}
         </div>

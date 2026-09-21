@@ -520,5 +520,12 @@
   "hero.storeSoonText": "La nostra app sta arrivando. Presto potrai scaricare il Maestro Agnes su Google Play e sull'App Store.",
   "hero.storeSoonClose": "Capito",
   "footer.appTitle": "Scarica l'app",
-  "dashboard.appTitle": "App Maestro Agnes"
+  "dashboard.appTitle": "App Maestro Agnes",
+  "delivery.downloadPdf": "Scarica PDF",
+  "delivery.deleteCta": "Elimina analisi",
+  "delivery.deleteTitle": "Eliminare questa analisi?",
+  "delivery.deleteConfirm": "L'analisi sarà cancellata dalla tua area membri. Per generarla di nuovo, dovrai acquistarla ancora.",
+  "delivery.deleteHint": "Vuoi rifare questa analisi? Eliminala e genera di nuovo dopo un nuovo acquisto.",
+  "delivery.deleted": "Analisi eliminata.",
+  "delivery.deleteError": "Impossibile eliminare l'analisi. Riprova."
 }

@@ -520,5 +520,12 @@
   "hero.storeSoonText": "Notre application arrive. Bientôt, vous pourrez télécharger Maître Agnes sur Google Play et l'App Store.",
   "hero.storeSoonClose": "Compris",
   "footer.appTitle": "Téléchargez l'application",
-  "dashboard.appTitle": "Application Maître Agnes"
+  "dashboard.appTitle": "Application Maître Agnes",
+  "delivery.downloadPdf": "Télécharger le PDF",
+  "delivery.deleteCta": "Supprimer l'analyse",
+  "delivery.deleteTitle": "Supprimer cette analyse ?",
+  "delivery.deleteConfirm": "L'analyse sera effacée de votre espace membres. Pour la générer à nouveau, il faudra la racheter.",
+  "delivery.deleteHint": "Vous voulez refaire cette analyse ? Supprimez-la et générez-la à nouveau après un nouvel achat.",
+  "delivery.deleted": "Analyse supprimée.",
+  "delivery.deleteError": "Impossible de supprimer l'analyse. Réessayez."
 }
