@@ -96,9 +96,12 @@ export function HoroscopeCard() {
           <p className="font-jost text-sm leading-relaxed tracking-wide text-cream/85">
             {t(horoscope.essenceKey)}
           </p>
-          <p className="font-jost text-sm font-light leading-relaxed tracking-wide text-cream/70">
-            {t(horoscope.toneKey)}
-          </p>
+          <div className="mt-1 flex flex-col gap-3 border-t border-gold/15 pt-3">
+            <MiniSection label={t("horoscope.section.overview")} text={t(horoscope.overviewKey)} />
+            <MiniSection label={t("horoscope.section.love")} text={t(horoscope.loveKey)} />
+            <MiniSection label={t("horoscope.section.career")} text={t(horoscope.careerKey)} />
+            <MiniSection label={t("horoscope.section.advice")} text={t(horoscope.adviceKey)} />
+          </div>
         </div>
 
         {/* Ação */}
@@ -140,3 +143,17 @@ export function HoroscopeCard() {
 }
 
 export default HoroscopeCard;
+
+/** Bloco compacto de seção do horóscopo no card. */
+function MiniSection({ label, text }: { label: string; text: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="font-jost text-[9px] uppercase tracking-[0.3em] text-gold/75">
+        {label}
+      </span>
+      <p className="font-jost text-sm font-light leading-relaxed tracking-wide text-cream/70">
+        {text}
+      </p>
+    </div>
+  );
+}
