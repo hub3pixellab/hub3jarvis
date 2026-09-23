@@ -9,3 +9,9 @@ verify_jwt = true
 # verified inside the function with constructEventAsync + STRIPE_WEBHOOK_SECRET.
 [functions.stripe-webhook]
 verify_jwt = false
+
+# sign-match é público: alimenta o widget de marketing (combinação de signos)
+# que pode ser embutido em páginas sem login. O resultado é cacheado por
+# par+idioma, então a IA só gera cada combinação uma única vez.
+[functions.sign-match]
+verify_jwt = false

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   BookOpen,
@@ -10,27 +9,12 @@ import {
   MessageCircle,
   Triangle,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/auth-context";
-import {
-  useEntitlements,
-  useInvalidateEntitlements,
-} from "@/hooks/useEntitlements";
-import {
-  consumeAnalysis,
-  consumeCompatibility,
-} from "@/services/entitlements";
-import { AnalysisResultDialog } from "@/components/dashboard/AnalysisResultDialog";
-import { AnalysisFormDialog } from "@/components/dashboard/AnalysisFormDialog";
-import {
-  generateAnalysis,
-  useDeleteDelivery,
-  useDeliveredAnalyses,
-  useInvalidateDeliveries,
-} from "@/hooks/useDeliveries";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { useAnalysisDelivery } from "@/hooks/useAnalysisDelivery";
 
 /** As 5 análises do Mestre (chaves i18n em services.s*Name). */
 const ANALYSES = [
@@ -46,138 +30,24 @@ export function EntitlementsCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: entitlements, isLoading } = useEntitlements(Boolean(user));
-  const { data: delivered } = useDeliveredAnalyses(user?.id);
-  const invalidate = useInvalidateEntitlements();
-  const invalidateDeliveries = useInvalidateDeliveries();
-  const [busyKey, setBusyKey] = useState<string | null>(null);
-  const [resultOpen, setResultOpen] = useState(false);
-  const [resultTitle, setResultTitle] = useState("");
-  const [resultContent, setResultContent] = useState("");
-  const [resultProvider, setResultProvider] = useState<string | null>(null);
-  const [resultLoading, setResultLoading] = useState(false);
-  const [resultId, setResultId] = useState<string | null>(null);
-  const [resultDocumentPath, setResultDocumentPath] = useState<string | null>(
-    null,
-  );
-  const [resultDate, setResultDate] = useState<string | null>(null);
-  const [formOpen, setFormOpen] = useState(false);
-  const [formKey, setFormKey] = useState("s1");
-  const [formTitle, setFormTitle] = useState("");
-  const deleteDelivery = useDeleteDelivery();
+  const { busyKey, deliveredMap, openDelivered, startDelivery, dialogs } =
+    useAnalysisDelivery();
 
   const hasPlan = entitlements?.has_plan;
   const isCiclo = entitlements?.plan_key === "ciclo97";
-  const deliveredMap = new Map(
-    (delivered ?? []).map((d) => [d.analysis_key, d]),
-  );
-  // Análises exibidas: as liberadas pelo plano + as já entregues (para rever).
   const available = isCiclo
-    ? ANALYSES // ciclo libera qualquer análise, com ritmo de 1 por semana
+    ? ANALYSES
     : ANALYSES.filter((a) =>
         (entitlements?.analyses_avulsas ?? []).includes(a.key),
       );
   const analyses = ANALYSES.filter(
-    (a) =>
-      available.some((x) => x.key === a.key) || deliveredMap.has(a.key),
+    (a) => available.some((x) => x.key === a.key) || deliveredMap.has(a.key),
   );
   const weeklyAvailable = Boolean(entitlements?.weekly_available);
   const compatRemaining = entitlements?.compatibility_remaining ?? 0;
 
-  /** Mostra uma análise já entregue (sem consumir nada). */
-  const openDelivered = (analysisKey: string, name: string) => {
-    const item = deliveredMap.get(analysisKey);
-    if (!item) return;
-    setResultTitle(name);
-    setResultContent(item.content);
-    setResultProvider(item.provider);
-    setResultId(item.id);
-    setResultDocumentPath(item.document_path);
-    setResultDate(item.created_at);
-    setResultLoading(false);
-    setResultOpen(true);
-  };
-
-  /** Apaga a análise aberta e libera o item para refazer após nova compra. */
-  const removeDelivered = async () => {
-    if (!resultId) return;
-    try {
-      await deleteDelivery.mutateAsync({
-        id: resultId,
-        documentPath: resultDocumentPath,
-      });
-      setResultOpen(false);
-      setResultId(null);
-      setResultDocumentPath(null);
-      setResultDate(null);
-      invalidate();
-      toast.success(t("delivery.deleted"));
-    } catch {
-      toast.error(t("delivery.deleteError"));
-    }
-  };
-
-  /** Abre o formulário de dados da análise (com anexo da certidão). */
-  const startDelivery = (analysisKey: string, name: string) => {
-    setFormKey(analysisKey);
-    setFormTitle(name);
-    setFormOpen(true);
-  };
-
-  /** Recebe os dados do formulário e gera a análise pela IA. */
-  const runDelivery = async (
-    formData: Record<string, unknown>,
-    documentPath: string | null,
-  ) => {
-    const key = formKey;
-    setBusyKey(key);
-    setResultTitle(formTitle);
-    setResultContent("");
-    setResultProvider(null);
-    setResultId(null);
-    setResultDocumentPath(documentPath);
-    setResultDate(null);
-    setResultLoading(true);
-    setResultOpen(true);
-    try {
-      // Gera primeiro (a função valida o direito); só então consome o crédito,
-      // para não perder a análise se a IA falhar.
-      const generated = await generateAnalysis(key, formData, documentPath);
-      setResultContent(generated.analysis.content);
-      setResultProvider(generated.analysis.provider);
-      setResultId(generated.analysis.id);
-      setResultDocumentPath(generated.analysis.document_path);
-      setResultDate(generated.analysis.created_at);
-      invalidateDeliveries();
-
-      // Compatibilidade usa o crédito de compatibilidade quando o plano não
-      // libera a análise s4 na lista de avulsas (ex.: Mapa Essencial, Ciclo).
-      const isCompatCredit =
-        key === "s4" &&
-        !(entitlements?.analyses_avulsas ?? []).includes("s4");
-      const consumed = isCompatCredit
-        ? await consumeCompatibility()
-        : await consumeAnalysis(key);
-      if (!consumed.ok && !consumed.kind) {
-        toast.error(
-          t(
-            consumed.error === "weekly_limit"
-              ? "entitlements.weeklyUsed"
-              : "entitlements.error",
-          ),
-        );
-      }
-      invalidate();
-    } catch {
-      setResultOpen(false);
-      toast.error(t("delivery.error"));
-    } finally {
-      setResultLoading(false);
-      setBusyKey(null);
-    }
-  };
-
   return (
-    <Card className="border-gold/20 bg-card">
+    <Card id="direitos" className="border-gold/20 bg-card">
       <CardHeader className="border-b border-gold/10 pb-3">
         <CardTitle className="flex items-center gap-2 font-cinzel text-xl text-cream">
           <Crown className="h-4 w-4 text-gold" strokeWidth={1.5} />
@@ -224,8 +94,6 @@ export function EntitlementsCard() {
               <ul className="flex flex-col gap-2">
                 {analyses.map(({ key, nameKey, Icon }) => {
                   const isDelivered = deliveredMap.has(key);
-                  // Compatibilidade usa o crédito de compatibilidade quando o
-                  // plano não libera s4 na lista de avulsas (ex.: Essencial, Ciclo).
                   const isCompatCredit =
                     key === "s4" &&
                     !(entitlements?.analyses_avulsas ?? []).includes("s4");
@@ -267,15 +135,9 @@ export function EntitlementsCard() {
                         }`}
                       >
                         {busyKey === key ? (
-                          <Loader2
-                            className="h-3 w-3 animate-spin"
-                            strokeWidth={1.5}
-                          />
+                          <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.5} />
                         ) : (
-                          <MessageCircle
-                            className="h-3 w-3"
-                            strokeWidth={1.5}
-                          />
+                          <MessageCircle className="h-3 w-3" strokeWidth={1.5} />
                         )}
                         {isDelivered
                           ? t("delivery.viewCta")
@@ -307,10 +169,7 @@ export function EntitlementsCard() {
                   className="inline-flex shrink-0 items-center gap-2 rounded-full border border-gold/50 px-4 py-2 font-jost text-[10px] uppercase tracking-[0.25em] text-gold transition hover:bg-gold/10 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {busyKey === "s4" ? (
-                    <Loader2
-                      className="h-3 w-3 animate-spin"
-                      strokeWidth={1.5}
-                    />
+                    <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.5} />
                   ) : (
                     <MessageCircle className="h-3 w-3" strokeWidth={1.5} />
                   )}
@@ -322,27 +181,7 @@ export function EntitlementsCard() {
         )}
       </CardContent>
 
-      <AnalysisFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        analysisKey={formKey}
-        title={formTitle}
-        onSubmitted={(formData, documentPath) =>
-          void runDelivery(formData, documentPath)
-        }
-      />
-
-      <AnalysisResultDialog
-        open={resultOpen}
-        onOpenChange={setResultOpen}
-        title={resultTitle}
-        content={resultContent}
-        isLoading={resultLoading}
-        provider={resultProvider}
-        deliveredAt={resultDate}
-        onDelete={resultId ? () => void removeDelivered() : undefined}
-        isDeleting={deleteDelivery.isPending}
-      />
+      {dialogs}
     </Card>
   );
 }
