@@ -55,3 +55,4 @@ renomear_*.py
 .pytest_cache/
 coverage/
 htmlcov/
+.env

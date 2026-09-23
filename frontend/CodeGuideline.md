@@ -1,41 +1,4 @@
-cd /workspaces/hub3jarvis/backend && source venv/bin/activate
-export AGNES_API_KEY="agnes-secreta-2026"
-
-# Teste do loader (agora deve achar @coder)
-python3 -c "
-import sys; sys.path.insert(0, '.')
-from skills_loader import detectar_skill
-print('@coder ->', detectar_skill('@coder revise isto'))
-print('@agent-coder ->', detectar_skill('@agent-coder revise isto'))
-print('@reviewer ->', detectar_skill('@reviewer revise isto'))
-print('@security ->', detectar_skill('@security audite isto'))
-"
-
-# Sobe o backend
-uvicorn main:app --reload --port 8000 &
-sleep 4
-
-# Teste real do terminal COM skill
-curl -s -X POST http://localhost:8000/api/agnes/chat \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: $AGNES_API_KEY" \
-  -d '{"mensagem": "@agent-coder revise este codigo com boas praticas"}' | head -c 800
-echo
-# Teste SEM skill (fluxo normal)
-curl -s -X POST http://localhost:8000/api/agnes/chat \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: $AGNES_API_KEY" \
-  -d '{"mensagem": "qual o meu horoscopo de hoje?"}' | head -c 400cd /workspaces/hub3jarvis
-
-# Vê o que mudou no arquivo antes de commitar
-git diff frontend/CodeGuideline.md | head -50
-
-# Se fizer sentido, commita junto
-git add frontend/CodeGuideline.md
-git commit -m "docs(frontend): atualiza CodeGuideline"
-
-# Agora o pull não bloqueia mais
-git pull --rebase origin main && git push origin main# Code Guideline
+# Code Guideline
 
 ## Project Structure Overview
 
