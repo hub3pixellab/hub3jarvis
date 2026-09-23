@@ -69,12 +69,18 @@ def detectar_skill(mensagem: str) -> Optional[str]:
     match = re.search(r"@([a-zA-Z0-9_-]+)", mensagem)
     if not match:
         return None
-    nome = match.group(1)
-    # correspondencia exata primeiro, depois por prefixo (ex.: @coder -> agent-coder)
+    nome = match.group(1).lower()
+    # 1) match exato (agent-coder -> agent-coder, coder -> coder)
     for s in lista:
         if s["nome"] == nome:
             return s["nome"]
+    # 2) match pelo nome sem prefixos comuns (coder -> agent-coder, reviewer -> agent-reviewer)
     for s in lista:
-        if s["nome"].startswith(nome):
+        base = re.sub(r"^(agent|swarm|expert|skill)-", "", s["nome"])
+        if base == nome or base.startswith(nome):
+            return s["nome"]
+    # 3) substring (code -> agent-coder, security -> agent-security-manager)
+    for s in lista:
+        if nome in s["nome"]:
             return s["nome"]
     return None
