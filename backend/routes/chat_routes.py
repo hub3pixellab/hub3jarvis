@@ -1,9 +1,11 @@
 """Chat Routes — Terminal de conversa com a Agnes + pagina web."""
 import os
+import re
 from pathlib import Path
 from fastapi import APIRouter, Header, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
+from skills_loader import carregar_skill, detectar_skill
 
 router = APIRouter(tags=["Agnes Chat"])
 AGNES_KEY = os.getenv("AGNES_API_KEY", "agnes-dev-key")
@@ -50,7 +52,17 @@ Dados do cliente (usar como base se relevante):
 - Foco: {req.foco}
 """
 
+        # >>> SKILLS RUFLO: @nome-da-skill injeta o SKILL.md no prompt
     prompt = AGNES_CHAT_PROMPT + contexto + "\nMensagem do cliente: " + req.mensagem
+    skill_nome = detectar_skill(req.mensagem)
+    if skill_nome:
+        skill_conteudo = carregar_skill(skill_nome)
+        if skill_conteudo:
+            prompt = (AGNES_CHAT_PROMPT
+                      + f"\n\n[SKILL ATIVA: {skill_nome}]\n{skill_conteudo}\n[/SKILL]\n"
+                      + contexto
+                      + "\nMensagem do cliente: " + re.sub(r"@[a-zA-Z0-9_-]+", "", req.mensagem).strip())
+    # <<< FIM SKILLS RUFLO
     resultado = await groq_chat.chat(prompt, temperature=0.7, max_tokens=2000)
     return {
         "resposta": resultado.get("resposta", ""),

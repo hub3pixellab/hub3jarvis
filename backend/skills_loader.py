@@ -7,7 +7,17 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import re
 
-SKILLS_DIR = Path(__file__).resolve().parent.parent.parent / "knowledge" / "ruflo-agents" / "skills"
+def _localizar_pasta_skills() -> Path:
+    """Localiza knowledge/ruflo-agents/skills subindo a partir de backend/."""
+    alvo = Path(__file__).resolve().parent
+    for _ in range(6):
+        candidato = alvo / "knowledge" / "ruflo-agents" / "skills"
+        if candidato.is_dir():
+            return candidato
+        alvo = alvo.parent
+    return alvo / "knowledge" / "ruflo-agents" / "skills"
+
+SKILLS_DIR = _localizar_pasta_skills()
 MAX_SKILL_CHARS = 15000  # limite de seguranca para nao estourar o contexto do modelo
 
 _cache: Dict[str, dict] = {}
