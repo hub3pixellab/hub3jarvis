@@ -3517,6 +3517,7 @@ export type Database = {
           gender: string | null
           id: string
           locale: string
+          location: string | null
           phone: string | null
           sexuality: string | null
           social_visible: boolean
@@ -3532,6 +3533,7 @@ export type Database = {
           gender?: string | null
           id: string
           locale?: string
+          location?: string | null
           phone?: string | null
           sexuality?: string | null
           social_visible?: boolean
@@ -3547,6 +3549,7 @@ export type Database = {
           gender?: string | null
           id?: string
           locale?: string
+          location?: string | null
           phone?: string | null
           sexuality?: string | null
           social_visible?: boolean

@@ -17,6 +17,11 @@ export interface PublicMember {
   is_following?: boolean;
   /** Se há match (follow mútuo) entre o usuário logado e o membro. */
   matched?: boolean;
+  gender?: string | null;
+  sexuality?: string | null;
+  location?: string | null;
+  /** Idade calculada a partir da data de nascimento. */
+  age?: number | null;
 }
 
 /** Item da lista de membros públicos. */
@@ -29,6 +34,10 @@ export interface PublicMemberRow {
   followers: number;
   following: number;
   is_following: boolean;
+  gender: string | null;
+  sexuality: string | null;
+  location: string | null;
+  age: number | null;
 }
 
 /** Meus números e visibilidade na rede. */

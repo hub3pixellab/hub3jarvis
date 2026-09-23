@@ -2,8 +2,10 @@ import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
+  CalendarDays,
   Check,
   Lock,
+  MapPin,
   MessageCircle,
   MessagesSquare,
   Share2,
@@ -134,6 +136,37 @@ export default function MemberProfilePage() {
                     {t("social.following", { count: member.following ?? 0 })}
                   </span>
                 </div>
+
+                {/* Idade, localidade, gênero e sexualidade (informações liberadas) */}
+                {(member.age != null ||
+                  member.location ||
+                  member.gender ||
+                  member.sexuality) && (
+                  <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:justify-start">
+                    {member.age != null && (
+                      <span className="inline-flex items-center gap-1.5 font-jost text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                        <CalendarDays className="h-3 w-3 text-gold/60" strokeWidth={1.5} />
+                        {t("profile.ageValue", { count: member.age })}
+                      </span>
+                    )}
+                    {member.location && (
+                      <span className="inline-flex items-center gap-1.5 font-jost text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                        <MapPin className="h-3 w-3 text-gold/60" strokeWidth={1.5} />
+                        {member.location}
+                      </span>
+                    )}
+                    {member.gender && (
+                      <span className="font-jost text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                        {t(`profile.gender.${member.gender}`)}
+                      </span>
+                    )}
+                    {member.sexuality && (
+                      <span className="font-jost text-[10px] uppercase tracking-[0.2em] text-cream/45">
+                        {t(`profile.sexuality.${member.sexuality}`)}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

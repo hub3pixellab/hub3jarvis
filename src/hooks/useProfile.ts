@@ -33,6 +33,7 @@ export function useUpdateProfile() {
           | "phone"
           | "gender"
           | "sexuality"
+          | "location"
         >
       >;
     }) => upsertProfile(userId, patch),
