@@ -19,6 +19,7 @@ import { useUpdateProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/auth-context";
 import { getZodiacSign } from "@/lib/zodiac";
 import { getChineseZodiacSign } from "@/lib/chineseZodiac";
+import { computeAge } from "@/lib/age";
 import { normalizePhone } from "@/lib/whatsapp";
 import { languageOptions } from "@/i18n/config";
 import type { Profile } from "@/domain/models";
@@ -37,6 +38,7 @@ const profileSchema = z.object({
     .or(z.literal("")),
   gender: z.string().optional().or(z.literal("")),
   sexuality: z.string().optional().or(z.literal("")),
+  location: z.string().trim().max(80).optional().or(z.literal("")),
   locale: z.string(),
 });
 
@@ -75,6 +77,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         phone: profile?.phone ?? "",
         gender: profile?.gender ?? "",
         sexuality: profile?.sexuality ?? "",
+        location: profile?.location ?? "",
         locale: profile?.locale ?? i18n.resolvedLanguage ?? "pt-BR",
       },
     });
@@ -82,6 +85,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   const birthDate = watch("birth_date");
   const derivedZodiac = getZodiacSign(birthDate || null);
   const derivedChineseZodiac = getChineseZodiacSign(birthDate || null);
+  const age = computeAge(birthDate || null);
 
   const onSubmit = async (values: ProfileValues) => {
     if (!user) return;
@@ -95,6 +99,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           phone: values.phone ? normalizePhone(values.phone) : null,
           gender: values.gender || null,
           sexuality: values.sexuality || null,
+          location: values.location || null,
           locale: values.locale,
         },
       });
@@ -173,6 +178,27 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           ) : (
             <p className="text-[11px] text-cream/45">{t("profile.phoneHint")}</p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="location">{t("profile.locationLabel")}</Label>
+          <Input
+            id="location"
+            placeholder={t("profile.locationPlaceholder")}
+            className="border-gold/25 bg-navy/60 text-cream placeholder:text-cream/35 focus:border-gold"
+            {...register("location")}
+          />
+          <p className="text-[11px] text-cream/45">{t("profile.locationHint")}</p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label>{t("profile.ageLabel")}</Label>
+          <div className="flex min-h-10 items-center rounded-md border border-gold/15 bg-navy/40 px-3 font-cinzel text-lg text-gold-gradient">
+            {age !== null
+              ? t("profile.ageValue", { count: age })
+              : t("profile.zodiacUnknown")}
+          </div>
+          <p className="text-[11px] text-cream/45">{t("profile.ageHint")}</p>
         </div>
 
         <div className="flex flex-col gap-2">

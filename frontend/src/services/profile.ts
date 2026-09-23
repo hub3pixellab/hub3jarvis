@@ -28,6 +28,7 @@ export async function upsertProfile(
       | "phone"
       | "gender"
       | "sexuality"
+      | "location"
     >
   >,
 ): Promise<Profile> {

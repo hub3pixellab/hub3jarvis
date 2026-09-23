@@ -1,4 +1,3 @@
-
 # Code Guideline
 
 ## Project Structure Overview

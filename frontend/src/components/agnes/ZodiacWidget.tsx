@@ -10,6 +10,7 @@ import {
 } from "@/lib/chineseZodiacData";
 import SignHoroscopeDialog from "@/components/agnes/SignHoroscopeDialog";
 import ChineseZodiacDialog from "@/components/agnes/ChineseZodiacDialog";
+import SignMatchCard from "@/components/agnes/SignMatchCard";
 
 interface ZodiacWidgetProps {
   /** Destino do CTA de consulta completa. Padrão: âncora dos planos. */
@@ -162,6 +163,11 @@ const ZodiacWidget = ({
               </span>
             </button>
           ))}
+        </div>
+
+        {/* Combinação dos signos (card espelho, presente em todas as páginas) */}
+        <div className="mt-16">
+          <SignMatchCard id={`${id}-match`} />
         </div>
       </div>
 

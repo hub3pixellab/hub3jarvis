@@ -27,6 +27,8 @@ export interface Profile {
   gender: string | null;
   /** Sexualidade declarada: heterossexual, homossexual, bissexual, pansexual, assexual, queer, outro. */
   sexuality: string | null;
+  /** Localidade (cidade/região) informada pelo usuário. */
+  location: string | null;
   /** Se o perfil está visível para outros membros na rede social. */
   social_visible: boolean;
   created_at: string;

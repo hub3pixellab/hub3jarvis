@@ -1,0 +1,88 @@
+-- Localidade no perfil (mesmo negócio, coluna aditiva nula)
+alter table public.profiles add column if not exists location text;
+
+-- Lista de membros públicos: inclui gênero, sexualidade, localidade e idade
+create or replace function public.list_public_members()
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_result jsonb;
+begin
+  select coalesce(jsonb_agg(row_to_jsonb(t) order by t.display_name), '[]'::jsonb)
+  into v_result
+  from (
+    select
+      p.id,
+      p.display_name,
+      p.bio,
+      p.zodiac_sign,
+      p.avatar_url,
+      p.gender,
+      p.sexuality,
+      p.location,
+      case when p.birth_date is not null
+           then date_part('year', age(p.birth_date))::int
+           else null end as age,
+      (select count(*) from public.follows f where f.following_id = p.id) as followers,
+      (select count(*) from public.follows f where f.follower_id = p.id) as following,
+      exists(select 1 from public.follows f where f.follower_id = auth.uid() and f.following_id = p.id) as is_following
+    from public.profiles p
+    where p.social_visible = true and p.id <> auth.uid()
+  ) t;
+  return v_result;
+end;
+$$;
+
+revoke execute on function public.list_public_members() from public, anon;
+grant execute on function public.list_public_members() to authenticated;
+
+-- Perfil público de um membro: inclui gênero, sexualidade, localidade e idade
+create or replace function public.get_public_member(p_user_id uuid)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_profile public.profiles%rowtype;
+  v_followers bigint;
+  v_following bigint;
+  v_self boolean := auth.uid() = p_user_id;
+begin
+  select * into v_profile from public.profiles where id = p_user_id;
+  if not found then
+    return jsonb_build_object('found', false);
+  end if;
+  if not v_profile.social_visible and not v_self then
+    return jsonb_build_object('found', true, 'hidden', true);
+  end if;
+  select count(*) into v_followers from public.follows where following_id = p_user_id;
+  select count(*) into v_following from public.follows where follower_id = p_user_id;
+  return jsonb_build_object(
+    'found', true,
+    'hidden', false,
+    'is_self', v_self,
+    'id', v_profile.id,
+    'display_name', v_profile.display_name,
+    'bio', v_profile.bio,
+    'zodiac_sign', v_profile.zodiac_sign,
+    'avatar_url', v_profile.avatar_url,
+    'gender', v_profile.gender,
+    'sexuality', v_profile.sexuality,
+    'location', v_profile.location,
+    'age', case when v_profile.birth_date is not null
+                then date_part('year', age(v_profile.birth_date))::int
+                else null end,
+    'birth_date', case when v_self then v_profile.birth_date else null end,
+    'social_visible', v_profile.social_visible,
+    'followers', v_followers,
+    'following', v_following,
+    'is_following', case when v_self then false else exists(select 1 from public.follows where follower_id = auth.uid() and following_id = p_user_id) end,
+    'matched', case when v_self then false else public.is_matched(auth.uid(), p_user_id) end
+  );
+end;
+$$;
+
+revoke execute on function public.get_public_member(uuid) from public, anon;
+grant execute on function public.get_public_member(uuid) to authenticated;

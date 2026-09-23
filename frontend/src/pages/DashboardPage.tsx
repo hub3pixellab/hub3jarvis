@@ -5,6 +5,7 @@ import { EntitlementsCard } from "@/components/dashboard/EntitlementsCard";
 import { WhatsAppConnect } from "@/components/dashboard/WhatsAppConnect";
 import { PurchasesCard } from "@/components/dashboard/PurchasesCard";
 import { SubscriptionCard } from "@/components/dashboard/SubscriptionCard";
+import SignMatchCard from "@/components/agnes/SignMatchCard";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -23,6 +24,9 @@ export default function DashboardPage() {
       {/* O horóscopo do dia fica nos ícones de signo (ocidental e chinês)
           dentro do cartão de identidade — não na visão geral. */}
       <IdentityCard />
+
+      {/* Combinação dos signos (leitura grátis + sinastria completa do plano) */}
+      <SignMatchCard id="combinacao" />
 
       <AnalysesTeaser />
 
