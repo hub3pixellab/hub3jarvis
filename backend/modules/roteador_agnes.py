@@ -37,6 +37,14 @@ async def responder(mensagem, temperature=0.8):
     try:
         from modules.groq_chat import groq_chat
         r = await groq_chat.chat(mensagem, temperature=temperature, max_tokens=3000)
+        # >>> FALLBACK: Groq retorna dict de erro (nao excecao) -> usa Gemini
+        if isinstance(r, dict) and (
+            str(r.get("provider", "")).lower() == "error"
+            or str(r.get("resposta", "")).startswith("Erro:")
+        ):
+            from modules.gemini_chat import chat as gemini_fallback
+            r = gemini_fallback(mensagem, temperature=temperature, max_tokens=2000)
+        # <<< FIM FALLBACK
     except Exception:
         r = {}
 
