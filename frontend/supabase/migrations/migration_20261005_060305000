@@ -1,0 +1,19 @@
+-- Cache do horóscopo do dia (signo + idioma + data) — mesma fonte: Mestre Agnes.
+-- Acesso apenas pela função de backend (service role).
+create table if not exists public.daily_horoscopes (
+  sign text not null,
+  lang text not null,
+  day date not null,
+  essence text,
+  panorama text,
+  love text,
+  career text,
+  advice text,
+  lucky_numbers jsonb not null default '[]'::jsonb,
+  lucky_color text,
+  created_at timestamptz not null default now(),
+  primary key (sign, lang, day)
+);
+
+alter table public.daily_horoscopes enable row level security;
+-- Sem políticas para clientes: somente a função de backend (service role) acessa.

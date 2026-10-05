@@ -636,5 +636,14 @@
   "profile.locationHint": "Cidade/região que aparece na tua página da rede.",
   "profile.ageLabel": "Idade",
   "profile.ageValue": "{{count}} anos",
-  "profile.ageHint": "Calculada automaticamente pela tua data de nascimento."
+  "profile.ageHint": "Calculada automaticamente pela tua data de nascimento.",
+  "zodiacWidget.readingLoading": "O Mestre Agnes está a ler o teu dia...",
+  "zodiacWidget.colorLabel": "Cor do dia",
+  "zodiacWidget.byMaster": "Mestre Agnes",
+  "zodiacWidget.updatedBy": "Atualizado por Mestre Agnes",
+  "zodiacWidget.shareText": "{{sign}} — horóscopo de hoje no Mestre Agnes",
+  "checkout.successTitle": "Pagamento confirmado!",
+  "checkout.successDesc": "O teu plano foi libertado. Acede à área de membros para ver as análises.",
+  "checkout.errorTitle": "Não conseguimos confirmar o pagamento",
+  "checkout.errorDesc": "Se o valor foi pago, os teus direitos serão libertados em instantes."
 }

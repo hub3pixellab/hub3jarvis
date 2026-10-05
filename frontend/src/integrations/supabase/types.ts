@@ -3426,6 +3426,48 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_horoscopes: {
+        Row: {
+          advice: string | null
+          career: string | null
+          created_at: string
+          day: string
+          essence: string | null
+          lang: string
+          love: string | null
+          lucky_color: string | null
+          lucky_numbers: Json
+          panorama: string | null
+          sign: string
+        }
+        Insert: {
+          advice?: string | null
+          career?: string | null
+          created_at?: string
+          day: string
+          essence?: string | null
+          lang: string
+          love?: string | null
+          lucky_color?: string | null
+          lucky_numbers?: Json
+          panorama?: string | null
+          sign: string
+        }
+        Update: {
+          advice?: string | null
+          career?: string | null
+          created_at?: string
+          day?: string
+          essence?: string | null
+          lang?: string
+          love?: string | null
+          lucky_color?: string | null
+          lucky_numbers?: Json
+          panorama?: string | null
+          sign?: string
+        }
+        Relationships: []
+      }
       delivered_analyses: {
         Row: {
           analysis_key: string
@@ -3813,7 +3855,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_20: {
+      messages_2026_10_02: {
         Row: {
           event: string | null
           extension: string
@@ -3846,7 +3888,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_21: {
+      messages_2026_10_03: {
         Row: {
           event: string | null
           extension: string
@@ -3879,7 +3921,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_22: {
+      messages_2026_10_04: {
         Row: {
           event: string | null
           extension: string
@@ -3912,7 +3954,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_23: {
+      messages_2026_10_05: {
         Row: {
           event: string | null
           extension: string
@@ -3945,7 +3987,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_24: {
+      messages_2026_10_06: {
         Row: {
           event: string | null
           extension: string
@@ -3978,7 +4020,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_25: {
+      messages_2026_10_07: {
         Row: {
           event: string | null
           extension: string
@@ -4011,7 +4053,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_09_26: {
+      messages_2026_10_08: {
         Row: {
           event: string | null
           extension: string
