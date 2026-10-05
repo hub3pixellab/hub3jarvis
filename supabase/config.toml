@@ -15,3 +15,8 @@ verify_jwt = false
 # par+idioma, então a IA só gera cada combinação uma única vez.
 [functions.sign-match]
 verify_jwt = false
+
+# daily-horoscope é público: alimenta os cards/pop-ups de horóscopo (inclusive
+# no widget de marketing). Fonte: Mestre Agnes, cacheado por signo+idioma+dia.
+[functions.daily-horoscope]
+verify_jwt = false

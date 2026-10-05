@@ -636,5 +636,14 @@
   "profile.locationHint": "Città/regione mostrata nella tua pagina della rete.",
   "profile.ageLabel": "Età",
   "profile.ageValue": "{{count}} anni",
-  "profile.ageHint": "Calcolata automaticamente dalla tua data di nascita."
+  "profile.ageHint": "Calcolata automaticamente dalla tua data di nascita.",
+  "zodiacWidget.readingLoading": "Il Maestro Agnes sta leggendo la tua giornata...",
+  "zodiacWidget.colorLabel": "Colore del giorno",
+  "zodiacWidget.byMaster": "Maestro Agnes",
+  "zodiacWidget.updatedBy": "Aggiornato dal Maestro Agnes",
+  "zodiacWidget.shareText": "{{sign}} — l'oroscopo di oggi su Maestro Agnes",
+  "checkout.successTitle": "Pagamento confermato!",
+  "checkout.successDesc": "Il tuo piano è sbloccato. Apri l'area membri per vedere le analisi.",
+  "checkout.errorTitle": "Non siamo riusciti a confermare il pagamento",
+  "checkout.errorDesc": "Se il pagamento è andato a buon fine, i tuoi accessi saranno sbloccati a breve."
 }

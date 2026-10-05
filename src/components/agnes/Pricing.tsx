@@ -55,7 +55,7 @@ const Pricing = () => {
         {
           body: {
             productId: plan.productId,
-            successUrl: `${window.location.origin}/#pagamento?status=success`,
+            successUrl: `${window.location.origin}/?status=success&session_id={CHECKOUT_SESSION_ID}`,
             cancelUrl: `${window.location.origin}/#pagamento`,
           },
         },
