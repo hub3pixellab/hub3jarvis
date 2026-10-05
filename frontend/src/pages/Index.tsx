@@ -5,14 +5,10 @@ import Services from "@/components/agnes/Services";
 import Pricing from "@/components/agnes/Pricing";
 import Faq from "@/components/agnes/Faq";
 import Footer from "@/components/agnes/Footer";
-import { CheckoutReturn } from "@/components/agnes/CheckoutReturn";
 
 const Index = () => {
   return (
     <main className="relative min-h-screen w-full bg-background text-foreground">
-      {/* Confirma a compra ao voltar do checkout do Stripe */}
-      <CheckoutReturn />
-
       <Navbar />
       <Hero />
 

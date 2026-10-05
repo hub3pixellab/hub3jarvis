@@ -1,4 +1,7 @@
-# Code Guideline
+git status
+git add .
+git commit -m "feat: atualizar Mestre Agnes"
+git push origin main# Code Guideline
 
 ## Project Structure Overview
 

@@ -636,14 +636,5 @@
   "profile.locationHint": "City/region shown on your network page.",
   "profile.ageLabel": "Age",
   "profile.ageValue": "{{count}} years old",
-  "profile.ageHint": "Calculated automatically from your date of birth.",
-  "zodiacWidget.readingLoading": "Master Agnes is reading your day...",
-  "zodiacWidget.colorLabel": "Color of the day",
-  "zodiacWidget.byMaster": "Master Agnes",
-  "zodiacWidget.updatedBy": "Updated by Master Agnes",
-  "zodiacWidget.shareText": "{{sign}} — today's horoscope on Master Agnes",
-  "checkout.successTitle": "Payment confirmed!",
-  "checkout.successDesc": "Your plan is unlocked. Open the members area to see your readings.",
-  "checkout.errorTitle": "We couldn't confirm the payment",
-  "checkout.errorDesc": "If the payment went through, your access will be unlocked shortly."
+  "profile.ageHint": "Calculated automatically from your date of birth."
 }
